@@ -69,14 +69,29 @@ implement and will likely require additional research to figure out.
  - 
 
 ## Use Cases (Functional Requirements)
-### Use Case 1
+### Use Case 1 (Filtering)
 1. Actors
+   - Primary Actor: User
 2. Triggers
+   - The user clicks on a filter(s)
 3. Preconditions
+   - User is currently on swiping page to find new partners
+   - Filters exist and are visible to the user
 4. Postconditions (success scenario)
+   - System filters out other users that don’t match the primary user’s specification and updates to display a list composed only of possible matches
 5. List of Steps (success scenario)
+   1. The user navigates to the swipe page to look for new partners
+   2. The user clicks their desired filter(s)
+   3. The system presents the updated partner list with only the desired potential matches in view
 6. Extensions/Variations of the Success Scenario
+   - Generates a minimum number of closest matches if there are no users in the database that match the user's specification
+   - Rotates the list of matches so the user doesn’t see the same group of matches for a certain filter specification
+   - Create a clear all filters button that resets all filters
+   - Multiple types of filters (binary, range)
 7. Exceptions: Failure Conditions and Scenarios
+   - If the user becomes unauthenticated (session expires), they are asked to login again
+   - If no matches are found, user notified and asked to modify/clear filters and try again or be shown the closest possible matches
+   - If there is a frontend (UI) or backend (server) failure, the system will attempt to resend the request
 ### Use Case 2
 1. Actors
 2. Triggers
