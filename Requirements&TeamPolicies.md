@@ -92,14 +92,37 @@ implement and will likely require additional research to figure out.
    - If the user becomes unauthenticated (session expires), they are asked to login again
    - If no matches are found, user notified and asked to modify/clear filters and try again or be shown the closest possible matches
    - If there is a frontend (UI) or backend (server) failure, the system will attempt to resend the request
-### Use Case 2
+### Use Case 2 (Editing Profile Information)
 1. Actors
+  	- Primary actor: User (with an existing account)
 2. Triggers
+  	- User opens app
 3. Preconditions
+  	- User has an existing profile
+ 	 - User is currently authenticated/signed in to the app
 4. Postconditions (success scenario)
-5. List of Steps (success scenario)
-6. Extensions/Variations of the Success Scenario
-7. Exceptions: Failure Conditions and Scenarios
+   - User's updated information is reflected in their profile page
+      - For the user themselves
+      - For users that interact with the user's profile
+5. List of steps (success scenario)
+ 	 1. User navigates to profile page
+	  2. User selects 'edit'
+ 	 3. User is presented editable profile info fields
+  	4. User inputs updated profile info
+	  5. User saves changes
+	  6. System confirms changes (informing the user of success), navigates back to profile page
+6. Extensions/variations of the success scenario
+   - User chooses to edit profile image(s)
+      - User can select images from camera roll
+7. Exceptions: failure conditions and scenarios  
+   - User wants to edit profile image(s), but app does not have camera roll permissions
+      - If the app has not previously asked for camera roll permissions, user is presented with option to enable camera roll permissions
+      - If user has denied permissions, display a message directing them to change their settings, then return to editing page
+   - User exits app without saving profile changes
+      - Changes are lost, not updated on system
+   - Backend failure prevents saving of changes
+      - System informs user of save issue, presents option to retry or exit without saving
+      - User can keep retrying, or exit back to profile page with no changes made
 ### Use Case 3
 1. Actors
 2. Triggers
