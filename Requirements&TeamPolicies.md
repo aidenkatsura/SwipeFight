@@ -2,12 +2,12 @@
 
 ## Team Info
 ### Members and Roles
- - Aiden =>
- - Brian =>
- - Calvin =>
- - Josh =>
- - Sam =>
- - Yashveer =>
+ - Aiden => Project Coordinator
+ - Brian => Main Tester
+ - Calvin => Lead Designer
+ - Josh => Product Manager
+ - Sam => 
+ - Yashveer => 
 
 ### Relevant Links
  - Repository: https://github.com/aidenkatsura/SwipeFight
@@ -66,7 +66,7 @@ implement and will likely require additional research to figure out.
 
 ### Stretch Goals
  - __Live Chat__
- - 
+ - __Monetization (Reswipe)__
 
 ## Use Cases (Functional Requirements)
 ### Use Case 1 (Filtering)
@@ -123,7 +123,7 @@ implement and will likely require additional research to figure out.
    - Backend failure prevents saving of changes
       - System informs user of save issue, presents option to retry or exit without saving
       - User can keep retrying, or exit back to profile page with no changes made
-### Use Case 3
+### Use Case 3 (Initial Profile Setup)
 1. Actors
 2. Triggers
 3. Preconditions
@@ -131,7 +131,7 @@ implement and will likely require additional research to figure out.
 5. List of Steps (success scenario)
 6. Extensions/Variations of the Success Scenario
 7. Exceptions: Failure Conditions and Scenarios
-### Use Case 4
+### Use Case 4 (Swiping)
 1. Actors
 2. Triggers
 3. Preconditions
@@ -156,9 +156,12 @@ implement and will likely require additional research to figure out.
 6. Extensions/Variations of the Success Scenario
 7. Exceptions: Failure Conditions and Scenarios
 ## Non-Functional Requirements
- -
- -
- -
+ - __Scalability__
+   - Handle a growing userbase
+ - __Security__
+   - Users should have username and password protected accounts
+ - __Third Case__
+   - Add
 ## External Requirements
 
 ## Team Process Description
