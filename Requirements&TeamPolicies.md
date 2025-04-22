@@ -1,13 +1,21 @@
 # Requirements & Team Policies
 
 ## Team Info
-### Members and Roles
+### Members and Roles (with Justification)
  - Aiden => Project Coordinator
+   - Organized with deadlines and understanding responsibilities of project and assignments
  - Brian => Main Tester
+   - Experience in developing, testing and debugging mobile apps
  - Calvin => Lead Designer
+   - Experience in Figma, Canva and other visual designing software
  - Josh => Product Manager
- - Sam => 
- - Yashveer => 
+   - Creative
+   - Able to see the bigger picture of projects
+   - Currently taking the product management course
+ - Sam => Co-lead Developer (Front-end)
+   - Experience with similar cross-platform mobile framework (Flutter)
+ - Yashveer => Co-lead Developer (Back-end)
+   - Experience with backend web development (331)
 
 ### Relevant Links
  - Repository: https://github.com/aidenkatsura/SwipeFight
