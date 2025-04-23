@@ -318,8 +318,8 @@ implement and will likely require additional research to figure out.
      - Sam: Assist in final debugging, ensure all front-end features are responsive
      - Yashveer: Deploy final backend to production environment and test live connections
  - Risks
-   1. Insufficient sample size (no matches will show)
-   2. Implementing geographic matching algorithm
-   3. Being too ambitious (trying to implement too many features/feature creep)
+   1. Potential learning curve with new technologies. Our choice of tech stack involves technologies that are new or unfamiliar to many group members (e.g., React Native), so it will be important to adapt to potential struggles.
+   2. Difficulty in implementing the matching algorithm, specifically when it comes to the complexity of geographic/location-based matching.
+   3. Being too ambitious given the limited timeframe of the project (trying to implement strech goals like user rating too early, implementing too many features/feature creep)
  - Describe at what point in your process external feedback will be most useful and how you will get that feedback
    - After implementing each feature, we should have outside members test our app and give feedback on bugs, unintuitive UX or app interactions, or any additional desired changes
