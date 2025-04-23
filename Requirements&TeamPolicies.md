@@ -115,7 +115,7 @@ implement and will likely require additional research to figure out.
 1. Actors
    - Primary actor: User (with an existing account)
 2. Triggers
-   - User opens app
+   - User selects 'edit' on profile page
 3. Preconditions
    - User has an existing profile
    - User is currently authenticated/signed in to the app
@@ -164,8 +164,8 @@ implement and will likely require additional research to figure out.
    - User can select images from their camera roll
 7. Exceptions: Failure Conditions and Scenarios
    - User wants to choose profile image(s), but app does not have camera roll permissions
-   - If the app has not previously asked for camera roll permissions, user is presented with the option to enable camera roll permissions
-   - If the user has denied permissions, display a message directing them to change their settings, then return to editing page
+      - If the app has not previously asked for camera roll permissions, user is presented with the option to enable camera roll permissions
+      - If the user has denied permissions, display a message directing them to change their settings, then return to editing page
    - User exits app without saving profile changes
      - Changes are lost, not updated on system
    - Backend failure prevents saving of changes
