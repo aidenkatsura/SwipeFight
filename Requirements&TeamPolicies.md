@@ -242,11 +242,47 @@ implement and will likely require additional research to figure out.
    - Detection of failed message sent, prompting users to retry
 ## Non-Functional Requirements
  - __Scalability__
-   - Handle a growing userbase
+   - Handle a growing userbase as well as a limited userbase
+ - __Usability__
+   - The app must run smoothly with a clean UI/UX and have clear/simple usability or tutorials
  - __Security__
    - Users should have username and password protected accounts
- - __Third Case__
-   - Add
 ## External Requirements
-
+ - Robustness against errors
+   - Detailed in exceptions section of **_Use Cases_**
+ - Product must be installable by user
+   - Prerequisites
+      - Clone repo (https://github.com/aidenkatsura/SwipeFight)
+      - Install the Expo Go app and make an account
+      - Have npm/Node.js installed in terminal
+   - In terminal, run
+     ```
+     npm install
+     npx expo start
+     ```
+   - Scan the generated QR code with the camera app which will open SwipeFight in Expo Go
+ - Software should be buildable
+   - See above
+ - Scope
+   - Approved by teaching staff
 ## Team Process Description
+ - Specify and justify the software toolset you will use
+   - Typescript: Familiar language and used for app development
+   - React-Native: Embedded integration for iOS, Android and web apps
+   - Firebase: Extremely easy to integrate, free to use
+ - Define and justify each team member’s role
+   - See **_Members and Roles (with Justification)_** at top of document
+ - Provide a schedule for each member (or sub-group) with a measurable, concrete milestone for each week
+   - __4/22 - 4/29__
+     - Aiden: Write report for the week, assist in front-end development
+     - Brian: Test front-end and communicate potential changes to team
+     - Calvin: Create design of profile page
+     - Josh: Make changes to existing skeleton for front-end to eliminate bugs
+     - Sam: Assist in front-end development
+     - Yashveer: Make changes to existing skeleton for front-end to eliminate bugs
+ - Specify and explain at least three major risks that could prevent you from completing your project
+   1. Insufficient sample size (no matches will show)
+   2. Implementing geographic matching algorithm
+   3. Being too ambitious (trying to implement too many features/feature creep)
+ - Describe at what point in your process external feedback will be most useful and how you will get that feedback
+   - After implementing each feature, we should have outside members test our app and give feedback on bugs, unintuitive UX or app interactions, or any additional desired changes
