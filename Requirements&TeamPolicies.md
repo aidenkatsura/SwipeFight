@@ -266,13 +266,13 @@ implement and will likely require additional research to figure out.
  - Scope
    - Approved by teaching staff
 ## Team Process Description
- - Specify and justify the software toolset you will use
+ - Software toolset
    - Typescript: Familiar language and used for app development
    - React-Native: Embedded integration for iOS, Android and web apps
    - Firebase: Extremely easy to integrate, free to use
- - Define and justify each team member’s role
+ - Member roles
    - See **_Members and Roles (with Justification)_** at top of document
- - Provide a schedule for each member (or sub-group) with a measurable, concrete milestone for each week
+ - Schedule
    - __4/22 - 4/29__
      - Aiden: Write report for the week, assist in front-end development
      - Brian: Test front-end and communicate potential changes to team
@@ -280,7 +280,42 @@ implement and will likely require additional research to figure out.
      - Josh: Make changes to existing skeleton for front-end to eliminate bugs
      - Sam: Assist in front-end development
      - Yashveer: Make changes to existing skeleton for front-end to eliminate bugs
- - Specify and explain at least three major risks that could prevent you from completing your project
+   - __4/29 - 5/6__
+     - Aiden: Draft full MVP feature list and outline risk mitigation plan
+     - Brian: Begin testing profile page design and live chat prototype (if available)
+     - Calvin: Finalize profile page design, start swipe card designs (match cards, animations)
+     - Josh: Implement initial location filter functionality in front-end
+     - Sam: Develop basic swiping interface (left/right swipe functionality, card rendering)
+     - Yashveer: Set up backend for user profile creation and location-based filtering endpoint
+   - __5/6 - 5/13__
+     - Aiden: Write weekly report, assist on bug fixes and front-end support
+     - Brian: Test swiping functionality and provide feedback on animations/UX
+     - Calvin: Finalize swipe card designs, begin live chat UI mockups
+     - Josh: Implement swiping animations and integrate with backend endpoint
+     - Sam: Connect swiping interface with location filtering logic
+     - Yashveer: Build backend logic for swipe matching and match storage
+   - __5/13 - 5/20__
+     - Aiden: Draft preliminary user testing survey/questions, gather early feedback
+     - Brian: Test live chat UI and backend message sending functionality
+     - Calvin: Complete live chat UI design, adjust based on early feedback
+     - Josh: Integrate live chat front-end with backend sockets
+     - Sam: Polish swiping and matching UX, handle edge cases (no matches, bad location, etc.)
+     - Yashveer: Set up chat backend using Socket.io and connect to front-end
+   - __5/20 - 5/27__
+     - Aiden: Collect and summarize user feedback from testing sessions
+     - Brian: Test profile editing functionality and swiping + chat interactions
+     - Calvin: Polish final UI elements and animations
+     - Josh: Implement error handling and UI notifications for swipe/chat failures
+     - Sam: Optimize front-end performance and fix outstanding bugs
+     - Yashveer: Finalize backend database structure and API endpoints for launch
+   - __5/27 - 6/3__
+     - Aiden: Write final report, compile project documentation
+     - Brian: Final system testing and compile final test cases
+     - Calvin: Finalize UI design adjustments based on last feedback round
+     - Josh: Final code cleanup and confirm full app functionality
+     - Sam: Assist in final debugging, ensure all front-end features are responsive
+     - Yashveer: Deploy final backend to production environment and test live connections
+ - Risks
    1. Insufficient sample size (no matches will show)
    2. Implementing geographic matching algorithm
    3. Being too ambitious (trying to implement too many features/feature creep)
