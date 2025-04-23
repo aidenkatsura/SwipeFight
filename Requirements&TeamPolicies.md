@@ -242,7 +242,8 @@ implement and will likely require additional research to figure out.
    - Detection of failed message sent, prompting users to retry
 ## Non-Functional Requirements
  - __Scalability__
-   - Handle a growing userbase as well as a limited userbase
+   - Handle a growing userbase with stress testing
+   - Handle a limited userbase in terms of available partners
  - __Usability__
    - The app must run smoothly with a clean UI/UX and have clear/simple usability or tutorials
  - __Security__
@@ -270,6 +271,7 @@ implement and will likely require additional research to figure out.
    - Typescript: Familiar language and used for app development
    - React-Native: Embedded integration for iOS, Android and web apps
    - Firebase: Extremely easy to integrate, free to use
+   - Socket.io: Useful for real-time chatting, abstracts a lot of implementation
  - Member roles
    - See **_Members and Roles (with Justification)_** at top of document
  - Schedule
