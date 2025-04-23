@@ -113,23 +113,23 @@ implement and will likely require additional research to figure out.
    - If there is a frontend (UI) or backend (server) failure, the system will attempt to resend the request
 ### Use Case 2 (Editing Profile Information)
 1. Actors
-  	- Primary actor: User (with an existing account)
+   - Primary actor: User (with an existing account)
 2. Triggers
-  	- User opens app
+   - User opens app
 3. Preconditions
-  	- User has an existing profile
- 	 - User is currently authenticated/signed in to the app
+   - User has an existing profile
+   - User is currently authenticated/signed in to the app
 4. Postconditions (success scenario)
    - User's updated information is reflected in their profile page
       - For the user themselves
       - For users that interact with the user's profile
 5. List of steps (success scenario)
- 	 1. User navigates to profile page
-	  2. User selects 'edit'
- 	 3. User is presented editable profile info fields
-  	4. User inputs updated profile info
-	  5. User saves changes
-	  6. System confirms changes (informing the user of success), navigates back to profile page
+   1. User navigates to profile page
+   2. User selects 'edit'
+   3. User is presented editable profile info fields
+   4. User inputs updated profile info
+   5. User saves changes
+   6. System confirms changes (informing the user of success), navigates back to profile page
 6. Extensions/variations of the success scenario
    - User chooses to edit profile image(s)
       - User can select images from camera roll
@@ -144,20 +144,59 @@ implement and will likely require additional research to figure out.
       - User can keep retrying, or exit back to profile page with no changes made
 ### Use Case 3 (Initial Profile Setup)
 1. Actors
+   - Primary Actor: User (without an account)
 2. Triggers
+   - User opens the app for the first time
 3. Preconditions
+   - User does not have an account
 4. Postconditions (success scenario)
+   - User's information is reflected in their profile page
+      - For the user themselves
+      - For users that interact with the user's profile
 5. List of Steps (success scenario)
+   1. User opens app
+   2. User selects sign up option
+   3. User is presented profile fields
+   4. User inputs information (email, password)
+   5. User creates account
+   6. System confirms account creation (informing the user of success), opens home
 6. Extensions/Variations of the Success Scenario
+   - User can select images from their camera roll
 7. Exceptions: Failure Conditions and Scenarios
+   - User wants to choose profile image(s), but app does not have camera roll permissions
+   - If the app has not previously asked for camera roll permissions, user is presented with the option to enable camera roll permissions
+   - If the user has denied permissions, display a message directing them to change their settings, then return to editing page
+   - User exits app without saving profile changes
+     - Changes are lost, not updated on system
+   - Backend failure prevents saving of changes
+     - System informs user of save issue, presents option to retry or exit without saving
+     - User can keep retrying or exit back to the profile page with no changes made
+   - User inputs banned phrase
+     - System informs user of use and prevents account creation
 ### Use Case 4 (Swiping)
 1. Actors
+   - Primary Actor: User
 2. Triggers
+   - The user swipes left or right on a potential sparring partner
 3. Preconditions
+   - User’s account is set up
+   - User is on the home/swiping page
+   - User has swipes remaining
 4. Postconditions (success scenario)
+   - If swiped right and other user previously swiped right: The users are matched and a live chat is created in the chats page
+   - If swiped right and other user has not seen: Your profile should show up in the challengers page of the other user
+   - If swiped left: The potential match will go away and will be replaced by a new partner
+     - They will not appear on your page again for a while
 5. List of Steps (success scenario)
+   1. The user swipes right or left on another user
+   2. The correct behavior as expressed by _Postconditions_ occurs
 6. Extensions/Variations of the Success Scenario
+   - If there are no more matches to show, there should be a screen that indicates this
+   - There should be some animation to indicate a match and differentiate from a “like” when they have not swiped on you yet
 7. Exceptions: Failure Conditions and Scenarios
+   - If the user becomes unauthenticated (session expires), they are asked to login again
+   - If the app is closed, the same person should be on the screen
+   - If a decision is rolled back (undo button), the result of the first swipe must be reversible
 ### Use Case 5
 1. Actors
 2. Triggers
