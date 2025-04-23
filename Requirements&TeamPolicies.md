@@ -197,22 +197,49 @@ implement and will likely require additional research to figure out.
    - If the user becomes unauthenticated (session expires), they are asked to login again
    - If the app is closed, the same person should be on the screen
    - If a decision is rolled back (undo button), the result of the first swipe must be reversible
-### Use Case 5
+### Use Case 5 (Changing Location)
 1. Actors
+   - Primary Actor: User
 2. Triggers
+   - When a user clicks on the location edit button on the swiping screen, which acts as a filter for user cards
 3. Preconditions
+   - User is currently on the swiping page
+   - User has location permissions available
 4. Postconditions (success scenario)
+   - User selects city and travel radius and only is able to swipe other users within that radius
 5. List of Steps (success scenario)
+   1. User navigates to the swiping page
+   2. User clicks location button which displays the location and radius currently set
+   3. User selects a city or edits radius
+   4. User’s swiping cards are updated and refreshed to match the location/radius
 6. Extensions/Variations of the Success Scenario
+   - If the user enters the location editing menu but makes no changes, the current swiping cards are kept the same
 7. Exceptions: Failure Conditions and Scenarios
-### Use Case 6
+   - If the user selects a bogus location (like the middle of the ocean) and there are no available users, there will be a warning that suggests changing location
+### Use Case 6 (Live Chat)
 1. Actors
+   - Primary Actors: User, Other User
 2. Triggers
+   - When two users swipe right on each other's profiles, it triggers a match and puts them into a live chat, allowing for people to exchange information
 3. Preconditions
+   - System detects two users match on each others profiles
+   - If either users did not match, chat feature should never occur between users
 4. Postconditions (success scenario)
+   - Matched users are automatically connected into the same chat as soon as they are matched
 5. List of Steps (success scenario)
+   1. User 1 swipes right on user 2
+   2. User 2 swipes right on user 1
+   3. System detects users are matched
+   4. Create a private chat between users
+   5. Users exchange information and schedule their time to meet
 6. Extensions/Variations of the Success Scenario
+   - Chat feature will show a visual and sound notification when a new message is received
+   - Multiple chats could be created and held by a single user
+   - Chats are maintained until one of the two users decides to disconnect
+   - Image or video sending feature within chat
 7. Exceptions: Failure Conditions and Scenarios
+   - Chats are only accessible if session is connected and uninterrupted
+   - Detection of failed message sent, prompting users to retry
 ## Non-Functional Requirements
  - __Scalability__
    - Handle a growing userbase
