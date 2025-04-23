@@ -68,13 +68,24 @@ implement and will likely require additional research to figure out.
 
 ### Major Features
  - __Swiping Feature__
+   - Swiping to the left means no and to the right means yes for matching. If two people both swipe to the right, that means it's a match.
  - __Multiple Tabs__
+   - One for each martial arts discipline, filtering out each profile by what users are wanting.
  - __Profile__
- - 
+   - Includes personal information such as desired discipline, location, ranking (belt color/elo) and some description of themself.
+ - __Live Chat__
+   - Allows matching partners to coordinate meeting details
+ - __Set Location-based Matching__
+   - Different than a user's permanent location/origin
 
 ### Stretch Goals
- - __Live Chat__
- - __Monetization (Reswipe)__
+ - __User Ratings__
+   - Users can rate each other after fights
+ - __Monetization__
+   - Reswipe, ads, etc.
+ - __Page for users that swiped right on you__
+ - __Banned Phrase Filter__
+ - __Clans__
 
 ## Use Cases (Functional Requirements)
 ### Use Case 1 (Filtering)
