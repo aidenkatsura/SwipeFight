@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View, Image, Dimensions, TouchableOpacity } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { MapPin, Star, Award, Circle } from 'lucide-react-native';
+import { MapPin, Star, Award, Circle, Hand, UserX } from 'lucide-react-native';
 import { theme } from '@/styles/theme';
 import { Fighter } from '@/types/fighter';
 
@@ -71,14 +71,14 @@ export function SwipeCard({ fighter, onSwipeLeft, onSwipeRight }: SwipeCardProps
             style={[styles.actionButton, styles.skipButton]}
             onPress={onSwipeLeft}
           >
-            <Circle size={32} color={theme.colors.error[500]} strokeWidth={2.5} />
+            <UserX size={32} color={theme.colors.error[500]} strokeWidth={2.5} />
           </TouchableOpacity>
 
           <TouchableOpacity
             style={[styles.actionButton, styles.challengeButton]}
             onPress={onSwipeRight}
           >
-            <Circle size={32} color={theme.colors.success[500]} strokeWidth={2.5} />
+            <Hand size={32} color={theme.colors.success[500]} strokeWidth={2.5} />
           </TouchableOpacity>
         </View>
       </View>
@@ -155,6 +155,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.3)',
     padding: theme.spacing[3],
+    paddingRight: theme.spacing[6],
     borderRadius: 12,
     marginBottom: theme.spacing[4],
   },
@@ -162,20 +163,25 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
+    paddingRight: theme.spacing[1],
+    minWidth: 120,
   },
   icon: {
-    marginRight: theme.spacing[1],
+    marginRight: theme.spacing[2],
   },
   statText: {
     fontFamily: 'Inter-Regular',
     fontSize: 14,
     color: theme.colors.white,
+    marginRight: 0,
+    flexShrink: 0,
+    width: 'auto',
   },
   divider: {
     width: 1,
     height: 20,
     backgroundColor: 'rgba(255, 255, 255, 0.3)',
-    marginHorizontal: theme.spacing[2],
+    marginHorizontal: theme.spacing[1],
   },
   actionsContainer: {
     flexDirection: 'row',
