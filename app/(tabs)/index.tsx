@@ -7,7 +7,7 @@ import { SwipeCard } from '@/components/SwipeCard';
 import { mockFighters } from '@/data/mockFighters';
 import { theme } from '@/styles/theme';
 import DisciplineFilter from '@/components/DisciplineFilter';
-import { ChevronLeft, ChevronRight } from 'lucide-react-native';
+import { Circle } from 'lucide-react-native';
 import { Fighter, Discipline } from '@/types/fighter';
 
 export default function FightScreen() {
@@ -67,9 +67,9 @@ export default function FightScreen() {
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>Find Fighters</Text>
-        <DisciplineFilter 
-          selectedDiscipline={selectedDiscipline} 
-          onSelectDiscipline={handleFilterChange} 
+        <DisciplineFilter
+          selectedDiscipline={selectedDiscipline}
+          onSelectDiscipline={handleFilterChange}
         />
       </View>
 
@@ -78,7 +78,13 @@ export default function FightScreen() {
           <Swiper
             ref={swiperRef}
             cards={fighters}
-            renderCard={(fighter) => fighter ? <SwipeCard fighter={fighter} /> : null}
+            renderCard={(fighter) => fighter ? (
+              <SwipeCard
+                fighter={fighter}
+                onSwipeLeft={handlePressSwipeLeft}
+                onSwipeRight={handlePressSwipeRight}
+              />
+            ) : null}
             onSwipedRight={handleSwipeRight}
             onSwipedLeft={handleSwipeLeft}
             backgroundColor={theme.colors.gray[100]}
@@ -109,7 +115,7 @@ export default function FightScreen() {
         ) : (
           <View style={styles.emptyState}>
             <Text style={styles.emptyStateText}>No fighters found in this discipline</Text>
-            <TouchableOpacity 
+            <TouchableOpacity
               style={styles.emptyStateButton}
               onPress={() => handleFilterChange('All')}
             >
@@ -117,21 +123,6 @@ export default function FightScreen() {
             </TouchableOpacity>
           </View>
         )}
-      </View>
-
-      <View style={styles.actions}>
-        <TouchableOpacity 
-          style={[styles.actionButton, styles.skipButton]} 
-          onPress={handlePressSwipeLeft}
-        >
-          <ChevronLeft size={28} color={theme.colors.gray[700]} />
-        </TouchableOpacity>
-        <TouchableOpacity 
-          style={[styles.actionButton, styles.challengeButton]} 
-          onPress={handlePressSwipeRight}
-        >
-          <ChevronRight size={28} color={theme.colors.white} />
-        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
@@ -144,7 +135,7 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingHorizontal: theme.spacing[4],
-    paddingTop: theme.spacing[6],
+    paddingTop: theme.spacing[4],
     paddingBottom: theme.spacing[2],
   },
   title: {
@@ -155,7 +146,7 @@ const styles = StyleSheet.create({
   },
   swiperContainer: {
     flex: 1,
-    paddingTop: theme.spacing[2],
+    paddingTop: 0,
   },
   overlayWrapper: {
     flexDirection: 'column',
@@ -186,29 +177,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     overflow: 'hidden',
     backgroundColor: 'rgba(255, 255, 255, 0.8)',
-  },
-  actions: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    padding: theme.spacing[4],
-  },
-  actionButton: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: theme.colors.gray[900],
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 2 },
-    elevation: 4,
-  },
-  skipButton: {
-    backgroundColor: theme.colors.white,
-  },
-  challengeButton: {
-    backgroundColor: theme.colors.primary[500],
   },
   emptyState: {
     flex: 1,

@@ -7,7 +7,7 @@ import StatCard from '@/components/StatCard';
 
 export default function ProfileScreen() {
   const user = mockCurrentUser;
-  
+
   const stats = [
     {
       id: '1',
@@ -41,14 +41,14 @@ export default function ProfileScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar style="light" />
-      
-      <View style={styles.header}>
+      <StatusBar style="dark" />
+
+      <View style={styles.settingsContainer}>
         <TouchableOpacity style={styles.settingsButton}>
-          <Settings color={theme.colors.white} size={24} />
+          <Settings color={theme.colors.gray[700]} size={24} />
         </TouchableOpacity>
       </View>
-      
+
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.profileHeader}>
           <View style={styles.profileImageContainer}>
@@ -57,17 +57,17 @@ export default function ProfileScreen() {
               <EditPencil color={theme.colors.white} size={18} />
             </TouchableOpacity>
           </View>
-          
+
           <Text style={styles.name}>{user.name}, {user.age}</Text>
           <View style={styles.disciplineBadge}>
             <Text style={styles.disciplineText}>{user.discipline}</Text>
           </View>
           <Text style={styles.rank}>{user.rank}</Text>
           <Text style={styles.location}>{user.location}</Text>
-          
+
           <View style={styles.statsGrid}>
             {stats.map(stat => (
-              <StatCard 
+              <StatCard
                 key={stat.id}
                 title={stat.title}
                 value={stat.value}
@@ -77,7 +77,7 @@ export default function ProfileScreen() {
             ))}
           </View>
         </View>
-        
+
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Recent Achievements</Text>
           {user.achievements && user.achievements.length > 0 ? (
@@ -91,7 +91,7 @@ export default function ProfileScreen() {
             <Text style={styles.emptyText}>No achievements yet</Text>
           )}
         </View>
-        
+
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Recent Matches</Text>
           {user.recentMatches && user.recentMatches.length > 0 ? (
@@ -104,8 +104,8 @@ export default function ProfileScreen() {
                 </View>
                 <View style={[
                   styles.matchResultBadge,
-                  match.result === 'win' ? styles.winBadge : 
-                  match.result === 'loss' ? styles.lossBadge : 
+                  match.result === 'win' ? styles.winBadge :
+                  match.result === 'loss' ? styles.lossBadge :
                   styles.drawBadge
                 ]}>
                   <Text style={styles.matchResultText}>
@@ -118,7 +118,7 @@ export default function ProfileScreen() {
             <Text style={styles.emptyText}>No recent matches</Text>
           )}
         </View>
-        
+
         <TouchableOpacity style={styles.logoutButton}>
           <LogOut color={theme.colors.gray[600]} size={20} />
           <Text style={styles.logoutText}>Log Out</Text>
@@ -133,12 +133,10 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: theme.colors.white,
   },
-  header: {
-    height: 120,
-    backgroundColor: theme.colors.primary[500],
+  settingsContainer: {
     paddingHorizontal: theme.spacing[4],
     paddingTop: theme.spacing[4],
-    justifyContent: 'flex-start',
+    paddingBottom: theme.spacing[2],
     alignItems: 'flex-end',
   },
   settingsButton: {
@@ -149,7 +147,6 @@ const styles = StyleSheet.create({
   },
   profileHeader: {
     alignItems: 'center',
-    marginTop: -50,
     paddingHorizontal: theme.spacing[4],
   },
   profileImageContainer: {
@@ -256,17 +253,18 @@ const styles = StyleSheet.create({
   matchOpponent: {
     fontFamily: 'Inter-SemiBold',
     fontSize: 14,
-    color: theme.colors.gray[800],
+    color: theme.colors.gray[900],
   },
   matchDate: {
     fontFamily: 'Inter-Regular',
     fontSize: 12,
     color: theme.colors.gray[600],
+    marginTop: 2,
   },
   matchResultBadge: {
     paddingHorizontal: theme.spacing[2],
     paddingVertical: theme.spacing[1],
-    borderRadius: theme.spacing[1],
+    borderRadius: 12,
   },
   winBadge: {
     backgroundColor: theme.colors.success[100],
@@ -285,20 +283,20 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-Regular',
     fontSize: 14,
     color: theme.colors.gray[600],
-    fontStyle: 'italic',
     textAlign: 'center',
-    padding: theme.spacing[4],
+    paddingVertical: theme.spacing[4],
   },
   logoutButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: theme.spacing[6],
+    marginBottom: theme.spacing[4],
     padding: theme.spacing[3],
   },
   logoutText: {
-    fontFamily: 'Inter-Regular',
-    fontSize: 14,
+    fontFamily: 'Inter-SemiBold',
+    fontSize: 16,
     color: theme.colors.gray[600],
     marginLeft: theme.spacing[2],
   },

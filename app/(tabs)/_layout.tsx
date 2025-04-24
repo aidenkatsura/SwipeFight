@@ -1,10 +1,10 @@
 import { Tabs } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
-import { 
-  Dumbbell, 
-  MessageSquare, 
-  Trophy, 
-  User 
+import {
+  Dumbbell,
+  MessageSquare,
+  Trophy,
+  User
 } from 'lucide-react-native';
 import { theme } from '@/styles/theme';
 
@@ -68,8 +68,9 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 8,
     shadowOffset: { width: 0, height: -2 },
-    height: 60,
-    padding: 6,
+    height: 80,
+    paddingTop: 8,
+    paddingBottom: 12,
   },
   tabBarLabel: {
     fontFamily: 'Inter-SemiBold',

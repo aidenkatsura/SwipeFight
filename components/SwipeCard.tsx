@@ -6,9 +6,11 @@ import { Fighter } from '@/types/fighter';
 
 interface SwipeCardProps {
   fighter: Fighter;
+  onSwipeLeft?: () => void;
+  onSwipeRight?: () => void;
 }
 
-export function SwipeCard({ fighter }: SwipeCardProps) {
+export function SwipeCard({ fighter, onSwipeLeft, onSwipeRight }: SwipeCardProps) {
   // Add safety check to prevent accessing properties of undefined fighter
   if (!fighter) {
     return null;
@@ -19,57 +21,63 @@ export function SwipeCard({ fighter }: SwipeCardProps) {
 
   return (
     <View style={[styles.card, { height: cardHeight }]}>
-      <Image 
-        source={{ uri: fighter.photo }} 
-        style={styles.image} 
+      <Image
+        source={{ uri: fighter.photo }}
+        style={styles.image}
         resizeMode="cover"
       />
-      
+
       <LinearGradient
         colors={['transparent', 'rgba(0,0,0,0.7)', 'rgba(0,0,0,0.9)']}
         style={styles.gradient}
       />
-      
+
       <View style={styles.infoContainer}>
         <View style={styles.nameAgeContainer}>
           <Text style={styles.name}>{fighter.name}</Text>
           <Text style={styles.age}>{fighter.age}</Text>
         </View>
-        
+
         <View style={styles.disciplineContainer}>
           <View style={styles.disciplineWrapper}>
             <Text style={styles.discipline}>{fighter.discipline}</Text>
           </View>
           <Text style={styles.rank}>{fighter.rank}</Text>
         </View>
-        
+
         <View style={styles.statsContainer}>
           <View style={styles.statItem}>
             <MapPin size={16} color={theme.colors.white} style={styles.icon} />
             <Text style={styles.statText}>{fighter.distance} miles away</Text>
           </View>
-          
+
           <View style={styles.divider} />
-          
+
           <View style={styles.statItem}>
             <Star size={16} color={theme.colors.gold} style={styles.icon} />
             <Text style={styles.statText}>{fighter.rating} rating</Text>
           </View>
-          
+
           <View style={styles.divider} />
-          
+
           <View style={styles.statItem}>
             <Award size={16} color={theme.colors.white} style={styles.icon} />
             <Text style={styles.statText}>{fighter.wins}-{fighter.losses}-{fighter.draws}</Text>
           </View>
         </View>
-        
+
         <View style={styles.actionsContainer}>
-          <TouchableOpacity style={[styles.actionButton, styles.skipButton]}>
+          <TouchableOpacity
+            style={[styles.actionButton, styles.skipButton]}
+            onPress={onSwipeLeft}
+          >
             <Circle size={32} color={theme.colors.error[500]} strokeWidth={2.5} />
           </TouchableOpacity>
-          
-          <TouchableOpacity style={[styles.actionButton, styles.challengeButton]}>
+
+          <TouchableOpacity
+            style={[styles.actionButton, styles.challengeButton]}
+            onPress={onSwipeRight}
+          >
             <Circle size={32} color={theme.colors.success[500]} strokeWidth={2.5} />
           </TouchableOpacity>
         </View>
