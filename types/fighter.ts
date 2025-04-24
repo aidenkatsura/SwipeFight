@@ -14,11 +14,16 @@ export interface Fighter {
 }
 
 export type Discipline = 
-  | 'Boxing'
+  | 'Aikido'
   | 'BJJ'
-  | 'Muay Thai'
-  | 'MMA'
+  | 'Boxing'
   | 'Judo'
-  | 'Wrestling'
   | 'Karate'
-  | 'Taekwondo';
+  | 'Kendo'
+  | 'Kickboxing'
+  | 'Kung Fu'
+  | 'Krav Maga'
+  | 'Taekwondo'
+  | 'MMA'
+  | 'Muay Thai'
+  | 'Wrestling';
