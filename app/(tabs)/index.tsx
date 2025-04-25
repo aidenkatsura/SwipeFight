@@ -10,22 +10,37 @@ import DisciplineFilter from '@/components/DisciplineFilter';
 import { Fighter, Discipline } from '@/types/fighter';
 
 export default function FightScreen() {
-  const [fighters, setFighters] = useState(mockFighters);
+  // All fighters that have not been swiped on
+  const [allFighters, setAllFighters] = useState(mockFighters);
+
+  // Fighters from allFighters that matched the most recent filter.
+  // Only updated when a filter is applied - not modified on swipes.
+  const [filteredFighters, setFilteredFighters] = useState(mockFighters);
+
   const [selectedDiscipline, setSelectedDiscipline] = useState<Discipline | 'All'>('All');
   const swiperRef = useRef<Swiper<Fighter>>(null);
 
   const handleSwipeRight = (index: number) => {
     triggerHapticFeedback('medium');
     // Check if index is valid to prevent accessing undefined fighter
-    if (index >= 0 && index < fighters.length) {
-      console.log('Challenged fighter:', fighters[index].name);
+    if (index >= 0 && index < filteredFighters.length) {
+      console.log('Challenged fighter:', filteredFighters[index].name);
     }
     // In production, would send challenge request to API
   };
 
-  const handleSwipeLeft = () => {
+  const handleSwipeLeft = (index: number) => {
     triggerHapticFeedback('light');
     // Skipped, nothing to do here
+  };
+
+  const handleSwipe = (index: number) => {
+    removeFighterFromAll(index);
+  }
+
+  // Removes the fighter at filteredFighters[index] from allFighters (matches on fighter id)
+  const removeFighterFromAll = (index: number) => {
+    setAllFighters(allFighters.filter((fighter) => fighter.id != filteredFighters[index].id))
   };
 
   const triggerHapticFeedback = (intensity: 'light' | 'medium' | 'heavy') => {
@@ -47,17 +62,12 @@ export default function FightScreen() {
   const handleFilterChange = (discipline: Discipline | 'All') => {
     setSelectedDiscipline(discipline);
     // In production, would fetch fighters by discipline from API
-/*
-Should this be fighters, not mockFighters so we don't load all fighters again
-*/
     if (discipline === 'All') {
-      setFighters(mockFighters);
+      setFilteredFighters(allFighters);
     } else {
-/*
-Should this also be fighters?
-*/
-      setFighters(mockFighters.filter(fighter => fighter.discipline === discipline));
+      setFilteredFighters(allFighters.filter(fighter => fighter.discipline === discipline));
     }
+    swiperRef.current?.jumpToCardIndex(0); // reset to start of fighter list
   };
 
   const handlePressSwipeLeft = () => {
@@ -79,10 +89,10 @@ Should this also be fighters?
       </View>
 
       <View style={styles.swiperContainer}>
-        {fighters.length > 0 ? (
+        {filteredFighters.length > 0 ? (
           <Swiper
             ref={swiperRef}
-            cards={fighters}
+            cards={filteredFighters}
             renderCard={(fighter) => fighter ? (
               <SwipeCard
                 fighter={fighter}
@@ -92,6 +102,7 @@ Should this also be fighters?
             ) : null}
             onSwipedRight={handleSwipeRight}
             onSwipedLeft={handleSwipeLeft}
+            onSwiped={handleSwipe}
             backgroundColor={theme.colors.gray[100]}
             stackSize={3}
             stackSeparation={15}
