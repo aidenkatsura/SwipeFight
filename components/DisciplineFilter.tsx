@@ -9,14 +9,19 @@ interface DisciplineFilterProps {
 
 const disciplines: (Discipline | 'All')[] = [
   'All', 
-  'Boxing', 
-  'BJJ', 
-  'Muay Thai', 
-  'MMA', 
-  'Judo', 
-  'Wrestling', 
-  'Karate', 
-  'Taekwondo'
+  'Aikido',
+  'BJJ',
+  'Boxing',
+  'Judo',
+  'Karate',
+  'Kendo',
+  'Kickboxing',
+  'Kung Fu',
+  'Krav Maga',
+  'Taekwondo',
+  'MMA',
+  'Muay Thai',
+  'Wrestling'
 ];
 
 export default function DisciplineFilter({ 

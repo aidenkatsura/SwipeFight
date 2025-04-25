@@ -13,6 +13,7 @@ export interface Fighter {
   draws: number;
 }
 
+// If adding anything here, make sure to update the DisciplineFilter.tsx file as well
 export type Discipline = 
   | 'Aikido'
   | 'BJJ'
