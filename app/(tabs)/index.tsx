@@ -7,7 +7,6 @@ import { SwipeCard } from '@/components/SwipeCard';
 import { mockFighters } from '@/data/mockFighters';
 import { theme } from '@/styles/theme';
 import DisciplineFilter from '@/components/DisciplineFilter';
-import { Circle } from 'lucide-react-native';
 import { Fighter, Discipline } from '@/types/fighter';
 
 export default function FightScreen() {
@@ -48,9 +47,15 @@ export default function FightScreen() {
   const handleFilterChange = (discipline: Discipline | 'All') => {
     setSelectedDiscipline(discipline);
     // In production, would fetch fighters by discipline from API
+/*
+Should this be fighters, not mockFighters so we don't load all fighters again
+*/
     if (discipline === 'All') {
       setFighters(mockFighters);
     } else {
+/*
+Should this also be fighters?
+*/
       setFighters(mockFighters.filter(fighter => fighter.discipline === discipline));
     }
   };
@@ -165,7 +170,7 @@ const styles = StyleSheet.create({
     padding: 8,
     borderRadius: 8,
     overflow: 'hidden',
-    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
   },
   overlayLabelChallenge: {
     fontSize: 32,
