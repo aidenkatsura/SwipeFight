@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View, Image, Dimensions, TouchableOpacity } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { MapPin, Star, Award, Circle, Hand, UserX } from 'lucide-react-native';
+import { MapPin, Star, Award, Hand, UserX } from 'lucide-react-native';
 import { theme } from '@/styles/theme';
 import { Fighter } from '@/types/fighter';
 
@@ -153,6 +153,8 @@ const styles = StyleSheet.create({
   statsContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
+    flexWrap: 'wrap',
     backgroundColor: 'rgba(0, 0, 0, 0.3)',
     padding: theme.spacing[3],
     paddingRight: theme.spacing[6],
@@ -162,9 +164,9 @@ const styles = StyleSheet.create({
   statItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    flex: 1,
+    flexShrink: 1,
     paddingRight: theme.spacing[1],
-    minWidth: 120,
+    minWidth: '30%',
   },
   icon: {
     marginRight: theme.spacing[2],
