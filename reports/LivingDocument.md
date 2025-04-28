@@ -1,7 +1,7 @@
 # Living Document
 
 ## Team Info
-### Members and Roles (with Justification)
+### Members and Roles
  - Aiden => Project Coordinator
    - Organized with deadlines and understanding responsibilities of project and assignments
  - Brian => Main Tester
@@ -276,7 +276,7 @@ implement and will likely require additional research to figure out.
    - Firebase: Extremely easy to integrate, free to use
    - Socket.io: Useful for real-time chatting, abstracts a lot of implementation
 ### Member roles
-   - See **_Members and Roles (with Justification)_** at top of document
+   - See [Members and Roles](#members-and-roles)
 ### Project Schedule
    - __4/22 - 4/29__
      - Aiden: Write report for the week, assist in front-end development
