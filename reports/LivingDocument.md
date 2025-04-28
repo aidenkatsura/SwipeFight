@@ -1,5 +1,4 @@
 # Living Document
-
 ## Team Info
 ### Members and Roles
  - Aiden => Project Coordinator
@@ -26,6 +25,7 @@
    - Use when communicating with staff
  - Group Chat
    - Primary form of communication
+
 
 ## Product Description
 ### Project Proposal
@@ -90,6 +90,7 @@ implement and will likely require additional research to figure out.
  - __Banned Phrase Filter__
  - __Clans__
 
+
 ## Use Cases (Functional Requirements)
 ### Use Case 1 (Filtering)
 1. Actors
@@ -114,6 +115,7 @@ implement and will likely require additional research to figure out.
    - If the user becomes unauthenticated (session expires), they are asked to login again
    - If no matches are found, user notified and asked to modify/clear filters and try again or be shown the closest possible matches
    - If there is a frontend (UI) or backend (server) failure, the system will attempt to resend the request
+
 ### Use Case 2 (Editing Profile Information)
 1. Actors
    - Primary actor: User (with an existing account)
@@ -145,6 +147,7 @@ implement and will likely require additional research to figure out.
    - Backend failure prevents saving of changes
       - System informs user of save issue, presents option to retry or exit without saving
       - User can keep retrying, or exit back to profile page with no changes made
+
 ### Use Case 3 (Initial Profile Setup)
 1. Actors
    - Primary Actor: User (without an account)
@@ -176,6 +179,7 @@ implement and will likely require additional research to figure out.
      - User can keep retrying or exit back to the profile page with no changes made
    - User inputs banned phrase
      - System informs user of use and prevents account creation
+
 ### Use Case 4 (Swiping)
 1. Actors
    - Primary Actor: User
@@ -200,6 +204,7 @@ implement and will likely require additional research to figure out.
    - If the user becomes unauthenticated (session expires), they are asked to login again
    - If the app is closed, the same person should be on the screen
    - If a decision is rolled back (undo button), the result of the first swipe must be reversible
+
 ### Use Case 5 (Changing Location)
 1. Actors
    - Primary Actor: User
@@ -219,6 +224,7 @@ implement and will likely require additional research to figure out.
    - If the user enters the location editing menu but makes no changes, the current swiping cards are kept the same
 7. Exceptions: Failure Conditions and Scenarios
    - If the user selects a bogus location (like the middle of the ocean) and there are no available users, there will be a warning that suggests changing location
+
 ### Use Case 6 (Live Chat)
 1. Actors
    - Primary Actors: User, Other User
@@ -243,6 +249,8 @@ implement and will likely require additional research to figure out.
 7. Exceptions: Failure Conditions and Scenarios
    - Chats are only accessible if session is connected and uninterrupted
    - Detection of failed message sent, prompting users to retry
+
+
 ## Non-Functional Requirements
  - __Scalability__
    - Handle a growing userbase with stress testing
@@ -251,6 +259,8 @@ implement and will likely require additional research to figure out.
    - The app must run smoothly with a clean UI/UX and have clear/simple usability or tutorials
  - __Security__
    - Users should have username and password protected accounts
+
+
 ## External Requirements
  - Robustness against errors
    - Detailed in exceptions section of **_Use Cases_**
@@ -269,6 +279,8 @@ implement and will likely require additional research to figure out.
    - Scan the generated QR code with the camera app which will open SwipeFight in Expo Go
  - Scope
    - Approved by teaching staff
+
+
 ## Team Process Description
 ### Software toolset
    - Typescript: Familiar language and used for app development
@@ -320,6 +332,7 @@ implement and will likely require additional research to figure out.
      - Josh: Final code cleanup and confirm full app functionality
      - Sam: Assist in final debugging, ensure all front-end features are responsive
      - Yashveer: Deploy final backend to production environment and test live connections
+
 ### Risks / Risk Assessment
    1. Potential learning curve with new technologies. Our choice of tech stack involves technologies that are new or unfamiliar to many group members (e.g., React Native), so it will be important to adapt to potential struggles.
 
@@ -332,13 +345,14 @@ implement and will likely require additional research to figure out.
     - If the geographic matching does not work as expected, we can reduce the searching algorithm to rating and discipline.
 
    3. Being too ambitious given the limited timeframe of the project (trying to implement stretch goals like user rating too early, implementing too many features/feature creep)
+
 ### Describe at what point in your process external feedback will be most useful and how you will get that feedback
- After implementing each feature, we should have outside members test our app and give feedback on bugs, unintuitive UX or app interactions, or any additional desired changes
+After implementing each feature, we should have outside members test our app and give feedback on bugs, unintuitive UX or app interactions, or any additional desired changes
+
 ### Documentation Plan
 
 
 ## Software Architecture
-
 ### Identify and describe the major software components and their functionality at a conceptual level
  - Mobile Client (iOS/Android): Provides interface between user and app
  - Backend API Server: Manages communication between components
@@ -361,12 +375,21 @@ implement and will likely require additional research to figure out.
    -
 
 
-
 ## Software Design
-[//]: <> (From slides, not document: ● Considers individual components:
-○ Data representation
-○ Interfaces, Class hierarchy
-○ …)
+### Provide a detailed definition of each of the software components you identified above
+ - Mobile Client
+   - What packages, classes, or other units of abstraction form these components?
+   - What are the responsibilities of each of those parts of a component?
+ - Backend API Server
+   - What packages, classes, or other units of abstraction form these components?
+   - What are the responsibilities of each of those parts of a component?
+ - Database Server
+   - What packages, classes, or other units of abstraction form these components?
+   - What are the responsibilities of each of those parts of a component?
+ - Real-Time Messaging
+   - What packages, classes, or other units of abstraction form these components?
+   - What are the responsibilities of each of those parts of a component?
+
 
 ## Coding Design
  - TypeScript [Coding Style Guide](https://docs.aws.amazon.com/prescriptive-guidance/latest/best-practices-cdk-typescript-iac/typescript-best-practices.html)
