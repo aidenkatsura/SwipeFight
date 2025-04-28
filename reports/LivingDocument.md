@@ -322,7 +322,15 @@ implement and will likely require additional research to figure out.
      - Yashveer: Deploy final backend to production environment and test live connections
  - Risks / Risk Assessment
    1. Potential learning curve with new technologies. Our choice of tech stack involves technologies that are new or unfamiliar to many group members (e.g., React Native), so it will be important to adapt to potential struggles.
+
    2. Difficulty in implementing the matching algorithm, specifically when it comes to the complexity of geographic/location-based matching.
+    - Swiping is the main motivator behind our system, therefore it has a high risk of occuring.
+    - If we do not implement the matching algorithm correctly, the user will be unhappy with the product and will not find it useful.
+    - We base the complexity of geographic matching with the fact that we will need several parameters so user's can specify how far to search.
+    - To reduce the impact of the matching algorithm, we are building several alternate matching algorithms to find the best version.
+    - To detect the problem, we will first run the matching algorithm with our mock fighters and then expand the userbase.
+    - If the geographic matching does not work as expected, we can reduce the searching algorithm to rating and discipline.
+
    3. Being too ambitious given the limited timeframe of the project (trying to implement stretch goals like user rating too early, implementing too many features/feature creep)
  - Describe at what point in your process external feedback will be most useful and how you will get that feedback
    - After implementing each feature, we should have outside members test our app and give feedback on bugs, unintuitive UX or app interactions, or any additional desired changes
