@@ -330,10 +330,17 @@ implement and will likely require additional research to figure out.
 
 
 ## Software Architecture
+[//]: <> (From slides, not document: ● High-level view of the overall system:
+○ What components do exist?
+○ What are the protocols between components?
+○ What type of storage etc.?)
 
 
 ## Software Design
-
+[//]: <> (From slides, not document: ● Considers individual components:
+○ Data representation
+○ Interfaces, Class hierarchy
+○ …)
 
 ## Coding Design
 
