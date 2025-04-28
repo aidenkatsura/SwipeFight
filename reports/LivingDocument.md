@@ -338,10 +338,28 @@ implement and will likely require additional research to figure out.
 
 
 ## Software Architecture
-[//]: <> (From slides, not document: ● High-level view of the overall system:
-○ What components do exist?
-○ What are the protocols between components?
-○ What type of storage etc.?)
+
+### Identify and describe the major software components and their functionality at a conceptual level
+ - Mobile Client (iOS/Android): Provides interface between user and app
+ - Backend API Server: Manages communication between components
+ - Database Server: Holds persistent data
+ - Real-Time Messaging: Allows users to communicate with each other after matching
+   
+### Specify the interfaces between components
+   - Mobile Client <=> Backend API Server: Tapping or swiping sends request to server which sends response back
+   - Backend API Server <=> Database Server: Saving profile, matches, messages
+   - Backend API Server <=> Real-Time Messaging: Sned and receive messages
+
+### Describe in detail what data your system stores, and how. If it uses a database, give the high level database schema. If not, describe how you are storing the data and its organization
+   - Using Firebase for the database
+   - Firebase will hold user profile information, matches, all users
+
+### If there are particular assumptions underpinning your chosen architecture, identify and describe them
+   - The information should be secure which means we 
+
+### For each of two decisions pertaining to your software architecture, identify and briefly describe an alternative. For each of the two alternatives, discuss its pros and cons compared to your choice
+   -
+
 
 
 ## Software Design
