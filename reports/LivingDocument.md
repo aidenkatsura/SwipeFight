@@ -343,4 +343,4 @@ implement and will likely require additional research to figure out.
 ○ …)
 
 ## Coding Design
-
+ - TypeScript [Coding Style Guide](https://docs.aws.amazon.com/prescriptive-guidance/latest/best-practices-cdk-typescript-iac/typescript-best-practices.html)
