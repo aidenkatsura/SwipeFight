@@ -270,14 +270,14 @@ implement and will likely require additional research to figure out.
  - Scope
    - Approved by teaching staff
 ## Team Process Description
- - Software toolset
+### Software toolset
    - Typescript: Familiar language and used for app development
    - React-Native: Embedded integration for iOS, Android and web apps
    - Firebase: Extremely easy to integrate, free to use
    - Socket.io: Useful for real-time chatting, abstracts a lot of implementation
- - Member roles
+### Member roles
    - See **_Members and Roles (with Justification)_** at top of document
- - Project Schedule
+### Project Schedule
    - __4/22 - 4/29__
      - Aiden: Write report for the week, assist in front-end development
      - Brian: Test front-end and communicate potential changes to team
@@ -320,7 +320,7 @@ implement and will likely require additional research to figure out.
      - Josh: Final code cleanup and confirm full app functionality
      - Sam: Assist in final debugging, ensure all front-end features are responsive
      - Yashveer: Deploy final backend to production environment and test live connections
- - Risks / Risk Assessment
+### Risks / Risk Assessment
    1. Potential learning curve with new technologies. Our choice of tech stack involves technologies that are new or unfamiliar to many group members (e.g., React Native), so it will be important to adapt to potential struggles.
 
    2. Difficulty in implementing the matching algorithm, specifically when it comes to the complexity of geographic/location-based matching.
@@ -332,9 +332,9 @@ implement and will likely require additional research to figure out.
     - If the geographic matching does not work as expected, we can reduce the searching algorithm to rating and discipline.
 
    3. Being too ambitious given the limited timeframe of the project (trying to implement stretch goals like user rating too early, implementing too many features/feature creep)
- - Describe at what point in your process external feedback will be most useful and how you will get that feedback
-   - After implementing each feature, we should have outside members test our app and give feedback on bugs, unintuitive UX or app interactions, or any additional desired changes
-- Documentation Plan
+### Describe at what point in your process external feedback will be most useful and how you will get that feedback
+ After implementing each feature, we should have outside members test our app and give feedback on bugs, unintuitive UX or app interactions, or any additional desired changes
+### Documentation Plan
 
 
 ## Software Architecture
