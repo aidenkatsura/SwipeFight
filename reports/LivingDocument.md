@@ -334,17 +334,40 @@ implement and will likely require additional research to figure out.
      - Yashveer: Deploy final backend to production environment and test live connections
 
 ### Risks / Risk Assessment
-   1. Potential learning curve with new technologies. Our choice of tech stack involves technologies that are new or unfamiliar to many group members (e.g., React Native), so it will be important to adapt to potential struggles.
-
+   1. Potential learning curve with new technologies
+      - Our choice of tech stack involves technologies that are new or unfamiliar to many group members (e.g., React Native), so it will be important to adapt to potential struggle
+      - High likelihood of occuring
+        - Many group memebers are learning the technologies as we've started working
+      - Medium impact if it occurs
+        - We've been quick to learn the frontend so far, however the backend could pose a potential struggle.
+      - We've shared resources so all of us can learn the tools and have been helping eachother learn.
+      - To get better estimates, we will closely monitor any difficulties when it comes to learning the new technologies.
+      - For this problem, its detection can come from a group member not knowing how to do something or from a member finding gaps in anothers knowledge.
+      - If it occurs, either have the group member individually learn, or have another teach them.
+      
    2. Difficulty in implementing the matching algorithm, specifically when it comes to the complexity of geographic/location-based matching.
-    - Swiping is the main motivator behind our system, therefore it has a high risk of occuring.
-    - If we do not implement the matching algorithm correctly, the user will be unhappy with the product and will not find it useful.
-    - We base the complexity of geographic matching with the fact that we will need several parameters so user's can specify how far to search.
-    - To reduce the impact of the matching algorithm, we are building several alternate matching algorithms to find the best version.
-    - To detect the problem, we will first run the matching algorithm with our mock fighters and then expand the userbase.
-    - If the geographic matching does not work as expected, we can reduce the searching algorithm to rating and discipline.
+      - Swiping is the main motivator behind our system, therefore it has a high risk of occuring.
+      - If we do not implement the matching algorithm correctly, the user will be unhappy with the product and will not find it useful.
+      - We base the complexity of geographic matching with the fact that we will need several parameters so user's can specify how far to search.
+      - To reduce the impact of the matching algorithm, we are building several alternate matching algorithms to find the best version.
+      - To detect the problem, we will first run the matching algorithm with our mock fighters and then expand the userbase.
+      - If the geographic matching does not work as expected, we can reduce the searching algorithm to rating and discipline.
 
    3. Being too ambitious given the limited timeframe of the project (trying to implement stretch goals like user rating too early, implementing too many features/feature creep)
+      - Medium likelihood of occuring
+        - SwipeFight has many exciting and unique features that can be implemented.
+        - We don't have much experience with projects with deadlines like this.
+      - High impact if it occurs
+        - Would push development behind
+        - Could lead to rushing core features.
+      - We've set a focus on implementing core features first and made sure to label certain features as stretch goals
+      - To get better estimates, we will closely monitor progress on each goal and feature
+      - To detect the problem, we will check if we are falling behind on progress or have started stretch goals too early
+      - If it occurs, we will cut the non-essential goal/feature and focus on the the most important parts of the project.
+   4. risk 4
+   5. risk 5
+
+   Since submitting the requirements document, we've been able to come up with more risks that might pose a challenge.
 
 ### Describe at what point in your process external feedback will be most useful and how you will get that feedback
 After implementing each feature, we should have outside members test our app and give feedback on bugs, unintuitive UX or app interactions, or any additional desired changes
