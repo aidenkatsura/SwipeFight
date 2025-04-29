@@ -391,7 +391,7 @@ implement and will likely require additional research to figure out.
 
    Since submitting the requirements document, we've been able to come up with more risks that might pose a challenge.
 
-### Describe at what point in your process external feedback will be most useful and how you will get that feedback
+__Describe at what point in your process external feedback will be most useful and how you will get that feedback__
 After implementing each feature, we should have outside members test our app and give feedback on bugs, unintuitive UX or app interactions, or any additional desired changes
 
 ### Documentation Plan
@@ -404,34 +404,34 @@ __User Guide__ outlines:
   - How to contact us
 
 ## Software Architecture
-### Identify and describe the major software components and their functionality at a conceptual level
+__Identify and describe the major software components and their functionality at a conceptual level__
  - Mobile Client (iOS/Android): Provides interface between user and app
  - Backend API Server: Manages communication between components
  - Database Server: Holds persistent data
  - Real-Time Messaging: Allows users to communicate with each other after matching
    
-### Specify the interfaces between components
+__Specify the interfaces between components__
    - Mobile Client <=> Backend API Server: Tapping or swiping sends request to server which sends response back
    - Backend API Server <=> Database Server: Saving profile, matches, messages
    - Backend API Server <=> Real-Time Messaging: Send and receive messages
 
-### Describe in detail what data your system stores, and how. If it uses a database, give the high level database schema. If not, describe how you are storing the data and its organization
+__Describe in detail what data your system stores, and how. If it uses a database, give the high level database schema. If not, describe how you are storing the data and its organization__
    - Using Firebase for the database
    - Firebase will hold user profile information, matches, all users, messages
 
-### If there are particular assumptions underpinning your chosen architecture, identify and describe them
+__If there are particular assumptions underpinning your chosen architecture, identify and describe them__
    - The information should be secure which means we need to have a secure database
    - User information will not change as frequently as other aspects
    - Interactions are isolated until users match
    - Messaging is only available after matching
 
-### For each of two decisions pertaining to your software architecture, identify and briefly describe an alternative. For each of the two alternatives, discuss its pros and cons compared to your choice
+__For each of two decisions pertaining to your software architecture, identify and briefly describe an alternative. For each of the two alternatives, discuss its pros and cons compared to your choice__
    - choice 1
    - choice 2
 
 
 ## Software Design
-### Provide a detailed definition of each of the software components you identified above
+__Provide a detailed definition of each of the software components you identified above__
  - Mobile Client
    - What packages, classes, or other units of abstraction form these components?
    - What are the responsibilities of each of those parts of a component?
