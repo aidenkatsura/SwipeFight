@@ -90,9 +90,11 @@ implement and will likely require additional research to figure out.
  - __Banned Phrase Filter__
  - __Clans__
 
-
 ## Use Cases (Functional Requirements)
-### Use Case 1 (Filtering)
+<details>
+<summary>Use Case 1 (Filtering)</summary>
+<br>
+
 1. Actors
    - Primary Actor: User
 2. Triggers
@@ -116,7 +118,11 @@ implement and will likely require additional research to figure out.
    - If no matches are found, user notified and asked to modify/clear filters and try again or be shown the closest possible matches
    - If there is a frontend (UI) or backend (server) failure, the system will attempt to resend the request
 
-### Use Case 2 (Editing Profile Information)
+</details>
+<details>
+<summary>Use Case 2 (Editing Profile Information)</summary>
+<br>
+
 1. Actors
    - Primary actor: User (with an existing account)
 2. Triggers
@@ -148,7 +154,11 @@ implement and will likely require additional research to figure out.
       - System informs user of save issue, presents option to retry or exit without saving
       - User can keep retrying, or exit back to profile page with no changes made
 
-### Use Case 3 (Initial Profile Setup)
+</details>
+<details>
+<summary>Use Case 3 (Initial Profile Setup)</summary>
+<br>
+
 1. Actors
    - Primary Actor: User (without an account)
 2. Triggers
@@ -179,8 +189,11 @@ implement and will likely require additional research to figure out.
      - User can keep retrying or exit back to the profile page with no changes made
    - User inputs banned phrase
      - System informs user of use and prevents account creation
+</details>
+<details>
+<summary>Use Case 4 (Swiping)</summary>
+<br>
 
-### Use Case 4 (Swiping)
 1. Actors
    - Primary Actor: User
 2. Triggers
@@ -205,7 +218,11 @@ implement and will likely require additional research to figure out.
    - If the app is closed, the same person should be on the screen
    - If a decision is rolled back (undo button), the result of the first swipe must be reversible
 
-### Use Case 5 (Changing Location)
+</details>
+<details>
+<summary>Use Case 5 (Changing Location)</summary>
+<br>
+
 1. Actors
    - Primary Actor: User
 2. Triggers
@@ -225,7 +242,11 @@ implement and will likely require additional research to figure out.
 7. Exceptions: Failure Conditions and Scenarios
    - If the user selects a bogus location (like the middle of the ocean) and there are no available users, there will be a warning that suggests changing location
 
-### Use Case 6 (Live Chat)
+</details>
+<details>
+<summary>Use Case 6 (Live Chat)</summary>
+<br>
+
 1. Actors
    - Primary Actors: User, Other User
 2. Triggers
@@ -250,6 +271,7 @@ implement and will likely require additional research to figure out.
    - Chats are only accessible if session is connected and uninterrupted
    - Detection of failed message sent, prompting users to retry
 
+</details>
 
 ## Non-Functional Requirements
  - __Scalability__
