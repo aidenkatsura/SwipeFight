@@ -386,8 +386,22 @@ implement and will likely require additional research to figure out.
       - To get better estimates, we will closely monitor progress on each goal and feature
       - To detect the problem, we will check if we are falling behind on progress or have started stretch goals too early
       - If it occurs, we will cut the non-essential goal/feature and focus on the the most important parts of the project.
-   4. risk 4
-   5. risk 5
+   4. User feedback is out of scope
+      - Medium chance of occuring
+        - Peers are used to high-end apps and may expect features that are not in our scope
+      - Low impact if it occurs
+        - We will not be able to implement the feature but it will impact us more because we are losing valuable feedback
+      - We have experienced this in previous projects where the feedback does not align with our vision
+      - To reduce the likelihood and impact of this problem, we will include our goals in the feedback form/survey/demo and disregard anything that is too far out of scope
+      - We will not be able to detect this problem until it occurs. However, by sticking to our plan we can eliminate the need for further implementation
+      - If this occurs, we will expand our feedback circle to receive more feedback and data
+   5. Dependency Roadblocks
+      - High likelihood of occuring
+      - High impact if it occurs
+      - We have already encountered roadblocks, such as needing to implement the backend and page transitions before implementing subpages
+      - We are making schedules and plans to outline what dependencies exist and what order to do tasks
+      - To detect this, we will use formal planning and anticipate these problems
+      - Should it occur, we will allocate more people to implement the feature until we are caught up
 
    Since submitting the requirements document, we've been able to come up with more risks that might pose a challenge.
 
