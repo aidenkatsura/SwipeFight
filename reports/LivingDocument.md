@@ -373,7 +373,13 @@ implement and will likely require additional research to figure out.
 After implementing each feature, we should have outside members test our app and give feedback on bugs, unintuitive UX or app interactions, or any additional desired changes
 
 ### Documentation Plan
-
+__User Guide__ outlines:
+  - How to login/sign up
+  - How to navigate tabs
+  - How to change profile information
+  - How to swipe/filter
+  - Steps to take after matching
+  - How to contact us
 
 ## Software Architecture
 ### Identify and describe the major software components and their functionality at a conceptual level
@@ -398,7 +404,8 @@ After implementing each feature, we should have outside members test our app and
    - Messaging is only available after matching
 
 ### For each of two decisions pertaining to your software architecture, identify and briefly describe an alternative. For each of the two alternatives, discuss its pros and cons compared to your choice
-   -
+   - choice 1
+   - choice 2
 
 
 ## Software Design
