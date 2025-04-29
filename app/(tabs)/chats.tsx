@@ -1,5 +1,6 @@
 import { StyleSheet, Text, View, FlatList, TouchableOpacity, Image, SafeAreaView } from 'react-native';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
+import { router } from 'expo-router';
 import { mockChats } from '@/data/mockChats';
 import { Chat } from '@/types/chat';
 import { theme } from '@/styles/theme';
@@ -8,29 +9,48 @@ import ChatBubble from '@/components/ChatBubble';
 
 export default function ChatsScreen() {
   const [chats, setChats] = useState<Chat[]>([]);
-  
+
   useEffect(() => {
     // Simulate API fetch
     setChats(mockChats);
   }, []);
 
+  // Sort chats by unread status and timestamp
+  const sortedChats = useMemo(() => {
+    return [...chats].sort((a, b) => {
+      // First sort by unread status
+      if (a.unreadCount > 0 && b.unreadCount === 0) return -1;
+      if (a.unreadCount === 0 && b.unreadCount > 0) return 1;
+
+      // Then sort by timestamp (most recent first)
+      return b.lastMessage.timestamp.getTime() - a.lastMessage.timestamp.getTime();
+    });
+  }, [chats]);
+
+  const handleChatPress = (chatId: string) => {
+    router.push(`/chat/${chatId}`);
+  };
+
   const renderChatItem = ({ item }: { item: Chat }) => {
     // Get the other participant (not the current user)
     const otherParticipant = item.participants[1]; // Assuming current user is always at index 0
-    
+
     return (
-      <TouchableOpacity style={styles.chatItem}>
-        <Image 
-          source={{ uri: otherParticipant.photo }} 
-          style={styles.profileImage} 
+      <TouchableOpacity
+        style={styles.chatItem}
+        onPress={() => handleChatPress(item.id)}
+      >
+        <Image
+          source={{ uri: otherParticipant.photo }}
+          style={styles.profileImage}
         />
-        
+
         {item.unreadCount > 0 && (
           <View style={styles.unreadBadge}>
             <Text style={styles.unreadText}>{item.unreadCount}</Text>
           </View>
         )}
-        
+
         <View style={styles.chatContent}>
           <View style={styles.chatHeader}>
             <Text style={styles.userName}>{otherParticipant.name}</Text>
@@ -38,10 +58,10 @@ export default function ChatsScreen() {
               {formatDistanceToNow(item.lastMessage.timestamp)}
             </Text>
           </View>
-          
-          <Text 
+
+          <Text
             style={[
-              styles.lastMessage, 
+              styles.lastMessage,
               item.unreadCount > 0 && styles.unreadMessage
             ]}
             numberOfLines={1}
@@ -58,10 +78,10 @@ export default function ChatsScreen() {
       <View style={styles.header}>
         <Text style={styles.title}>Chats</Text>
       </View>
-      
-      {chats.length > 0 ? (
+
+      {sortedChats.length > 0 ? (
         <FlatList
-          data={chats}
+          data={sortedChats}
           renderItem={renderChatItem}
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.chatsList}
