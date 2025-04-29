@@ -1,12 +1,43 @@
-import { StyleSheet, Text, View, Image, ScrollView, TouchableOpacity, SafeAreaView } from 'react-native';
+import { StyleSheet, Text, View, Image, ScrollView, TouchableOpacity, SafeAreaView, Alert } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { Pencil as EditPencil, Settings, Medal, Trophy, LogOut } from 'lucide-react-native';
 import { theme } from '@/styles/theme';
 import { mockCurrentUser } from '@/data/mockCurrentUser';
 import StatCard from '@/components/StatCard';
+import * as ImagePicker from 'expo-image-picker';
+import { useState } from 'react';
 
 export default function ProfileScreen() {
-  const user = mockCurrentUser;
+  const [user, setUser] = useState(mockCurrentUser);
+
+  const pickImage = async () => {
+    // Request permission to access the media library
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (status !== 'granted') {
+      Alert.alert(
+        'Permission Required',
+        'Please grant permission to access your photos to change your profile picture.'
+      );
+      return;
+    }
+
+    // Launch the image picker
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      // Update the user's photo with the selected image
+      setUser(prevUser => ({
+        ...prevUser,
+        photo: result.assets[0].uri
+      }));
+    }
+  };
 
   const stats = [
     {
@@ -53,7 +84,10 @@ export default function ProfileScreen() {
         <View style={styles.profileHeader}>
           <View style={styles.profileImageContainer}>
             <Image source={{ uri: user.photo }} style={styles.profileImage} />
-            <TouchableOpacity style={styles.editProfileButton}>
+            <TouchableOpacity
+              style={styles.editProfileButton}
+              onPress={pickImage}
+            >
               <EditPencil color={theme.colors.white} size={18} />
             </TouchableOpacity>
           </View>
