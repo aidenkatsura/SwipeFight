@@ -385,14 +385,17 @@ After implementing each feature, we should have outside members test our app and
 ### Specify the interfaces between components
    - Mobile Client <=> Backend API Server: Tapping or swiping sends request to server which sends response back
    - Backend API Server <=> Database Server: Saving profile, matches, messages
-   - Backend API Server <=> Real-Time Messaging: Sned and receive messages
+   - Backend API Server <=> Real-Time Messaging: Send and receive messages
 
 ### Describe in detail what data your system stores, and how. If it uses a database, give the high level database schema. If not, describe how you are storing the data and its organization
    - Using Firebase for the database
-   - Firebase will hold user profile information, matches, all users
+   - Firebase will hold user profile information, matches, all users, messages
 
 ### If there are particular assumptions underpinning your chosen architecture, identify and describe them
-   - The information should be secure which means we 
+   - The information should be secure which means we need to have a secure database
+   - User information will not change as frequently as other aspects
+   - Interactions are isolated until users match
+   - Messaging is only available after matching
 
 ### For each of two decisions pertaining to your software architecture, identify and briefly describe an alternative. For each of the two alternatives, discuss its pros and cons compared to your choice
    -
