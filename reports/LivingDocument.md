@@ -362,19 +362,19 @@ implement and will likely require additional research to figure out.
 |                              | 2. Fix front-end skeleton bugs               | 2 person-weeks                | Task 1                                      |
 |                              | 3. Build basic front-end UI/navigation       | 2 person-weeks                | Task 2                                      |
 | Profile system implemented   | 4. Implement profile page front-end          | 1 person-week                 | Task 3                                      |
-|                              | 5. Build backend for user profile creation   | 1 person-week                 | –                                           |
+|                              | 5. Build backend for user profile creation   | 2 person-week                 | Task 1                                      |
 |                              | 6. Build backend for profile editing         | 1 person-week                 | Task 5                                      |
 | Filtering system functional  | 7. Implement front-end filtering             | 1 person-week                 | Task 3                                      |
 |                              | 8. Build backend for location filtering      | 1 person-week                 | Task 5                                      |
 | Swipe/match system functional| 9. Design swipe card UI/animations           | 1 person-week                 | Task 3                                      |
-|                              | 10. Implement swipe functionality            | 1 person-week                 | Tasks 3, 9                                  |
+|                              | 10. Implement swipe functionality            | 2 person-weeks                | Tasks 3, 9                                  |
 |                              | 11. Build backend logic for swipe matching   | 1 person-week                 | Task 5                                      |
 |                              | 12. Integrate swiping and matching backend   | 1 person-week                 | Tasks 10, 11                                |
 | Live chat system complete    | 13. Design live chat UI                      | 1 person-week                 | Task 3                                      |
 |                              | 14. Implement live chat front-end            | 2 person-weeks                | Task 13                                     |
 |                              | 15. Build real-time chat backend             | 1 person-week                 | Task 5                                      |
-|                              | 16. Integrate chat front-end with backend    | 1 person-week                 | Tasks 14, 15                                |
-| Core features tested         | 17. Test swiping, chat, and profile features | 2 person-weeks                | Tasks 4, 6, 7, 8, 12, 16                    |
+|                              | 16. Integrate chat front-end with backend    | 2 person-weeks                | Tasks 14, 15                                |
+| Core features tested         | 17. Test swiping, chat, and profile features | 3 person-weeks                | Tasks 4, 6, 7, 8, 12, 16                    |
 | Post-feedback improvements   | 18. Apply user feedback                      | 1 person-week                 | Task 17 (ideally)                           |
 |                              | 19. Finalize front-end, optimize performance | 1 person-week                 | Tasks 4, 7, 10, 14                          |
 | Final polish and delivery    | 20. Finalize and deploy backend              | 1 person-week                 | Tasks 5, 6, 8, 11, 15                       |
@@ -448,7 +448,7 @@ We can configure Mocha tests to post a comment on GitHub Issues if a test is fai
 
 For __manual__ tests, a checklist that reflects what our team wants in each feature will be filled. This allows us to remain on task of what we want. __Basic walkthroughs__ will also allow us to test if our UI/UX is consistent across the app, regardless of changes or features.
 
-While we chose Mocha due to previous experience, other automated testing applications like [Jest](https://jestjs.io/) or [Detox](https://wix.github.io/Detox/) could also work. Since our team has not used those, there will need to be time to research.
+While we chose Mocha due to previous experience, other automated testing applications like [Jest](https://jestjs.io/) or [Detox](https://wix.github.io/Detox/) could also work. Unit testing with Mocha will be used to verify main front-end functionality (e.g., our matching algorithm) and back-end functionality (e.g., user authentication, editing an existing profile, starting a new chat). Integration testing will consist of manual testing (especially early on) and, as we progress, we may consider end-to-end testing tools (e.g., Detox). Since our team has not used those, there will need to be time to research.
 
 ### Documentation Plan
 We will incorporate a __User Guide__ that explains how to use the app. Since the app’s functionality may evolve during development, we plan to begin writing the user guide during the final polishing phase when features are more stable and clearly defined. In our user guide, we will outline the app’s functionality, how to use it, and troubleshooting including:
@@ -460,6 +460,8 @@ We will incorporate a __User Guide__ that explains how to use the app. Since the
   - How to contact us
 
 We’ll write a __System Guide__ detailing how the app’s systems work. We’ll include the information we deem the most important for technical team members and developers to understand.
+
+Documentation within the codebase can make use of standard [JSDoc](https://www.typescriptlang.org/docs/handbook/jsdoc-supported-types.html) comments where applicable for clear communication of code functionality.
 
 
 ## Software Architecture
@@ -554,3 +556,4 @@ __Chat component__
 
 ## Coding Design
  - TypeScript [Coding Style Guide](https://docs.aws.amazon.com/prescriptive-guidance/latest/best-practices-cdk-typescript-iac/typescript-best-practices.html)
+   - Chosen for the straightforward guidelines (and reputation of Amazon). The guide suggests using [ESLint](https://www.npmjs.com/package/@typescript-eslint/eslint-plugin) and [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode), which we can use to automatically fix formatting errors.
