@@ -355,6 +355,33 @@ implement and will likely require additional research to figure out.
      - Sam: Assist in final debugging, ensure all front-end features are responsive
      - Yashveer: Deploy final backend to production environment and test live connections
 
+
+| Milestone                     | Task                                         | Estimated Time (person-weeks) | Dependencies                                |
+|------------------------------|----------------------------------------------|-------------------------------|---------------------------------------------|
+| Initial project setup        | 1. Set up repo and development environments  | 1 person-week                 | –                                           |
+|                              | 2. Fix front-end skeleton bugs               | 2 person-weeks                | Task 1                                      |
+|                              | 3. Build basic front-end UI/navigation       | 2 person-weeks                | Task 2                                      |
+| Profile system implemented   | 4. Implement profile page front-end          | 1 person-week                 | Task 3                                      |
+|                              | 5. Build backend for user profile creation   | 1 person-week                 | –                                           |
+|                              | 6. Build backend for profile editing         | 1 person-week                 | Task 5                                      |
+| Filtering system functional  | 7. Implement front-end filtering             | 1 person-week                 | Task 3                                      |
+|                              | 8. Build backend for location filtering      | 1 person-week                 | Task 5                                      |
+| Swipe/match system functional| 9. Design swipe card UI/animations           | 1 person-week                 | Task 3                                      |
+|                              | 10. Implement swipe functionality            | 1 person-week                 | Tasks 3, 9                                  |
+|                              | 11. Build backend logic for swipe matching   | 1 person-week                 | Task 5                                      |
+|                              | 12. Integrate swiping and matching backend   | 1 person-week                 | Tasks 10, 11                                |
+| Live chat system complete    | 13. Design live chat UI                      | 1 person-week                 | Task 3                                      |
+|                              | 14. Implement live chat front-end            | 2 person-weeks                | Task 13                                     |
+|                              | 15. Build real-time chat backend             | 1 person-week                 | Task 5                                      |
+|                              | 16. Integrate chat front-end with backend    | 1 person-week                 | Tasks 14, 15                                |
+| Core features tested         | 17. Test swiping, chat, and profile features | 2 person-weeks                | Tasks 4, 6, 7, 8, 12, 16                    |
+| Post-feedback improvements   | 18. Apply user feedback                      | 1 person-week                 | Task 17 (ideally)                           |
+|                              | 19. Finalize front-end, optimize performance | 1 person-week                 | Tasks 4, 7, 10, 14                          |
+| Final polish and delivery    | 20. Finalize and deploy backend              | 1 person-week                 | Tasks 5, 6, 8, 11, 15                       |
+|                              | 21. Write documentation (user/system guide)  | 1 person-week                 | Tasks 19, 20 (final version); can draft earlier |
+|                              | 22. Final testing and test case documentation| 1 person-week                 | Tasks 17, 19, 20                            |
+
+
 ### Risks / Risk Assessment
    1. Potential learning curve with new technologies
       - Our choice of tech stack involves technologies that are new or unfamiliar to many group members (e.g., React Native), so it will be important to adapt to potential struggle
