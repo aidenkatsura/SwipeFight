@@ -467,9 +467,23 @@ __If there are particular assumptions underpinning your chosen architecture, ide
    - Messaging is only available after matching
 
 __For each of two decisions pertaining to your software architecture, identify and briefly describe an alternative. For each of the two alternatives, discuss its pros and cons compared to your choice__
-   - choice 1
-   - choice 2
-
+   - Firebase (NoSQL) vs SQL
+     - Pros of Firebase
+       - Automatic scaling
+       - Built in authentication integration
+       - Real-time updates built in
+     - Pros of Traditional SQL
+       - ACID compliance
+       - Can do more complex queries and joins
+       - More difficult to integrate
+   - Restful API vs GraphQL
+     - Pros of Restful
+       - Simpler, more widely used
+       - Easier to monitor and log requests
+       - Built in HTTP semantics
+     - Pros of GraphQL
+       - Clients request exactly the fields they need
+       - A single GraphQL endpoint handles all queries and mutations
 
 ## Software Design
 __Provide a detailed definition of each of the software components you identified above__
