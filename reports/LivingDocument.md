@@ -433,6 +433,7 @@ implement and will likely require additional research to figure out.
    Since submitting the requirements document, we've been able to come up with more risks that might pose a challenge.
 
 __Describe at what point in your process external feedback will be most useful and how you will get that feedback__
+
 After implementing each feature, we should have outside members test our app and give feedback on bugs, unintuitive UX or app interactions, or any additional desired changes
 
 ### Test Plan and Bugs
@@ -475,34 +476,34 @@ __Specify the interfaces between components__
 
 __Describe in detail what data your system stores, and how. If it uses a database, give the high level database schema. If not, describe how you are storing the data and its organization__
    - Using Firebase for the database
-   - The system stores data from chats and sends messages from the sender to the receiver. It also stores user profiles including user location range, logic information (encrypted), friends, user rating, and other user information.
-    - User
-      - ID (String)
-      - Name (String)
-      - Email (String)
-      - Profile Photo Path (String?)
-      - Discipline (String)
-      - Rank (String)
-      - Location (String)
-      - Age (Integer)
-      - Friends (List<User>)
-      - Record
-        - Wins (Integer)
-        - Losses (Integer)
-        - Draws (Integer)
-      - Rating (Integer)
-      - createdAt (timestamp)
-    - Match
-      - ID (String)
-      - Participants (List<User>)
-      - Result (Result)
-      - Winner (User)
-      - Loser (User)
-    - Chat
-      - ID (String)
-      - Participants (List<User>)
-      - Messages (List<Messages>)
-      - lastUpdated (timestamp)
+   - The system stores data from chats and sends messages from the sender to the receiver. It also stores user profiles including user location range, logic information (encrypted), friends, user rating, and other user information. <br>
+     - User
+       - ID (String)
+       - Name (String)
+       - Email (String)
+       - Profile Photo Path (String?)
+       - Discipline (String)
+       - Rank (String)
+       - Location (String)
+       - Age (Integer)
+       - Friends (List<User>)
+       - Record
+         - Wins (Integer)
+         - Losses (Integer)
+         - Draws (Integer)
+       - Rating (Integer)
+       - createdAt (timestamp)
+     - Match
+       - ID (String)
+       - Participants (List<User>)
+       - Result (Result)
+       - Winner (User)
+       - Loser (User)
+     - Chat
+       - ID (String)
+       - Participants (List<User>)
+       - Messages (List<Messages>)
+       - lastUpdated (timestamp)
 
 __If there are particular assumptions underpinning your chosen architecture, identify and describe them__
    - The information should be secure which means we need to have a secure database
