@@ -431,7 +431,34 @@ __Specify the interfaces between components__
 
 __Describe in detail what data your system stores, and how. If it uses a database, give the high level database schema. If not, describe how you are storing the data and its organization__
    - Using Firebase for the database
-   - Firebase will hold user profile information, matches, all users, messages
+   - The system stores data from chats and sends messages from the sender to the receiver. It also stores user profiles including user location range, logic information (encrypted), friends, user rating, and other user information.
+    - User
+      - ID (String)
+      - Name (String)
+      - Email (String)
+      - Profile Photo Path (String?)
+      - Discipline (String)
+      - Rank (String)
+      - Location (String)
+      - Age (Integer)
+      - Friends (List<User>)
+      - Record
+        - Wins (Integer)
+        - Losses (Integer)
+        - Draws (Integer)
+      - Rating (Integer)
+      - createdAt (timestamp)
+    - Match
+      - ID (String)
+      - Participants (List<User>)
+      - Result (Result)
+      - Winner (User)
+      - Loser (User)
+    - Chat
+      - ID (String)
+      - Participants (List<User>)
+      - Messages (List<Messages>)
+      - lastUpdated (timestamp)
 
 __If there are particular assumptions underpinning your chosen architecture, identify and describe them__
    - The information should be secure which means we need to have a secure database
