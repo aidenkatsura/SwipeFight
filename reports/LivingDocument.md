@@ -435,14 +435,31 @@ implement and will likely require additional research to figure out.
 __Describe at what point in your process external feedback will be most useful and how you will get that feedback__
 After implementing each feature, we should have outside members test our app and give feedback on bugs, unintuitive UX or app interactions, or any additional desired changes
 
+### Test Plan and Bugs
+After each task implementation, we will use both __manual__ and __automated__ tests. For automated testing, we will run a series of [Mocha](https://mochajs.org/) tests, a JavaScript testing framework that runs in Node.js. We expect to build a series of tests after each task, maintaining consistency across all tasks while adding new features.
+__Benefits__ of using Mocha include:
+  - Simple syntax – Easy to write readable test cases
+  - Flexible – Works with any assertion library
+  - Extensive plugin ecosystem – Allows integration with additional tools and services
+  - Configured for React Native – Compatible with React Native projects
+
+We can configure Mocha tests to post a comment on GitHub Issues if a test is failed, allowing us to track bugs during use and testing. For now, since we just have a framework of our codebase, we will have to identify what tests to write initially.
+
+For __manual__ tests, a checklist that reflects what our team wants in each feature will be filled. This allows us to remain on task of what we want. __Basic walkthroughs__ will also allow us to test if our UI/UX is consistent across the app, regardless of changes or features.
+
+While we chose Mocha due to previous experience, other automated testing applications like [Jest](https://jestjs.io/) or [Detox](https://wix.github.io/Detox/) could also work. Since our team has not used those, there will need to be time to research.
+
 ### Documentation Plan
-__User Guide__ outlines:
+We will incorporate a __User Guide__ that explains how to use the app. Since the app’s functionality may evolve during development, we plan to begin writing the user guide during the final polishing phase when features are more stable and clearly defined. In our user guide, we will outline the app’s functionality, how to use it, and troubleshooting including:
   - How to login/sign up
   - How to navigate tabs
   - How to change profile information
   - How to swipe/filter
   - Steps to take after matching
   - How to contact us
+
+We’ll write a __System Guide__ detailing how the app’s systems work. We’ll include the information we deem the most important for technical team members and developers to understand.
+
 
 ## Software Architecture
 __Identify and describe the major software components and their functionality at a conceptual level__
