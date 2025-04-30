@@ -446,15 +446,18 @@ __For each of two decisions pertaining to your software architecture, identify a
 
 ## Software Design
 __Provide a detailed definition of each of the software components you identified above__
+
 __User component__
    - UserService: handles logic for creating, updating, retrieving user profiles
    - UserRepository: handles user data read and write to/from the database
    - User: represents a single user object, contains fields like id, name, email, discipline, rank, list of friends, etc.
    - Record: handles game records for a user, records wins, losses, and draws
+     
 __Match component__
    - MatchService: logic to create new matches, record results, update user records based on outcomes.
    - MatchRepository: read/write to database about match data
    - Match: a Match object contains user ids of fighters and result (winner/loser)
+     
 __Chat component__
    - ChatService: Handles sending/receiving messages, creating chats between users, and updating chat history
    - ChatRepository: handles database operations for writing and reading chat history
