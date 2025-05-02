@@ -4,9 +4,16 @@ import { Pencil as EditPencil, Settings, Medal, Trophy, LogOut } from 'lucide-re
 import { theme } from '@/styles/theme';
 import { mockCurrentUser } from '@/data/mockCurrentUser';
 import StatCard from '@/components/StatCard';
+import { router } from 'expo-router';
+import { Fighter } from '@/types/fighter';
 
 export default function ProfileScreen() {
   const user = mockCurrentUser;
+
+
+  const handleEditProfilePress = () => {
+    router.push('/profile-editor/profile-editor');
+  };
 
   const stats = [
     {
@@ -53,7 +60,7 @@ export default function ProfileScreen() {
         <View style={styles.profileHeader}>
           <View style={styles.profileImageContainer}>
             <Image source={{ uri: user.photo }} style={styles.profileImage} />
-            <TouchableOpacity style={styles.editProfileButton}>
+            <TouchableOpacity style={styles.editProfileButton} onPress={handleEditProfilePress}>
               <EditPencil color={theme.colors.white} size={18} />
             </TouchableOpacity>
           </View>
