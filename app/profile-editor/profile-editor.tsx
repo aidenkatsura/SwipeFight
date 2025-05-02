@@ -1,5 +1,6 @@
 // app/edit-profile.tsx
-import { View, Text, TextInput, Picker, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
+import { View, Image, Text, TextInput, Picker, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
 import { useState } from 'react';
 import { useRouter } from 'expo-router';
 import { theme } from '@/styles/theme';
@@ -14,19 +15,49 @@ export default function EditProfileScreen() {
   const [age, setAge] = useState(user.age.toString());
   const [location, setLocation] = useState(user.location);
   const [discipline, setDiscipline] = useState<Discipline>(user.discipline);
+  const [photo, setPhoto] = useState(user.photo);
 
   const handleSave = () => {
     // Implement save logic here (backend API call, etc.)
     // For now, just log the updated user data
-    console.log('Updated user:', { name, location });
+    console.log('Updated user:', { name, age, location, discipline, photo });
 
     // Go back to profile
     router.back();
   };
 
+  const handlePhotoChange = async () => {
+    // Request permission to access media library
+    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (permissionResult.granted === false) {
+      alert('Permission to access camera roll is required!');
+      return;
+    }
+      // Launch the image picker
+      const pickerResult = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1], // Ensure the image is square
+        quality: 1,
+      });
+  
+      // Ensure the result is not canceled and has the expected structure
+      if (!pickerResult.canceled && pickerResult.assets && pickerResult.assets[0].uri) {
+        setPhoto(pickerResult.assets[0].uri); // Access the URI of the first image asset
+      }
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.title}>Edit Profile</Text>
+
+      <Text style={styles.label}>Profile Picture</Text>
+      <TouchableOpacity onPress={handlePhotoChange}>
+        <Image
+          source={{ uri: photo }}
+          style={styles.picture}
+        />
+      </TouchableOpacity>
 
       <Text style={styles.label}>Name</Text>
       <TextInput
@@ -99,6 +130,14 @@ const styles = StyleSheet.create({
     marginTop: theme.spacing[3],
     marginBottom: theme.spacing[1],
     marginLeft: theme.spacing[3],
+  },
+  picture: {
+    width: 200,
+    height: 200,
+    borderRadius: 100,
+    marginTop: theme.spacing[2],
+    alignContent: 'center',
+    alignSelf: 'center',
   },
   input: {
     borderWidth: 1,
