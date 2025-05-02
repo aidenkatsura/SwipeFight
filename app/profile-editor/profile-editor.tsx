@@ -16,7 +16,8 @@ export default function EditProfileScreen() {
   const [discipline, setDiscipline] = useState<Discipline>(user.discipline);
 
   const handleSave = () => {
-    // In a real app, you'd send this to your backend.
+    // Implement save logic here (backend API call, etc.)
+    // For now, just log the updated user data
     console.log('Updated user:', { name, location });
 
     // Go back to profile
@@ -79,7 +80,8 @@ export default function EditProfileScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: theme.spacing[4],
+    paddingHorizontal: theme.spacing[4],
+    paddingVertical: theme.spacing[6],
     backgroundColor: theme.colors.white,
   },
   title: {
@@ -87,12 +89,16 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-Bold',
     marginBottom: theme.spacing[4],
     color: theme.colors.gray[900],
+    marginTop: theme.spacing[2],
+    marginLeft: theme.spacing[3],
   },
   label: {
     fontSize: 16,
     fontFamily: 'Inter-SemiBold',
     color: theme.colors.gray[800],
     marginTop: theme.spacing[3],
+    marginBottom: theme.spacing[1],
+    marginLeft: theme.spacing[3],
   },
   input: {
     borderWidth: 1,
@@ -102,6 +108,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: 'Inter-Regular',
     marginTop: theme.spacing[1],
+    marginLeft: theme.spacing[2],
+    marginRight: theme.spacing[2],
   },
   saveButton: {
     marginTop: theme.spacing[6],
@@ -109,6 +117,8 @@ const styles = StyleSheet.create({
     padding: theme.spacing[4],
     borderRadius: 10,
     alignItems: 'center',
+    marginLeft: theme.spacing[2],
+    marginRight: theme.spacing[2],
   },
   saveButtonText: {
     fontSize: 16,
