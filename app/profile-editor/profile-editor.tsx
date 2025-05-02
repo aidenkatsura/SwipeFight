@@ -1,16 +1,19 @@
 // app/edit-profile.tsx
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
+import { View, Text, TextInput, Picker, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
 import { useState } from 'react';
 import { useRouter } from 'expo-router';
 import { theme } from '@/styles/theme';
 import { mockCurrentUser } from '@/data/mockCurrentUser';
+import { Discipline } from '@/types/fighter';
 
 export default function EditProfileScreen() {
   const router = useRouter();
   const user = mockCurrentUser;
 
   const [name, setName] = useState(user.name);
+  const [age, setAge] = useState(user.age.toString());
   const [location, setLocation] = useState(user.location);
+  const [discipline, setDiscipline] = useState<Discipline>(user.discipline);
 
   const handleSave = () => {
     // In a real app, you'd send this to your backend.
@@ -31,12 +34,40 @@ export default function EditProfileScreen() {
         onChangeText={setName}
       />
 
+      <Text style={styles.label}>Age</Text>
+      <TextInput
+        style={styles.input}
+        value={age}
+        onChangeText={setAge}
+      />
+
       <Text style={styles.label}>Location</Text>
       <TextInput
         style={styles.input}
         value={location}
         onChangeText={setLocation}
       />
+
+      <Text style={styles.label}>Discipline</Text>
+      <Picker
+        selectedValue={discipline}
+        style={styles.input}
+        onValueChange={(itemValue: Discipline) => setDiscipline(itemValue as Discipline)}
+      >
+        <Picker.Item label="Aikido" value="Aikido" />
+        <Picker.Item label="BJJ" value="BJJ" />
+        <Picker.Item label="Boxing" value="Boxing" />
+        <Picker.Item label="Judo" value="Judo" />
+        <Picker.Item label="Karate" value="Karate" />
+        <Picker.Item label="Kendo" value="Kendo" />
+        <Picker.Item label="Kickboxing" value="Kickboxing" />
+        <Picker.Item label="Kung Fu" value="Kung Fu" />
+        <Picker.Item label="Krav Maga" value="Krav Maga" />
+        <Picker.Item label="Taekwondo" value="Taekwondo" />
+        <Picker.Item label="MMA" value="MMA" />
+        <Picker.Item label="Muay Thai" value="Muay Thai" />
+        <Picker.Item label="Wrestling" value="Wrestling" />
+      </Picker>
 
       <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
         <Text style={styles.saveButtonText}>Save</Text>
