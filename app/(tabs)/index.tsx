@@ -4,11 +4,10 @@ import Swiper from 'react-native-deck-swiper';
 import { Platform } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import { SwipeCard } from '@/components/SwipeCard';
-import { mockFighters } from '@/data/mockFighters';
 import { theme } from '@/styles/theme';
 import DisciplineFilter from '@/components/DisciplineFilter';
 import { Fighter, Discipline } from '@/types/fighter';
-import { addNewFighterToDB, fetchUsersFromDB } from '@/utils/firebaseUtils';
+import { changeUserDocId, fetchUsersFromDB } from '@/utils/firebaseUtils';
 
 export default function FightScreen() {
   // All fighters that have not been swiped on
