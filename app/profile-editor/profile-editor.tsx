@@ -1,5 +1,5 @@
 // app/edit-profile.tsx
-import { View, Image, Text, TextInput, Picker, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
+import { Image, KeyboardAvoidingView, Text, TextInput, Picker, Platform, TouchableOpacity, ScrollView, StyleSheet, SafeAreaView } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { useState } from 'react';
 import { useRouter } from 'expo-router';
@@ -49,61 +49,74 @@ export default function EditProfileScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>Edit Profile</Text>
-
-      <Text style={styles.label}>Profile Picture</Text>
-      <TouchableOpacity onPress={handlePhotoChange}>
-        <Image
-          source={{ uri: photo }}
-          style={styles.picture}
-        />
-      </TouchableOpacity>
-
-      <Text style={styles.label}>Name</Text>
-      <TextInput
-        style={styles.input}
-        value={name}
-        onChangeText={setName}
-      />
-
-      <Text style={styles.label}>Age</Text>
-      <TextInput
-        style={styles.input}
-        value={age}
-        onChangeText={setAge}
-      />
-
-      <Text style={styles.label}>Location</Text>
-      <TextInput
-        style={styles.input}
-        value={location}
-        onChangeText={setLocation}
-      />
-
-      <Text style={styles.label}>Discipline</Text>
-      <Picker
-        selectedValue={discipline}
-        style={styles.input}
-        onValueChange={(itemValue: Discipline) => setDiscipline(itemValue as Discipline)}
+      <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      style={{ flex: 1 }}
       >
-        <Picker.Item label="Aikido" value="Aikido" />
-        <Picker.Item label="BJJ" value="BJJ" />
-        <Picker.Item label="Boxing" value="Boxing" />
-        <Picker.Item label="Judo" value="Judo" />
-        <Picker.Item label="Karate" value="Karate" />
-        <Picker.Item label="Kendo" value="Kendo" />
-        <Picker.Item label="Kickboxing" value="Kickboxing" />
-        <Picker.Item label="Kung Fu" value="Kung Fu" />
-        <Picker.Item label="Krav Maga" value="Krav Maga" />
-        <Picker.Item label="Taekwondo" value="Taekwondo" />
-        <Picker.Item label="MMA" value="MMA" />
-        <Picker.Item label="Muay Thai" value="Muay Thai" />
-        <Picker.Item label="Wrestling" value="Wrestling" />
-      </Picker>
+        <ScrollView
+        contentContainerStyle={styles.scrollContainer}
+        keyboardShouldPersistTaps="handled"
+        >
+          <Text style={styles.title}>Edit Profile</Text>
 
-      <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-        <Text style={styles.saveButtonText}>Save</Text>
-      </TouchableOpacity>
+          <Text style={styles.label}>Profile Picture</Text>
+          <TouchableOpacity onPress={handlePhotoChange}>
+            <Image
+              source={{ uri: photo }}
+              style={styles.picture}
+            />
+          </TouchableOpacity>
+
+          <Text style={styles.label}>Name</Text>
+          <TextInput
+            style={styles.input}
+            value={name}
+            onChangeText={setName}
+          />
+
+          <Text style={styles.label}>Age</Text>
+          <TextInput
+            style={styles.input}
+            value={age}
+            onChangeText={setAge}
+          />
+
+          <Text style={styles.label}>Location</Text>
+          <TextInput
+            style={styles.input}
+            value={location}
+            onChangeText={setLocation}
+          />
+
+          <Text style={styles.label}>Discipline</Text>
+          <Picker
+            selectedValue={discipline}
+            style={styles.input}
+            onValueChange={(itemValue: Discipline) => setDiscipline(itemValue as Discipline)}
+          >
+            <Picker.Item label="Aikido" value="Aikido" />
+            <Picker.Item label="BJJ" value="BJJ" />
+            <Picker.Item label="Boxing" value="Boxing" />
+            <Picker.Item label="Judo" value="Judo" />
+            <Picker.Item label="Karate" value="Karate" />
+            <Picker.Item label="Kendo" value="Kendo" />
+            <Picker.Item label="Kickboxing" value="Kickboxing" />
+            <Picker.Item label="Kung Fu" value="Kung Fu" />
+            <Picker.Item label="Krav Maga" value="Krav Maga" />
+            <Picker.Item label="Taekwondo" value="Taekwondo" />
+            <Picker.Item label="MMA" value="MMA" />
+            <Picker.Item label="Muay Thai" value="Muay Thai" />
+            <Picker.Item label="Wrestling" value="Wrestling" />
+          </Picker>
+
+          
+
+          <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
+            <Text style={styles.saveButtonText}>Save</Text>
+          </TouchableOpacity>
+          
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
@@ -114,6 +127,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: theme.spacing[4],
     paddingVertical: theme.spacing[6],
     backgroundColor: theme.colors.white,
+  },
+  scrollContainer: {
+    paddingBottom: theme.spacing[10],
   },
   title: {
     fontSize: 24,
