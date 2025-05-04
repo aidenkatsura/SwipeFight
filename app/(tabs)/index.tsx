@@ -1,5 +1,5 @@
 import { StyleSheet, View, Text, SafeAreaView, TouchableOpacity } from 'react-native';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Swiper from 'react-native-deck-swiper';
 import { Platform } from 'react-native';
 import * as Haptics from 'expo-haptics';
@@ -8,17 +8,38 @@ import { mockFighters } from '@/data/mockFighters';
 import { theme } from '@/styles/theme';
 import DisciplineFilter from '@/components/DisciplineFilter';
 import { Fighter, Discipline } from '@/types/fighter';
+import { collection, deleteDoc, doc, getDoc, getDocs, query, setDoc } from 'firebase/firestore';
+import { db } from '@/FirebaseConfig';
 
 export default function FightScreen() {
   // All fighters that have not been swiped on
-  const [allFighters, setAllFighters] = useState(mockFighters);
+  const [allFighters, setAllFighters] = useState<Fighter[]>([]);
 
   // Fighters from allFighters that matched the most recent filter.
   // Only updated when a filter is applied - not modified on swipes.
-  const [filteredFighters, setFilteredFighters] = useState(mockFighters);
+  const [filteredFighters, setFilteredFighters] = useState<Fighter[]>([]);
 
   const [selectedDiscipline, setSelectedDiscipline] = useState<Discipline | 'All'>('All');
   const swiperRef = useRef<Swiper<Fighter>>(null);
+  const usersCollection = collection(db, 'users');
+
+  // Get all users from db
+  const fetchUsers = async () => {
+    try {
+      const querySnapshot = await getDocs(usersCollection);
+      const users = querySnapshot.docs.map((doc) => doc.data());
+      console.log('Fetched users:', users);
+      setAllFighters(users as Fighter[]);
+      setFilteredFighters(users as Fighter[]);
+    } catch (error) {
+      console.error('Error fetching users:', error);
+    }
+  };
+
+  // Fetch users when the component mounts
+  useEffect(() => {
+    fetchUsers();
+  }, []);  
 
   const handleSwipeRight = (index: number) => {
     triggerHapticFeedback('medium');
