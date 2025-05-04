@@ -8,8 +8,7 @@ import { mockFighters } from '@/data/mockFighters';
 import { theme } from '@/styles/theme';
 import DisciplineFilter from '@/components/DisciplineFilter';
 import { Fighter, Discipline } from '@/types/fighter';
-import { collection, deleteDoc, doc, getDoc, getDocs, query, setDoc } from 'firebase/firestore';
-import { db } from '@/FirebaseConfig';
+import { addNewFighterToDB, fetchUsersFromDB } from '@/utils/firebaseUtils';
 
 export default function FightScreen() {
   // All fighters that have not been swiped on
@@ -21,16 +20,14 @@ export default function FightScreen() {
 
   const [selectedDiscipline, setSelectedDiscipline] = useState<Discipline | 'All'>('All');
   const swiperRef = useRef<Swiper<Fighter>>(null);
-  const usersCollection = collection(db, 'users');
 
   // Get all users from db
   const fetchUsers = async () => {
     try {
-      const querySnapshot = await getDocs(usersCollection);
-      const users = querySnapshot.docs.map((doc) => doc.data());
+      const users: Fighter[] = await fetchUsersFromDB();
       console.log('Fetched users:', users);
-      setAllFighters(users as Fighter[]);
-      setFilteredFighters(users as Fighter[]);
+      setAllFighters(users);
+      setFilteredFighters(users);
     } catch (error) {
       console.error('Error fetching users:', error);
     }
