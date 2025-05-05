@@ -1,24 +1,46 @@
-import { StyleSheet, View, Text, SafeAreaView, TouchableOpacity } from 'react-native';
-import { useState, useRef } from 'react';
+import { StyleSheet, View, Text, SafeAreaView, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { useState, useRef, useEffect } from 'react';
 import Swiper from 'react-native-deck-swiper';
 import { Platform } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import { SwipeCard } from '@/components/SwipeCard';
-import { mockFighters } from '@/data/mockFighters';
 import { theme } from '@/styles/theme';
 import DisciplineFilter from '@/components/DisciplineFilter';
 import { Fighter, Discipline } from '@/types/fighter';
+import { fetchUsersFromDB } from '@/utils/firebaseUtils';
 
 export default function FightScreen() {
   // All fighters that have not been swiped on
-  const [allFighters, setAllFighters] = useState(mockFighters);
+  const [allFighters, setAllFighters] = useState<Fighter[]>([]);
 
   // Fighters from allFighters that matched the most recent filter.
   // Only updated when a filter is applied - not modified on swipes.
-  const [filteredFighters, setFilteredFighters] = useState(mockFighters);
+  const [filteredFighters, setFilteredFighters] = useState<Fighter[]>([]);
 
   const [selectedDiscipline, setSelectedDiscipline] = useState<Discipline | 'All'>('All');
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const swiperRef = useRef<Swiper<Fighter>>(null);
+
+  // Get all users from db
+  const fetchUsers = async () => {
+    try {
+      setIsLoading(true); // Set loading to true so spinner shows while fetching
+
+      const users: Fighter[] = await fetchUsersFromDB();
+      console.log('Fetched users:', users);
+      setAllFighters(users);
+      setFilteredFighters(users);
+    } catch (error) {
+      console.error('Error fetching users:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Fetch users when the component mounts
+  useEffect(() => {
+    fetchUsers();
+  }, []);  
 
   const handleSwipeRight = (index: number) => {
     triggerHapticFeedback('medium');
@@ -89,7 +111,11 @@ export default function FightScreen() {
       </View>
 
       <View style={styles.swiperContainer}>
-        {filteredFighters.length > 0 ? (
+        {isLoading ? ( // Loading spinner while fetching users
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size={100} color={theme.colors.primary[500]} />
+          </View>
+        ) : filteredFighters.length > 0 ? (
           <Swiper
             ref={swiperRef}
             cards={filteredFighters}
@@ -163,6 +189,11 @@ const styles = StyleSheet.create({
   swiperContainer: {
     flex: 1,
     paddingTop: 0,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   overlayWrapper: {
     flexDirection: 'column',
