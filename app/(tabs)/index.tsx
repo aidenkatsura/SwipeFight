@@ -7,7 +7,7 @@ import { SwipeCard } from '@/components/SwipeCard';
 import { theme } from '@/styles/theme';
 import DisciplineFilter from '@/components/DisciplineFilter';
 import { Fighter, Discipline } from '@/types/fighter';
-import { fetchUsersFromDB } from '@/utils/firebaseUtils';
+import { addChat, addMatchToUser, fetchUsersFromDB } from '@/utils/firebaseUtils';
 
 export default function FightScreen() {
   // All fighters that have not been swiped on
@@ -48,6 +48,9 @@ export default function FightScreen() {
     if (index >= 0 && index < filteredFighters.length) {
       console.log('Challenged fighter:', filteredFighters[index].name);
     }
+    //pretend urr user is id "user0"
+    addMatchToUser("0", filteredFighters[index].id);
+    addChat("0", filteredFighters[index].id);
     // In production, would send challenge request to API
   };
 

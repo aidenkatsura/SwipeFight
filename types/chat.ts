@@ -9,12 +9,7 @@ export interface ChatMessage {
 
 export interface Chat {
   id: string;
-  matchId: string;
-  participants: {
-    id: string;
-    name: string;
-    photo: string;
-  }[];
-  lastMessage: ChatMessage;
+  participants: string[];
+  messages: ChatMessage[];
   unreadCount: number;
 }

@@ -7,6 +7,7 @@ import { ChatMessage, Chat } from '@/types/chat';
 import { formatDistanceToNow } from '@/utils/dateUtils';
 import { Send } from 'lucide-react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { fetchChatFromDB } from '@/utils/firebaseUtils';
 
 export default function ChatScreen() {
   const { id } = useLocalSearchParams();
@@ -16,42 +17,25 @@ export default function ChatScreen() {
   const flatListRef = useRef<FlatList>(null);
   const keyboardHeight = useRef(0);
 
-  useEffect(() => {
-    // Find the chat with the matching ID
-    const foundChat = mockChats.find(chat => chat.id === id);
-    if (foundChat) {
-      setChat(foundChat);
-      // In a real app, we would fetch messages for this chat
-      // For now, we'll just use some mock messages
-      const mockMessages: ChatMessage[] = [
-        {
-          id: '1',
-          senderId: '1',
-          receiverId: '2',
-          message: 'Hey! Ready for our match?',
-          timestamp: new Date(Date.now() - 3600000),
-          read: true,
-        },
-        {
-          id: '2',
-          senderId: '2',
-          receiverId: '1',
-          message: 'Absolutely! When works for you?',
-          timestamp: new Date(Date.now() - 3500000),
-          read: true,
-        },
-        {
-          id: '3',
-          senderId: '1',
-          receiverId: '2',
-          message: 'How about tomorrow at 3 PM?',
-          timestamp: new Date(Date.now() - 3400000),
-          read: true,
-        },
-      ];
-      setMessages(mockMessages);
-    }
-
+   // Get all users from db
+    const fetchChat = async () => {
+      try {
+        //setIsLoading(true); // Set loading to true so spinner shows while fetching
+  
+        const chat: Chat = await fetchChatFromDB("1");
+        console.log('Fetched chat:', chat);
+        setChat(chat);
+        setMessages(chat.messages);
+      } catch (error) {
+        console.error('Error fetching users:', error);
+      } finally {
+        //setIsLoading(false);
+      }
+    };
+  
+    // Fetch users when the component mounts
+    useEffect(() => {
+      fetchChat();
     // Add keyboard listeners
     const keyboardWillShow = Keyboard.addListener(
       Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
@@ -71,7 +55,67 @@ export default function ChatScreen() {
       keyboardWillShow.remove();
       keyboardWillHide.remove();
     };
-  }, [id]);
+  }, [id]); 
+
+  // useEffect(() => {
+  //   // Find the chat with the matching ID
+  //   //const foundChat = mockChats.find(chat => chat.id === id);
+
+    
+  //   const foundChat = fetchChatFromDB("1");
+  //   if (foundChat) {
+  //     setChat(foundChat);
+  //     // In a real app, we would fetch messages for this chat
+  //     // For now, we'll just use some mock messages
+  //     const mockMessages: ChatMessage[] = [
+  //       {
+  //         id: '1',
+  //         senderId: '1',
+  //         receiverId: '2',
+  //         message: 'Hey! Ready for our match?',
+  //         timestamp: new Date(Date.now() - 3600000),
+  //         read: true,
+  //       },
+  //       {
+  //         id: '2',
+  //         senderId: '2',
+  //         receiverId: '1',
+  //         message: 'Absolutely! When works for you?',
+  //         timestamp: new Date(Date.now() - 3500000),
+  //         read: true,
+  //       },
+  //       {
+  //         id: '3',
+  //         senderId: '1',
+  //         receiverId: '2',
+  //         message: 'How about tomorrow at 3 PM?',
+  //         timestamp: new Date(Date.now() - 3400000),
+  //         read: true,
+  //       },
+  //     ];
+  //     setMessages(mockMessages);
+  //   }
+
+  //   // Add keyboard listeners
+  //   const keyboardWillShow = Keyboard.addListener(
+  //     Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
+  //     (e) => {
+  //       keyboardHeight.current = e.endCoordinates.height;
+  //     }
+  //   );
+
+  //   const keyboardWillHide = Keyboard.addListener(
+  //     Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
+  //     () => {
+  //       keyboardHeight.current = 0;
+  //     }
+  //   );
+
+  //   return () => {
+  //     keyboardWillShow.remove();
+  //     keyboardWillHide.remove();
+  //   };
+  // }, [id]);
 
   const handleSend = () => {
     if (newMessage.trim()) {
@@ -107,7 +151,7 @@ export default function ChatScreen() {
           {item.message}
         </Text>
         <Text style={styles.timestamp}>
-          {formatDistanceToNow(item.timestamp)}
+          {/*formatDistanceToNow(item.timestamp)*/}
         </Text>
       </View>
     );
@@ -118,6 +162,7 @@ export default function ChatScreen() {
   }
 
   // Get the other participant (not the current user)
+  //const otherParticipant = chat.participants[1];
   const otherParticipant = chat.participants[1];
 
   return (
@@ -125,10 +170,10 @@ export default function ChatScreen() {
       <SafeAreaView style={styles.container}>
         <View style={styles.header}>
           <Image
-            source={{ uri: otherParticipant.photo }}
+            source={{ uri: "https://images.pexels.com/photos/3911779/pexels-photo-3911779.jpeg" }}
             style={styles.profileImage}
           />
-          <Text style={styles.userName}>{otherParticipant.name}</Text>
+          <Text style={styles.userName}>{"JOE"}</Text>
         </View>
 
         <KeyboardAvoidingView

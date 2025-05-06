@@ -1,6 +1,7 @@
-import { collection, getDocs, doc, getDoc, setDoc, deleteDoc, addDoc, runTransaction } from 'firebase/firestore';
+import { collection, getDocs, doc, getDoc, setDoc, deleteDoc, addDoc, runTransaction, arrayUnion } from 'firebase/firestore';
 import { db } from '@/FirebaseConfig';
 import { Fighter } from '@/types/fighter';
+import { Chat, ChatMessage } from '@/types/chat';
 
 /**
  * Fetch all users from the Firestore database.
@@ -96,5 +97,156 @@ export const changeUserDocId = async (oldDocId: string, newDocId: string): Promi
   } catch (error) {
     console.error('Error changing document ID:', error);
     return false; // Return false if the transaction fails
+  }
+};
+
+/**
+ * Adds a match to the user's matches array
+ * 
+ * 
+ * @param {string} targetUserId - The current document ID of the user.
+ * @param {string} matchUserId - The user id of the user whose been matched with.
+ * @returns {Promise<boolean>} Resolves to true if the document ID was successfully changed, 
+ *                             or false if the old ID does not exist or the new ID already exists.
+ * @throws Throws an error if an unexpected failure occurs.
+ */
+export async function addMatchToUser(targetUserId: string, matchUserId: string) {
+  try {
+    const userRef = doc(db, 'users', targetUserId);
+
+    await runTransaction(db, async (transaction) => {
+      const userDoc = await transaction.get(userRef);
+
+      if (!userDoc.exists()) {
+        throw new Error(`User with ID ${targetUserId} not found.`);
+      }
+
+      // Safely add the matchUserId to the matches array
+      transaction.update(userRef, {
+        matches: arrayUnion(matchUserId)
+      });
+    });
+  } catch (error) {
+    console.error('Error adding new match to user:', error);
+    return false; // Return false if the transaction fails
+  }
+};
+
+/**
+ * Fetch a specific chat from the Firestore database.
+ *  
+ * @param {string} targetChatId - the target id of the Chat
+ * 
+ * @returns {Promise<Chat>} A promise that resolves to an array of Fighter objects.
+ * @throws Throws an error if fetching users fails.
+ */
+export const fetchChatFromDB = async (targetChatId: string): Promise<Chat> => {
+  try {
+    const docRef = doc(db, 'chats', '1');
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      return docSnap.data() as Chat;
+    } else {
+      throw new Error('No such document!');
+    }
+  } catch (error) {
+    console.error('Error fetching chat from Firestore:', error);
+    throw new Error('No such document!');
+  }
+};
+
+
+/**
+ * Adds a match to the user's matches array
+ * 
+ * 
+ * @param {string} userId1 - user 1's id
+ * @param {string} userId2 - user 2's id
+ * @returns {Promise<boolean>} Resolves to true if the document ID was successfully changed, 
+ *                             or false if the old ID does not exist or the new ID already exists.
+ * @throws Throws an error if an unexpected failure occurs.
+ */
+export async function addChat(userId1: string, userId2: string) {
+  try {
+    // Create a reference to a new document in the 'chats' collection
+    const chatDocRef = doc(collection(db, 'chats'));
+    const chatId = chatDocRef.id;
+
+    const chat: Chat = {
+      id: chatId,
+      participants: [userId1, userId2],
+      messages: [],
+      unreadCount: 0,
+    };
+
+    await runTransaction(db, async (transaction) => {
+      // Optionally check for existing chats here
+
+      // Create the new chat document
+      transaction.set(chatDocRef, chat);
+    });
+    addChatToUser(userId1, chatId);
+    addChatToUser(userId2, chatId);
+    return true;
+  } catch (error) {
+    console.error('Error creating new chat:', error);
+    return false;
+  }
+};
+
+/**
+ * Adds a match to the user's matches array
+ * 
+ * 
+ * @param {string} targetUserId - The current document ID of the user.
+ * @param {string} chatId - The user id of the user whose been matched with.
+ * @returns {Promise<boolean>} Resolves to true if the document ID was successfully changed, 
+ *                             or false if the old ID does not exist or the new ID already exists.
+ * @throws Throws an error if an unexpected failure occurs.
+ */
+ async function addChatToUser(targetUserId: string, chatId: string) {
+  try {
+    const userRef = doc(db, 'users', targetUserId);
+
+    await runTransaction(db, async (transaction) => {
+      const userDoc = await transaction.get(userRef);
+
+      if (!userDoc.exists()) {
+        throw new Error(`User with ID ${targetUserId} not found.`);
+      }
+
+      // Safely add the matchUserId to the matches array
+      transaction.update(userRef, {
+        chats: arrayUnion(chatId)
+      });
+    });
+  } catch (error) {
+    console.error('Error adding new chat to user:', error);
+    return false; // Return false if the transaction fails
+  }
+};
+
+
+/**
+ * Fetch the 'chats' array from a specific user document.
+ * 
+ * @param {string} targetUserId - The document ID of the user.
+ * @returns {Promise<string[]>} A promise that resolves to an array of chat IDs.
+ * @throws Throws an error if fetching the user fails.
+ */
+export const fetchUserChatsFromDB = async (targetUserId: string): Promise<string[]> => {
+  try {
+    const userDocRef = doc(db, 'users', targetUserId);
+    const userDocSnap = await getDoc(userDocRef);
+
+    if (!userDocSnap.exists()) {
+      throw new Error(`User with ID ${targetUserId} does not exist.`);
+    }
+
+    const userData = userDocSnap.data();
+    return userData.chats || []; // return chats array or empty if undefined
+  } catch (error) {
+    console.error('Error fetching user chats from Firestore:', error);
+    throw new Error('Failed to fetch user chats from Firestore.');
   }
 };

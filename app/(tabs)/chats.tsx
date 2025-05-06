@@ -6,13 +6,42 @@ import { Chat } from '@/types/chat';
 import { theme } from '@/styles/theme';
 import { formatDistanceToNow } from '@/utils/dateUtils';
 import ChatBubble from '@/components/ChatBubble';
+import { fetchChatFromDB, fetchUserChatsFromDB } from '@/utils/firebaseUtils';
+
+
+const userId = '0'; // Replace with auth context or prop
 
 export default function ChatsScreen() {
+  // const [chats, setChats] = useState<Chat[]>([]);
+
+  // useEffect(() => {
+  //   // Simulate API fetch
+  //   setChats(mockChats);
+  // }, []);
+
   const [chats, setChats] = useState<Chat[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Simulate API fetch
-    setChats(mockChats);
+    const loadChats = async () => {
+      try {
+        const chatIds = await fetchUserChatsFromDB(userId);
+
+        const chatPromises = chatIds.map((id) => fetchChatFromDB(id));
+        const chatResults = await Promise.all(chatPromises);
+
+        // Optionally filter out nulls if getChat can return null for missing docs
+        const validChats = chatResults.filter((chat): chat is Chat => !!chat);
+
+        setChats(validChats);
+      } catch (error) {
+        console.error('Failed to load chats:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadChats();
   }, []);
 
   // Sort chats by unread status and timestamp
@@ -23,7 +52,8 @@ export default function ChatsScreen() {
       if (a.unreadCount === 0 && b.unreadCount > 0) return 1;
 
       // Then sort by timestamp (most recent first)
-      return b.lastMessage.timestamp.getTime() - a.lastMessage.timestamp.getTime();
+      //return b.lastMessage.timestamp.getTime() - a.lastMessage.timestamp.getTime();
+      return 1;
     });
   }, [chats]);
 
@@ -41,7 +71,7 @@ export default function ChatsScreen() {
         onPress={() => handleChatPress(item.id)}
       >
         <Image
-          source={{ uri: otherParticipant.photo }}
+          source={{ uri: "https://images.pexels.com/photos/3911779/pexels-photo-3911779.jpeg"}}
           style={styles.profileImage}
         />
 
@@ -53,9 +83,9 @@ export default function ChatsScreen() {
 
         <View style={styles.chatContent}>
           <View style={styles.chatHeader}>
-            <Text style={styles.userName}>{otherParticipant.name}</Text>
+            <Text style={styles.userName}>{/*otherParticipant.name*/}</Text>
             <Text style={styles.timestamp}>
-              {formatDistanceToNow(item.lastMessage.timestamp)}
+              {/*formatDistanceToNow(item.lastMessage.timestamp)*/}
             </Text>
           </View>
 
@@ -66,7 +96,7 @@ export default function ChatsScreen() {
             ]}
             numberOfLines={1}
           >
-            {item.lastMessage.message}
+            {/*item.lastMessage.message */}
           </Text>
         </View>
       </TouchableOpacity>
