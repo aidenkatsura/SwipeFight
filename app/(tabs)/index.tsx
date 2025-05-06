@@ -8,6 +8,7 @@ import { theme } from '@/styles/theme';
 import DisciplineFilter from '@/components/DisciplineFilter';
 import { Fighter, Discipline } from '@/types/fighter';
 import { fetchUsersFromDB } from '@/utils/firebaseUtils';
+import { filterFightersByDiscipline } from '@/utils/filterUtils';
 
 export default function FightScreen() {
   // All fighters that have not been swiped on
@@ -83,13 +84,9 @@ export default function FightScreen() {
 
   const handleFilterChange = (discipline: Discipline | 'All') => {
     setSelectedDiscipline(discipline);
-    // In production, would fetch fighters by discipline from API
-    if (discipline === 'All') {
-      setFilteredFighters(allFighters);
-    } else {
-      setFilteredFighters(allFighters.filter(fighter => fighter.discipline === discipline));
-    }
-    swiperRef.current?.jumpToCardIndex(0); // reset to start of fighter list
+    const filtered = filterFightersByDiscipline(allFighters, discipline); // Use the filter function
+    setFilteredFighters(filtered);
+    swiperRef.current?.jumpToCardIndex(0);
   };
 
   const handlePressSwipeLeft = () => {
