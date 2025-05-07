@@ -2,6 +2,7 @@ import { formatDistanceToNow } from '../utils/dateUtils';
 import { mockFighters } from '../data/mockFighters';
 import { filterFightersByDiscipline } from '../utils/filterUtils';
 import { ChatMessage } from '../types/chat';
+import { Discipline, Fighter } from '@/types/fighter';
 
 var assert = require('assert');
 describe('Dummy Test: Array', function () {
@@ -15,8 +16,7 @@ describe('Dummy Test: Array', function () {
 
 describe('Swiping Screen', function () {
   describe('Filter by Discipline', function () {
-    it('Should only show users with the selected discipline', function () {
-      assert.equal(mockFighters.length, 12); // Original length of mockFighters
+    it('should only show users with the selected discipline', function () {
       const selectedDiscipline = 'Boxing';
       
       // Use the imported filter function instead of manually filtering
@@ -26,6 +26,38 @@ describe('Swiping Screen', function () {
       assert.equal(filteredFighters[0].discipline, selectedDiscipline);
       assert.equal(filteredFighters[1].discipline, selectedDiscipline);
     });
+
+    it("should return all users when 'All' is selected", function () {
+      const selectedDiscipline = 'All'; // Assuming "All" means no filtering
+
+      const filteredFighters = filterFightersByDiscipline(mockFighters, selectedDiscipline);
+
+      // Assert that all fighters are returned (order preserved)
+      assert.equal(filteredFighters.length, mockFighters.length);
+      assert.deepStrictEqual(filteredFighters, mockFighters);
+    });
+
+    it('should return an empty array when the input is empty (with a specific discipline selected)', function () {
+      const selectedDiscipline: Discipline = 'Boxing';
+      const emptyFighters: Fighter[] = [];
+
+      const filteredFighters = filterFightersByDiscipline(emptyFighters, selectedDiscipline);
+
+      // Assert that the result is an empty array
+      assert.equal(filteredFighters.length, 0);
+      assert.deepStrictEqual(filteredFighters, []);
+    });
+
+    it("should return empty array when input is empty (with 'All' selected)", function () {
+      const selectedDiscipline = 'All';
+      const emptyFighters: Fighter[] = [];
+
+      const filteredFighters = filterFightersByDiscipline(emptyFighters, selectedDiscipline);
+
+      // Assert that the result is an empty array
+      assert.equal(filteredFighters.length, 0);
+      assert.deepStrictEqual(filteredFighters, []);
+    });
   });
 });
 
@@ -33,7 +65,7 @@ describe('Swiping Screen', function () {
 
 describe('Leaderboard Rankings', function () {
   describe('Rank based on rating', function () {
-    it('Should rank each discipline by user ranking', function () {
+    it('should rank each discipline by user ranking', function () {
       assert.equal(mockFighters.length, 12); // Original length of mockFighters
       const selectedDiscipline = 'Boxing';
       
