@@ -7,6 +7,8 @@ import { ChatMessage, Chat } from '@/types/chat';
 import { formatDistanceToNow } from '@/utils/dateUtils';
 import { Send } from 'lucide-react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { Ionicons } from '@expo/vector-icons';
+import { router } from 'expo-router';
 
 export default function ChatScreen() {
   const { id } = useLocalSearchParams();
@@ -96,19 +98,27 @@ export default function ChatScreen() {
     const isCurrentUser = item.senderId === '1'; // Assuming current user's ID is '1'
 
     return (
-      <View style={[
-        styles.messageContainer,
-        isCurrentUser ? styles.currentUserMessage : styles.otherUserMessage
-      ]}>
-        <Text style={[
-          styles.messageText,
-          isCurrentUser ? styles.currentUserText : styles.otherUserText
+      <View style={{ flexDirection: 'row', alignItems: 'flex-end', marginBottom: theme.spacing[2], justifyContent: isCurrentUser ? 'flex-end' : 'flex-start' }}>
+        {!isCurrentUser && (
+          <Image
+            source={{ uri: otherParticipant.photo }}
+            style={{ width: 28, height: 28, borderRadius: 14, marginRight: theme.spacing[2] }}
+          />
+        )}
+        <View style={[
+          styles.messageContainer,
+          isCurrentUser ? styles.currentUserMessage : styles.otherUserMessage
         ]}>
-          {item.message}
-        </Text>
-        <Text style={styles.timestamp}>
-          {formatDistanceToNow(item.timestamp)}
-        </Text>
+          <Text style={[
+            styles.messageText,
+            isCurrentUser ? styles.currentUserText : styles.otherUserText
+          ]}>
+            {item.message}
+          </Text>
+          <Text style={styles.timestamp}>
+            {formatDistanceToNow(item.timestamp)}
+          </Text>
+        </View>
       </View>
     );
   };
@@ -124,6 +134,9 @@ export default function ChatScreen() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaView style={styles.container}>
         <View style={styles.header}>
+          <TouchableOpacity onPress={() => router.back()} style={{ marginRight: theme.spacing[3] }}>
+            <Ionicons name="arrow-back" size={28} color={theme.colors.gray[900]} />
+          </TouchableOpacity>
           <Image
             source={{ uri: otherParticipant.photo }}
             style={styles.profileImage}
