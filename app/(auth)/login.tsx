@@ -4,6 +4,7 @@ import { Link, router } from 'expo-router';
 import { theme } from '@/styles/theme';
 import { auth } from '@/FirebaseConfig';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+import { ScrollView } from 'react-native-gesture-handler';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
@@ -57,81 +58,86 @@ export default function LoginScreen() {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardAvoidContainer}
       >
-        <View style={styles.headerContainer}>
-          <Image 
-            source={{ uri: 'https://images.pexels.com/photos/4761668/pexels-photo-4761668.jpeg' }} 
-            style={styles.backgroundImage} 
-          />
-          <View style={styles.overlay} />
-          <View style={styles.logoContainer}>
-            <Text style={styles.logoText}>SwipeFight</Text>
-            <Text style={styles.tagline}>Find your next sparring partner</Text>
-          </View>
-        </View>
-
-        <View style={styles.formContainer}>
-          {error && (
-            <View style={styles.errorContainer}>
-              <Text style={styles.errorText}>{error}</Text>
+        <ScrollView
+          contentContainerStyle={styles.scrollContainer}
+          keyboardShouldPersistTaps="handled"
+        >
+          <View style={styles.headerContainer}>
+            <Image 
+              source={{ uri: 'https://images.pexels.com/photos/4761668/pexels-photo-4761668.jpeg' }} 
+              style={styles.backgroundImage} 
+            />
+            <View style={styles.overlay} />
+            <View style={styles.logoContainer}>
+              <Text style={styles.logoText}>SwipeFight</Text>
+              <Text style={styles.tagline}>Find your next sparring partner</Text>
             </View>
-          )}
-
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Email</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Enter your email"
-              placeholderTextColor={theme.colors.gray[400]}
-              value={email}
-              onChangeText={setEmail}
-              keyboardType="email-address"
-              autoCapitalize="none"
-            />
           </View>
 
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Password</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Enter your password"
-              placeholderTextColor={theme.colors.gray[400]}
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry
-            />
-            <TouchableOpacity style={styles.forgotPassword}>
-              <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
-            </TouchableOpacity>
-          </View>
+          <View style={styles.formContainer}>
+            {error && (
+              <View style={styles.errorContainer}>
+                <Text style={styles.errorText}>{error}</Text>
+              </View>
+            )}
 
-          <TouchableOpacity 
-            style={[styles.loginButton, loading && styles.loginButtonDisabled]}
-            onPress={signIn}
-            disabled={loading}
-          >
-            <Text style={styles.loginButtonText}>
-              {loading ? 'Logging in...' : 'Login'}
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity 
-            style={[styles.loginButton, loading && styles.loginButtonDisabled]}
-            onPress={signUp}
-            disabled={loading}
-          >
-            <Text style={styles.loginButtonText}>
-              {loading ? 'Create Account' : 'Create Account'}
-            </Text>
-          </TouchableOpacity>
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>Email</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Enter your email"
+                placeholderTextColor={theme.colors.gray[400]}
+                value={email}
+                onChangeText={setEmail}
+                keyboardType="email-address"
+                autoCapitalize="none"
+              />
+            </View>
 
-          {/* <View style={styles.signupContainer}>
-            <Text style={styles.signupText}>Don't have an account? </Text>
-            <Link href="/signup" asChild>
-              <TouchableOpacity>
-                <Text style={styles.signupLink}>Sign Up</Text>
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>Password</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Enter your password"
+                placeholderTextColor={theme.colors.gray[400]}
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry
+              />
+              <TouchableOpacity style={styles.forgotPassword}>
+                <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
               </TouchableOpacity>
-            </Link>
-          </View> */}
-        </View>
+            </View>
+
+            <TouchableOpacity 
+              style={[styles.loginButton, loading && styles.loginButtonDisabled]}
+              onPress={signIn}
+              disabled={loading}
+            >
+              <Text style={styles.loginButtonText}>
+                {loading ? 'Logging in...' : 'Login'}
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity 
+              style={[styles.loginButton, loading && styles.loginButtonDisabled]}
+              onPress={signUp}
+              disabled={loading}
+            >
+              <Text style={styles.loginButtonText}>
+                {loading ? 'Create Account' : 'Create Account'}
+              </Text>
+            </TouchableOpacity>
+
+            {/* <View style={styles.signupContainer}>
+              <Text style={styles.signupText}>Don't have an account? </Text>
+              <Link href="/signup" asChild>
+                <TouchableOpacity>
+                  <Text style={styles.signupLink}>Sign Up</Text>
+                </TouchableOpacity>
+              </Link>
+            </View> */}
+          </View>
+        </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
@@ -144,6 +150,9 @@ const styles = StyleSheet.create({
   },
   keyboardAvoidContainer: {
     flex: 1,
+  },
+  scrollContainer: {
+    paddingBottom: theme.spacing[5],
   },
   headerContainer: {
     height: 240,
@@ -161,7 +170,7 @@ const styles = StyleSheet.create({
   },
   logoContainer: {
     alignItems: 'center',
-    marginBottom: theme.spacing[4],
+    marginBottom: theme.spacing[10],
   },
   logoText: {
     fontFamily: 'Inter-Bold',
@@ -186,7 +195,7 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.white,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
-    marginTop: -20,
+    marginTop: 20,
   },
   errorContainer: {
     backgroundColor: theme.colors.error[100],
