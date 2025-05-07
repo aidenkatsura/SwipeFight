@@ -18,7 +18,7 @@ describe('Swiping Screen', function () {
   describe('Filter by Discipline', function () {
     it('should only show users with the selected discipline', function () {
       const selectedDiscipline = 'Boxing';
-      
+
       // Use the imported filter function instead of manually filtering
       const filteredFighters = filterFightersByDiscipline(mockFighters, selectedDiscipline);
 
@@ -59,6 +59,32 @@ describe('Swiping Screen', function () {
       assert.deepStrictEqual(filteredFighters, []);
     });
   });
+  describe('Error Handling', function () {
+    it('should return an empty array when fighters input is null', function () {
+      const selectedDiscipline = 'Boxing';
+      const fighters = null;
+
+      const filteredFighters = filterFightersByDiscipline(fighters as any, selectedDiscipline);
+
+      assert.deepStrictEqual(filteredFighters, []);
+    });
+    it('should throw an error when discipline is null or undefined', function () {
+      const fighters: Fighter[] = mockFighters;
+
+      assert.throws(() => filterFightersByDiscipline(fighters, null as any), Error);
+      assert.throws(() => filterFightersByDiscipline(fighters, undefined as any), Error);
+    });
+
+    it('should return an empty array when fighters input is not an array', function () {
+      const selectedDiscipline = 'Boxing';
+      const fighters = { name: 'Invalid Input' };
+
+      const filteredFighters = filterFightersByDiscipline(fighters as any, selectedDiscipline);
+
+      assert.deepStrictEqual(filteredFighters, []);
+    });
+  });
+
 });
 
 
@@ -68,7 +94,7 @@ describe('Leaderboard Rankings', function () {
     it('should rank each discipline by user ranking', function () {
       assert.equal(mockFighters.length, 12); // Original length of mockFighters
       const selectedDiscipline = 'Boxing';
-      
+
       // Use the imported filter function instead of manually filtering
       const filteredFighters = filterFightersByDiscipline(mockFighters, selectedDiscipline);
 
