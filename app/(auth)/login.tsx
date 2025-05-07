@@ -127,15 +127,6 @@ export default function LoginScreen() {
                 {loading ? 'Create Account' : 'Create Account'}
               </Text>
             </TouchableOpacity>
-
-            {/* <View style={styles.signupContainer}>
-              <Text style={styles.signupText}>Don't have an account? </Text>
-              <Link href="/signup" asChild>
-                <TouchableOpacity>
-                  <Text style={styles.signupLink}>Sign Up</Text>
-                </TouchableOpacity>
-              </Link>
-            </View> */}
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
