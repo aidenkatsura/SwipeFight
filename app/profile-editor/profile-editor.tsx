@@ -1,11 +1,13 @@
 // app/edit-profile.tsx
-import { Image, KeyboardAvoidingView, Text, TextInput, Picker, Platform, TouchableOpacity, ScrollView, StyleSheet, SafeAreaView } from 'react-native';
+import { Image, KeyboardAvoidingView, Text, TextInput, Platform, TouchableOpacity, ScrollView, StyleSheet, SafeAreaView } from 'react-native';
+import { SelectList } from 'react-native-dropdown-select-list';
 import * as ImagePicker from 'expo-image-picker';
 import { useState } from 'react';
 import { useRouter } from 'expo-router';
 import { theme } from '@/styles/theme';
 import { mockCurrentUser } from '@/data/mockCurrentUser';
 import { Discipline } from '@/types/fighter';
+import { View } from 'lucide-react-native';
 
 export default function EditProfileScreen() {
   const router = useRouter();
@@ -89,32 +91,31 @@ export default function EditProfileScreen() {
           />
 
           <Text style={styles.label}>Discipline</Text>
-          <Picker
-            selectedValue={discipline}
-            style={styles.input}
-            onValueChange={(itemValue: Discipline) => setDiscipline(itemValue as Discipline)}
-          >
-            <Picker.Item label="Aikido" value="Aikido" />
-            <Picker.Item label="BJJ" value="BJJ" />
-            <Picker.Item label="Boxing" value="Boxing" />
-            <Picker.Item label="Judo" value="Judo" />
-            <Picker.Item label="Karate" value="Karate" />
-            <Picker.Item label="Kendo" value="Kendo" />
-            <Picker.Item label="Kickboxing" value="Kickboxing" />
-            <Picker.Item label="Kung Fu" value="Kung Fu" />
-            <Picker.Item label="Krav Maga" value="Krav Maga" />
-            <Picker.Item label="Taekwondo" value="Taekwondo" />
-            <Picker.Item label="MMA" value="MMA" />
-            <Picker.Item label="Muay Thai" value="Muay Thai" />
-            <Picker.Item label="Wrestling" value="Wrestling" />
-          </Picker>
-
-          
-
+          <SelectList
+            inputStyles={styles.selectText}
+            boxStyles={styles.input}
+            dropdownStyles={styles.input}
+            dropdownItemStyles={styles.dropdownText}
+            setSelected={setDiscipline}
+            search={false}
+            placeholder='Select your discipline'
+            data={[ { label: 'Aikido', value: 'Aikido' },
+                    { label: 'BJJ', value: 'BJJ' },
+                    { label: 'Boxing', value: 'Boxing' },
+                    { label: 'Judo', value: 'Judo' },
+                    { label: 'Karate', value: 'Karate' },
+                    { label: 'Kendo', value: 'Kendo' },
+                    { label: 'Kickboxing', value: 'Kickboxing' },
+                    { label: 'Kung Fu', value: 'Kung Fu' },
+                    { label: 'Krav Maga', value: 'Krav Maga' },
+                    { label: 'Taekwondo', value: 'Taekwondo' },
+                    { label: 'MMA', value: 'MMA' },
+                    { label: 'Muay Thai', value: 'Muay Thai' },
+                    { label: 'Wrestling', value: 'Wrestling' },   ]}
+            />
           <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
             <Text style={styles.saveButtonText}>Save</Text>
           </TouchableOpacity>
-          
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -140,7 +141,7 @@ const styles = StyleSheet.create({
     marginLeft: theme.spacing[3],
   },
   label: {
-    fontSize: 16,
+    fontSize: 20,
     fontFamily: 'Inter-SemiBold',
     color: theme.colors.gray[800],
     marginTop: theme.spacing[3],
@@ -163,8 +164,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: 'Inter-Regular',
     marginTop: theme.spacing[1],
-    marginLeft: theme.spacing[2],
-    marginRight: theme.spacing[2],
+    marginHorizontal: theme.spacing[2],
   },
   saveButton: {
     marginTop: theme.spacing[6],
@@ -172,12 +172,20 @@ const styles = StyleSheet.create({
     padding: theme.spacing[4],
     borderRadius: 10,
     alignItems: 'center',
-    marginLeft: theme.spacing[2],
-    marginRight: theme.spacing[2],
+    marginHorizontal: theme.spacing[2],
   },
   saveButtonText: {
     fontSize: 16,
     fontFamily: 'Inter-Bold',
     color: theme.colors.white,
+  },
+  selectText: {
+    fontSize: 16,
+    fontFamily: 'Inter-Regular',
+    color: theme.colors.gray[800],
+  },
+  dropdownText: {
+    color: theme.colors.gray[800],
+    padding: theme.spacing[4],
   },
 });
