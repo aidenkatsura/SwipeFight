@@ -437,18 +437,97 @@ __Describe at what point in your process external feedback will be most useful a
 After implementing each feature, we should have outside members test our app and give feedback on bugs, unintuitive UX or app interactions, or any additional desired changes
 
 ### Test Plan and Bugs
+
+__Testing__
+
 After each task implementation, we will use both __manual__ and __automated__ tests. For automated testing, we will run a series of [Mocha](https://mochajs.org/) tests, a JavaScript testing framework that runs in Node.js. We expect to build a series of tests after each task, maintaining consistency across all tasks while adding new features.
+
 __Benefits__ of using Mocha include:
   - Simple syntax – Easy to write readable test cases
   - Flexible – Works with any assertion library
   - Extensive plugin ecosystem – Allows integration with additional tools and services
   - Configured for React Native – Compatible with React Native projects
 
-We can configure Mocha tests to post a comment on GitHub Issues if a test is failed, allowing us to track bugs during use and testing. For now, since we just have a framework of our codebase, we will have to identify what tests to write initially.
+We can configure Mocha tests to post a comment on GitHub Issues if a test is failed, allowing us to track bugs during use and testing.
+
+To __add a test__ to the code base:
+ 1. From inside the root directory, navigate to test/test.ts
+ 2. Add test case
+ 3. Run test with
+   ```
+   npm test
+   ```
+
+While we chose Mocha due to previous experience, other automated testing applications like [Jest](https://jestjs.io/) or [Detox](https://wix.github.io/Detox/) could also work. Unit testing with Mocha will be used to verify main front-end functionality (e.g., our matching algorithm) and back-end functionality (e.g., user authentication, editing an existing profile, starting a new chat). Integration testing will consist of manual testing (especially early on) and, as we progress, we may consider end-to-end testing tools (e.g., Detox). Since our team has not used those, there will need to be time to research.
 
 For __manual__ tests, a checklist that reflects what our team wants in each feature will be filled. This allows us to remain on task of what we want. __Basic walkthroughs__ will also allow us to test if our UI/UX is consistent across the app, regardless of changes or features.
 
-While we chose Mocha due to previous experience, other automated testing applications like [Jest](https://jestjs.io/) or [Detox](https://wix.github.io/Detox/) could also work. Unit testing with Mocha will be used to verify main front-end functionality (e.g., our matching algorithm) and back-end functionality (e.g., user authentication, editing an existing profile, starting a new chat). Integration testing will consist of manual testing (especially early on) and, as we progress, we may consider end-to-end testing tools (e.g., Detox). Since our team has not used those, there will need to be time to research.
+__Continuous Integration__ <br>
+We considered multiple CI services and came to the following evaluations:
+
+__GitHub Actions__
+
+_Pros_
+ - Directly linked to GitHub
+ - Premade Template
+ - Simple to edit
+ - Well-documented
+
+_Cons_
+ - Difficult to debug
+ - Limits flexibiility with other git providers
+
+__Travis__
+
+_Pros_
+ - Integrates with GitHub and Slack
+ - Tons of features and customizability
+ - Simple Syntax
+ - Open source community support
+ - Offers some free credits for students
+
+_Cons_
+ - Allows limited free use for open source repos, otherwise $15 a month per user base price
+
+__CircleCI__
+
+_Pros_
+ - Free
+ - Works with any Git provider
+ - Fast, efficient and parallelizable
+ - Dynamic pipelines
+
+_Cons_
+ - Limited weekly credits despite being free
+ - Linux-based performance is better than Windows/macOS support
+
+After weighing these options, we decided to use __GitHub Actions__ as our CI service. It is linked to our repository via the file .github/workflows/node.js.yml that we created with one of the provided workflow templates. We chose to use GitHub Actions as our CI service because it was the easiest to implement and link to our repository. It also has a template that specifically works with Node.js.
+
+__Which tests will be executed in a CI build__
+ - Database verification (profile creation, changing profile status, etc)
+ - Algorithm (Who appears on top of stack when searching)
+ - Filtering (Discipline)
+
+__Which development actions trigger a CI build__
+
+It will build and run tests every time that someone pushes to main or creates a pull request to main.
+
+__Recording Code Contributions__
+
+ - Aiden
+   - [Mocha Setup](https://github.com/aidenkatsura/SwipeFight/commit/e9ae8d7a778121e78648e4890b9f6af5259f0f0e)
+   - [Continuous Integration Setup](https://github.com/aidenkatsura/SwipeFight/commit/31aeb7a9b46aca8c7015eb1e335f093c0a84358f)
+   - [Filtering Test Case](https://github.com/aidenkatsura/SwipeFight/commit/09acf566193d813af1e06e9a814d5d3cbed27b0b)
+ - Brian
+   - [Live-Chat Message Received Test Case](https://github.com/aidenkatsura/SwipeFight/commit/781487a38d8074fe7d326dc7b72aa43063cc48f4)
+ - Calvin
+   - [] ()
+ - Josh
+   - [] ()
+ - Sam
+   - [Empty Array Filtering Test Case](https://github.com/aidenkatsura/SwipeFight/commit/902a685b62f6ce3df3bba8bc76553f6e3d2a1aa3)
+ - Yashveer
+   - [Format Time Test Case](https://github.com/aidenkatsura/SwipeFight/commit/d57bd8f9a7b1215df5f1b91fd40df34d3502bc85)
 
 ### Documentation Plan
 We will incorporate a __User Guide__ that explains how to use the app. Since the app’s functionality may evolve during development, we plan to begin writing the user guide during the final polishing phase when features are more stable and clearly defined. In our user guide, we will outline the app’s functionality, how to use it, and troubleshooting including:
