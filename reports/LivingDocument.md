@@ -17,7 +17,7 @@
    - Main Feature Implementation: UI and Project Framework
  - Sam => Co-lead Developer (Back-end)
    - Experience with similar cross-platform mobile framework (Flutter)
-   - Main Feature Implementation: Database and Authentification
+   - Main Feature Implementation: Database and Authentication
  - Yashveer => Co-lead Developer (Front-end)
    - Experience with web development (331)
    - Main Feature Implementation: Matching
@@ -529,9 +529,9 @@ __Recording Code Contributions__
  - Calvin
    - [] ()
  - Josh
-   - [] ()
+   - [Filtering Error Test Cases](https://github.com/aidenkatsura/SwipeFight/commit/de3bf260097c7ee069f6e1b8e0741c05367f66a6)
  - Sam
-   - [Empty Array Filtering Test Case](https://github.com/aidenkatsura/SwipeFight/commit/902a685b62f6ce3df3bba8bc76553f6e3d2a1aa3)
+   - [Empty Array Filtering Test Cases](https://github.com/aidenkatsura/SwipeFight/commit/902a685b62f6ce3df3bba8bc76553f6e3d2a1aa3)
  - Yashveer
    - [Format Time Test Case](https://github.com/aidenkatsura/SwipeFight/commit/d57bd8f9a7b1215df5f1b91fd40df34d3502bc85)
 
@@ -552,17 +552,22 @@ Documentation within the codebase can make use of standard [JSDoc](https://www.t
 ## Software Architecture
 __Identify and describe the major software components and their functionality at a conceptual level__
  - Mobile Client (iOS/Android): Provides interface between user and app
- - Backend API Server: Manages communication between components
- - Database Server: Holds persistent data
- - Real-Time Messaging: Allows users to communicate with each other after matching
+   - Real-Time Messaging: Allows users to communicate with each other after matching
+ - Firebase: Back-end/database system that stores and manages user data; also provides authentication
+   - Firestore: Stores user profiles, matches, chat information
+   - Auth: Firebase Authentication service
+   - Firebase Storage: More robust storage (user photos)
    
 __Specify the interfaces between components__
-   - Mobile Client <=> Backend API Server: Tapping or swiping sends request to server which sends response back
-   - Backend API Server <=> Database Server: Saving profile, matches, messages
-   - Backend API Server <=> Real-Time Messaging: Send and receive messages
+   - Client sends/receives data (profile info, matches, chats) which is stored with Firestore, retrieved via Firebase SDK
+     - Client sends requests to Firestore to: create profile, edit profile info, (potentially) delete profile
+     - Swiping left/right in client triggers update of matches in db
+     - Real-time updates for chat-related interactions (sending messages, receiving messages, start/end chat)
+   - User-uploaded images stored with Firebase Storage (url retrievable via SDK)
+   - User authentication handled by Firebase Authentication (client interacts via SDK)
 
 __Describe in detail what data your system stores, and how. If it uses a database, give the high level database schema. If not, describe how you are storing the data and its organization__
-   - Using Firebase for the database
+   - Using [Firestore](https://firebase.google.com/docs/firestore) for the database
    - The system stores data from chats and sends messages from the sender to the receiver. It also stores user profiles including user location range, logic information (encrypted), friends, user rating, and other user information. <br>
      - User
        - ID (String)
@@ -601,21 +606,34 @@ __If there are particular assumptions underpinning your chosen architecture, ide
 __For each of two decisions pertaining to your software architecture, identify and briefly describe an alternative. For each of the two alternatives, discuss its pros and cons compared to your choice__
    - Firebase (NoSQL) vs SQL
      - Pros of Firebase
-       - Automatic scaling
-       - Built in authentication integration
-       - Real-time updates built in
+       - Manages backend without the need to manage a server. This is especially useful as we are generally unfamiliar with backend technologies and want to get working in our limited time frame.
+       - Built in authentication integration. We plan to have user sign-up and authentication, so this is a valuable feature.
+       - Automatic scaling, which is good to have if we have many concurrent users of the app
+       - Flexibility of NoSQL/JSON allows for more experimentation during development, makes it easy to make changes
+     - Cons of Firebase
+       - Pricing. While we're unlikely to hit any usage limits that would require us to pay for anything, some features we would like to use (e.g., image storage) require accounts linked with payment methods.
+       - ACID properties not guaranteed for complex operations across collections, which could make data hard to work with if we want to interact with, for example, both user chat info and profile info that are stored in separate collections
      - Pros of Traditional SQL
-       - ACID compliance
-       - Can do more complex queries and joins
-       - More difficult to integrate
-   - Restful API vs GraphQL
-     - Pros of Restful
-       - Simpler, more widely used
-       - Easier to monitor and log requests
-       - Built in HTTP semantics
-     - Pros of GraphQL
-       - Clients request exactly the fields they need
-       - A single GraphQL endpoint handles all queries and mutations
+       - ACID compliance allows for more predictable processing of complex queries, which could be useful if we frequently need to operate across data sets/tables (e.g., users, their chats, their matches)
+       - Relational model has data integrity benefits (e.g., using foreign keys would be useful to track data corresponding to users across tables)
+       - Previous experience with SQL (CSE344) could make for an easier transition
+     - Cons of Traditional SQL
+       - More work to update database schema, which is not ideal as we're trying things out
+       - No built-in real-time updating, making features like live chat more difficult
+       - Requires more complex setup and backend management, which could be time consuming and not ideal for our time frame
+   - Firestore for realtime chat vs WebSockets
+     - Pros of Firestore for realtime chat
+       - Real-time updates are built-in to Firebase, which would be useful for features like live chat
+       - With other compelling reasons to use Firebase in general, it would be easier to stay within the Firebase ecosystem for live chat
+     - Cons of Firestore for realtime chat
+       - Active chats require many document reads, potentially racking up operations and costs
+       - Does not have built-in presence tracking, which is a desirable chat feature
+     - Pros of WebSockets
+       - Provides low latency, which makes for a better real-time chat experience
+       - Efficiency and scalability are also desirable in general, especially as messaging requires a lot of data
+     - Cons of WebSockets
+       - Much more complexity and management required compared to Firestore, which is not ideal given our inexperience and time frame
+       - Requires a dedicated server - not as simple as being available in the Firebase ecosystem
 
 ## Software Design
 __Provide a detailed definition of each of the software components you identified above__
