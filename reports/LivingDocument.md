@@ -527,7 +527,7 @@ __Recording Code Contributions__
  - Brian
    - [Live-Chat Message Received Test Case](https://github.com/aidenkatsura/SwipeFight/commit/781487a38d8074fe7d326dc7b72aa43063cc48f4)
  - Calvin
-   - [] ()
+   - [Chat Message Read Case](https://github.com/aidenkatsura/SwipeFight/commit/7ff0ecc856f83ec571aa27a6f71cdb5bfcf86099)
  - Josh
    - [Filtering Error Test Cases](https://github.com/aidenkatsura/SwipeFight/commit/de3bf260097c7ee069f6e1b8e0741c05367f66a6)
  - Sam
