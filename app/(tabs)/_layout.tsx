@@ -9,6 +9,7 @@ import {
 } from 'lucide-react-native';
 import { theme } from '@/styles/theme';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
   
 export default function TabLayout() {
   const [loading, setLoading] = useState(true);
@@ -22,13 +23,16 @@ export default function TabLayout() {
     return unsubscribe;
   }, []);
 
+  useEffect(() => {
+    if (!loading && !isAuthenticated) {
+      router.replace('/(auth)/login');
+    }
+  }, [loading, isAuthenticated]);
+
   if (loading) return null;
 
-  if (!isAuthenticated) {
-    router.replace('/(auth)/login');
-  }
-
   return (
+    <GestureHandlerRootView style={styles.container}>
     <Tabs
       screenOptions={{
         headerShown: false,
@@ -75,10 +79,14 @@ export default function TabLayout() {
         }}
       />
     </Tabs>
+    </GestureHandlerRootView>
   );
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
   tabBar: {
     backgroundColor: theme.colors.white,
     borderTopColor: theme.colors.gray[200],
