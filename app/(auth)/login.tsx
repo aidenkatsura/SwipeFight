@@ -1,7 +1,9 @@
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image, SafeAreaView, KeyboardAvoidingView, Platform } from 'react-native';
 import { useState } from 'react';
-import { Link } from 'expo-router';
+import { Link, router } from 'expo-router';
 import { theme } from '@/styles/theme';
+import { auth } from '@/FirebaseConfig';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
@@ -9,22 +11,45 @@ export default function LoginScreen() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleLogin = () => {
-    // Basic validation
-    if (!email || !password) {
-      setError('Please enter both email and password');
-      return;
-    }
+  const signIn = async () => {
+    try {
+      if (!email || !password) {
+        setError('Please enter both email and password');
+        return;
+      }
 
-    setLoading(true);
-    setError(null);
-
-    // Simulate API call
-    setTimeout(() => {
+      setLoading(true);
+      const user = await signInWithEmailAndPassword(auth, email, password)
+      if (user) console.log('sign in success');
+      if (user) router.replace('/(tabs)');
+    } catch (error: any) {
+      console.log(error)
+      alert('Sign in failed: ' + error.message);
+      setError('Sign in failed: ' + error.message);
+    } finally {
       setLoading(false);
-      // Mock successful login - in a real app would navigate to main app
-    }, 1500);
-  };
+    }
+  }
+
+  const signUp = async () => {
+    try {
+      if (!email || !password) {
+        setError('Please enter both email and password');
+        return;
+      }
+
+      setLoading(true);
+      const user = await createUserWithEmailAndPassword(auth, email, password)
+      if (user) console.log('sign up success');
+      if (user) router.replace('/(tabs)');
+    } catch (error: any) {
+      console.log(error)
+      alert('Sign in failed: ' + error.message);
+      setError('Sign in failed: ' + error.message);
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -81,22 +106,31 @@ export default function LoginScreen() {
 
           <TouchableOpacity 
             style={[styles.loginButton, loading && styles.loginButtonDisabled]}
-            onPress={handleLogin}
+            onPress={signIn}
             disabled={loading}
           >
             <Text style={styles.loginButtonText}>
               {loading ? 'Logging in...' : 'Login'}
             </Text>
           </TouchableOpacity>
+          <TouchableOpacity 
+            style={[styles.loginButton, loading && styles.loginButtonDisabled]}
+            onPress={signUp}
+            disabled={loading}
+          >
+            <Text style={styles.loginButtonText}>
+              {loading ? 'Create Account' : 'Create Account'}
+            </Text>
+          </TouchableOpacity>
 
-          <View style={styles.signupContainer}>
+          {/* <View style={styles.signupContainer}>
             <Text style={styles.signupText}>Don't have an account? </Text>
             <Link href="/signup" asChild>
               <TouchableOpacity>
                 <Text style={styles.signupLink}>Sign Up</Text>
               </TouchableOpacity>
             </Link>
-          </View>
+          </View> */}
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>

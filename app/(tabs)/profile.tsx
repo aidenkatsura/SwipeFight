@@ -6,13 +6,23 @@ import { mockCurrentUser } from '@/data/mockCurrentUser';
 import StatCard from '@/components/StatCard';
 import { router } from 'expo-router';
 import { Fighter } from '@/types/fighter';
+import { signOut } from 'firebase/auth'; // Import signOut from Firebase
+import { auth } from '@/FirebaseConfig'; // Import your Firebase auth instance
 
 export default function ProfileScreen() {
   const user = mockCurrentUser;
 
-
   const handleEditProfilePress = () => {
     router.push('/profile-editor/profile-editor');
+  };
+
+  const handleSignOut = async () => {
+    try {
+      await signOut(auth); // Sign out the user
+      router.replace('/(auth)/login'); // Redirect to the login screen
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
   };
 
   const stats = [
@@ -126,7 +136,8 @@ export default function ProfileScreen() {
           )}
         </View>
 
-        <TouchableOpacity style={styles.logoutButton}>
+        {/* Log Out Button */}
+        <TouchableOpacity style={styles.logoutButton} onPress={handleSignOut}>
           <LogOut color={theme.colors.gray[600]} size={20} />
           <Text style={styles.logoutText}>Log Out</Text>
         </TouchableOpacity>

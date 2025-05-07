@@ -1,4 +1,4 @@
-import { Tabs } from 'expo-router';
+import { Redirect, router, Tabs } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 import {
   Dumbbell,
@@ -7,8 +7,14 @@ import {
   User
 } from 'lucide-react-native';
 import { theme } from '@/styles/theme';
+import { getAuth } from 'firebase/auth';
 
 export default function TabLayout() {
+  getAuth().onAuthStateChanged((user) => {
+    if (!user) router.replace('/(auth)/login');
+  });
+  //if (true) return <Redirect href="/(auth)/login" />;
+  
   return (
     <Tabs
       screenOptions={{
