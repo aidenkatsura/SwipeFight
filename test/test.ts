@@ -183,3 +183,51 @@ describe('Chat Feature', function () {
     assert.equal(updatedMessages[0].read, false);
   });
 });
+
+describe('Chat Feature', function () {
+  it('should receive a message sent by the user', function () {
+    function sendMessage(messages: ChatMessage[], newMessage: ChatMessage): ChatMessage[] {
+      return [...messages, { ...newMessage, read: false }];
+    }
+
+    const initialMessages: ChatMessage[] = [];
+    const newMessage: ChatMessage = {
+      id: '1',
+      senderId: 'user1',
+      receiverId: 'user2',
+      message: 'Hello!',
+      timestamp: new Date(),
+      read: false,
+    };
+
+    const updatedMessages = sendMessage(initialMessages, newMessage);
+
+    assert.equal(updatedMessages.length, 1);
+    assert.equal(updatedMessages[0].message, 'Hello!');
+    assert.equal(updatedMessages[0].read, false);
+  });
+
+  it('should mark a message as read', function () {
+    function markAsRead(messages: ChatMessage[], messageId: string): ChatMessage[] {
+      return messages.map((msg) =>
+        msg.id === messageId ? { ...msg, read: true } : msg
+      );
+    }
+
+    const initialMessages: ChatMessage[] = [
+      {
+        id: '1',
+        senderId: 'user1',
+        receiverId: 'user2',
+        message: 'Hello!',
+        timestamp: new Date(),
+        read: false,
+      },
+    ];
+
+    const updatedMessages = markAsRead(initialMessages, '1');
+
+    assert.equal(updatedMessages[0].read, true);
+    assert.equal(updatedMessages[0].message, 'Hello!');
+  });
+});
