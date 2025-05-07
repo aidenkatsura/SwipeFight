@@ -6,84 +6,93 @@ import { Chat } from '@/types/chat';
 import { theme } from '@/styles/theme';
 import { formatDistanceToNow } from '@/utils/dateUtils';
 import ChatBubble from '@/components/ChatBubble';
-import { fetchChatFromDB, fetchUserChatsFromDB } from '@/utils/firebaseUtils';
+import { fetchChatFromDB, fetchUserChatsFromDB, fetchUserFromDB } from '@/utils/firebaseUtils';
+import { Fighter } from '@/types/fighter';
 
 
 const userId = '0'; // Replace with auth context or prop
 
 export default function ChatsScreen() {
-  // const [chats, setChats] = useState<Chat[]>([]);
-
-  // useEffect(() => {
-  //   // Simulate API fetch
-  //   setChats(mockChats);
-  // }, []);
-
-  const [chats, setChats] = useState<Chat[]>([]);
   const [loading, setLoading] = useState(true);
+
+  type EnrichedChat = {chat: Chat, otherParticipant: Fighter};
+  const [chats, setChats] = useState<EnrichedChat[]>([]);
 
   useEffect(() => {
     const loadChats = async () => {
       try {
         const chatIds = await fetchUserChatsFromDB(userId);
-
-        const chatPromises = chatIds.map((id) => fetchChatFromDB(id));
+  
+        const chatPromises = chatIds.map((id: string) => fetchChatFromDB(id));
         const chatResults = await Promise.all(chatPromises);
-
-        // Optionally filter out nulls if getChat can return null for missing docs
-        const validChats = chatResults.filter((chat): chat is Chat => !!chat);
-
-        setChats(validChats);
+  
+        const validChats = chatResults.filter((chat: any): chat is Chat => !!chat);
+  
+        // Fetch and attach user info
+        const enrichedChatPromises = validChats.map(async (chat) => {
+          // Find the "other" user (assuming current user is always in participants)
+          const otherUserId = userId === chat.participants[0]
+          ? chat.participants[1]
+          : chat.participants[0];
+          const otherParticipant = await fetchUserFromDB(otherUserId);
+          console.log(chat);
+          return { chat: chat, otherParticipant: otherParticipant };
+        });
+  
+        const enrichedChats = await Promise.all(enrichedChatPromises);
+        setChats(enrichedChats);
       } catch (error) {
         console.error('Failed to load chats:', error);
       } finally {
         setLoading(false);
       }
     };
-
+  
     loadChats();
   }, []);
+  
 
   // Sort chats by unread status and timestamp
   const sortedChats = useMemo(() => {
     return [...chats].sort((a, b) => {
       // First sort by unread status
-      if (a.unreadCount > 0 && b.unreadCount === 0) return -1;
-      if (a.unreadCount === 0 && b.unreadCount > 0) return 1;
+      if (a.chat.unreadCount > 0 && b.chat.unreadCount === 0) return -1;
+      if (a.chat.unreadCount === 0 && b.chat.unreadCount > 0) return 1;
 
       // Then sort by timestamp (most recent first)
       //return b.lastMessage.timestamp.getTime() - a.lastMessage.timestamp.getTime();
       return 1;
     });
   }, [chats]);
+  
 
   const handleChatPress = (chatId: string) => {
     router.push(`/chat/${chatId}`);
   };
 
-  const renderChatItem = ({ item }: { item: Chat }) => {
+  const renderChatItem = ({ item }: { item: EnrichedChat }) => {
     // Get the other participant (not the current user)
-    const otherParticipant = item.participants[1]; // Assuming current user is always at index 0
+    //const otherParticipant = item.participants[1]; // Assuming current user is always at index 0
 
     return (
       <TouchableOpacity
         style={styles.chatItem}
-        onPress={() => handleChatPress(item.id)}
+        onPress={() => handleChatPress(item.chat.id)}
       >
         <Image
-          source={{ uri: "https://images.pexels.com/photos/3911779/pexels-photo-3911779.jpeg"}}
+          source={{ uri: item.otherParticipant.photo}}
           style={styles.profileImage}
         />
 
-        {item.unreadCount > 0 && (
+        {item.chat.unreadCount > 0 && (
           <View style={styles.unreadBadge}>
-            <Text style={styles.unreadText}>{item.unreadCount}</Text>
+            <Text style={styles.unreadText}>{item.chat.unreadCount}</Text>
           </View>
         )}
 
         <View style={styles.chatContent}>
           <View style={styles.chatHeader}>
-            <Text style={styles.userName}>{/*otherParticipant.name*/}</Text>
+            <Text style={styles.userName}>{item.otherParticipant.name}</Text>
             <Text style={styles.timestamp}>
               {/*formatDistanceToNow(item.lastMessage.timestamp)*/}
             </Text>
@@ -92,7 +101,7 @@ export default function ChatsScreen() {
           <Text
             style={[
               styles.lastMessage,
-              item.unreadCount > 0 && styles.unreadMessage
+              item.chat.unreadCount > 0 && styles.unreadMessage
             ]}
             numberOfLines={1}
           >
@@ -113,7 +122,7 @@ export default function ChatsScreen() {
         <FlatList
           data={sortedChats}
           renderItem={renderChatItem}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => item.chat.id}
           contentContainerStyle={styles.chatsList}
         />
       ) : (

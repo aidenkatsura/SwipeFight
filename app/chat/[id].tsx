@@ -1,37 +1,60 @@
 import { StyleSheet, Text, View, FlatList, TextInput, TouchableOpacity, Image, KeyboardAvoidingView, Platform, SafeAreaView, Keyboard } from 'react-native';
-import { useEffect, useState, useRef } from 'react';
-import { useLocalSearchParams } from 'expo-router';
+import React, { useEffect, useState, useRef } from 'react';
+import { router, useLocalSearchParams } from 'expo-router';
 import { theme } from '@/styles/theme';
 import { mockChats } from '@/data/mockChats';
 import { ChatMessage, Chat } from '@/types/chat';
 import { formatDistanceToNow } from '@/utils/dateUtils';
 import { Send } from 'lucide-react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { fetchChatFromDB } from '@/utils/firebaseUtils';
+import { fetchChatFromDB, fetchUserFromDB } from '@/utils/firebaseUtils';
+import { Fighter } from '@/types/fighter';
+import { Ionicons } from '@expo/vector-icons';
+
+
+const userId = '0'; // Replace with auth context or prop
 
 export default function ChatScreen() {
   const { id } = useLocalSearchParams();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [newMessage, setNewMessage] = useState('');
-  const [chat, setChat] = useState<Chat | null>(null);
+  //const [chat, setChat] = useState<Chat | null>(null);
   const flatListRef = useRef<FlatList>(null);
   const keyboardHeight = useRef(0);
 
-   // Get all users from db
-    const fetchChat = async () => {
-      try {
-        //setIsLoading(true); // Set loading to true so spinner shows while fetching
+  type EnrichedChat = {
+    chat: Chat;
+    otherParticipant: Fighter;
+  };
   
-        const chat: Chat = await fetchChatFromDB("1");
-        console.log('Fetched chat:', chat);
-        setChat(chat);
-        setMessages(chat.messages);
-      } catch (error) {
-        console.error('Error fetching users:', error);
-      } finally {
-        //setIsLoading(false);
+  const [chat, setChat] = useState<EnrichedChat | null>(null);
+  
+  const fetchChat = async () => {
+    try {
+      if (!id || typeof id !== 'string') {
+        console.error('Invalid chat ID:', id);
+        return;
       }
-    };
+      const chat: Chat = await fetchChatFromDB(id);
+      console.log('Fetched chat:', chat);
+      
+      const otherUserId =
+        userId === chat.participants[0]
+          ? chat.participants[1]
+          : chat.participants[0];
+          
+      const otherParticipant = await fetchUserFromDB(otherUserId);
+      const enriched: EnrichedChat = {
+        chat,
+        otherParticipant,
+      };
+  
+      setChat(enriched);
+      setMessages(chat.messages);
+    } catch (error) {
+      console.error('Error fetching chat or user:', error);
+    }
+  };
   
     // Fetch users when the component mounts
     useEffect(() => {
@@ -56,66 +79,6 @@ export default function ChatScreen() {
       keyboardWillHide.remove();
     };
   }, [id]); 
-
-  // useEffect(() => {
-  //   // Find the chat with the matching ID
-  //   //const foundChat = mockChats.find(chat => chat.id === id);
-
-    
-  //   const foundChat = fetchChatFromDB("1");
-  //   if (foundChat) {
-  //     setChat(foundChat);
-  //     // In a real app, we would fetch messages for this chat
-  //     // For now, we'll just use some mock messages
-  //     const mockMessages: ChatMessage[] = [
-  //       {
-  //         id: '1',
-  //         senderId: '1',
-  //         receiverId: '2',
-  //         message: 'Hey! Ready for our match?',
-  //         timestamp: new Date(Date.now() - 3600000),
-  //         read: true,
-  //       },
-  //       {
-  //         id: '2',
-  //         senderId: '2',
-  //         receiverId: '1',
-  //         message: 'Absolutely! When works for you?',
-  //         timestamp: new Date(Date.now() - 3500000),
-  //         read: true,
-  //       },
-  //       {
-  //         id: '3',
-  //         senderId: '1',
-  //         receiverId: '2',
-  //         message: 'How about tomorrow at 3 PM?',
-  //         timestamp: new Date(Date.now() - 3400000),
-  //         read: true,
-  //       },
-  //     ];
-  //     setMessages(mockMessages);
-  //   }
-
-  //   // Add keyboard listeners
-  //   const keyboardWillShow = Keyboard.addListener(
-  //     Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
-  //     (e) => {
-  //       keyboardHeight.current = e.endCoordinates.height;
-  //     }
-  //   );
-
-  //   const keyboardWillHide = Keyboard.addListener(
-  //     Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
-  //     () => {
-  //       keyboardHeight.current = 0;
-  //     }
-  //   );
-
-  //   return () => {
-  //     keyboardWillShow.remove();
-  //     keyboardWillHide.remove();
-  //   };
-  // }, [id]);
 
   const handleSend = () => {
     if (newMessage.trim()) {
@@ -163,17 +126,19 @@ export default function ChatScreen() {
 
   // Get the other participant (not the current user)
   //const otherParticipant = chat.participants[1];
-  const otherParticipant = chat.participants[1];
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaView style={styles.container}>
         <View style={styles.header}>
+          <TouchableOpacity onPress={() => router.back()} style={{ marginRight: theme.spacing[3] }}>
+            <Ionicons name="arrow-back" size={28} color={theme.colors.gray[900]} />
+          </TouchableOpacity>
           <Image
-            source={{ uri: "https://images.pexels.com/photos/3911779/pexels-photo-3911779.jpeg" }}
+            source={{ uri: chat.otherParticipant.photo }}
             style={styles.profileImage}
           />
-          <Text style={styles.userName}>{"JOE"}</Text>
+          <Text style={styles.userName}>{chat.otherParticipant.name}</Text>
         </View>
 
         <KeyboardAvoidingView
@@ -300,3 +265,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 });
+
+function async(arg0: Chat) {
+  throw new Error('Function not implemented.');
+}

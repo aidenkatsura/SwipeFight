@@ -142,7 +142,7 @@ export async function addMatchToUser(targetUserId: string, matchUserId: string) 
  */
 export const fetchChatFromDB = async (targetChatId: string): Promise<Chat> => {
   try {
-    const docRef = doc(db, 'chats', '1');
+    const docRef = doc(db, 'chats', targetChatId);
     const docSnap = await getDoc(docRef);
     if (docSnap.exists()) {
       return docSnap.data() as Chat;
@@ -248,5 +248,29 @@ export const fetchUserChatsFromDB = async (targetUserId: string): Promise<string
   } catch (error) {
     console.error('Error fetching user chats from Firestore:', error);
     throw new Error('Failed to fetch user chats from Firestore.');
+  }
+};
+
+
+/**
+ * Fetch a specific chat from the Firestore database.
+ *  
+ * @param {string} targetUserId - the target id of the Chat
+ * 
+ * @returns {Promise<Fighter>} A promise that resolves to an array of Fighter objects.
+ * @throws Throws an error if fetching users fails.
+ */
+export const fetchUserFromDB = async (targetUserId: string): Promise<Fighter> => {
+  try {
+    const docRef = doc(db, 'users', targetUserId);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      return docSnap.data() as Fighter;
+    } else {
+      throw new Error('No such document!');
+    }
+  } catch (error) {
+    console.error('Error fetching chat from Firestore:', error);
+    throw new Error('No such document!');
   }
 };
