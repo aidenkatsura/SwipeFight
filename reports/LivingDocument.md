@@ -638,22 +638,44 @@ __For each of two decisions pertaining to your software architecture, identify a
 ## Software Design
 __Provide a detailed definition of each of the software components you identified above__
 
-__User component__
+__Mobile Client__
+ - User component
    - UserService: handles logic for creating, updating, retrieving user profiles
+     - Utilizes functions from UserRepository to get user data, implement client-side logic (e.g., matching)
    - UserRepository: handles user data read and write to/from the database
+     - Functions that use [@firebase/firestore](https://www.npmjs.com/package/@firebase/firestore) to fetch a user by id, create a new user, edit a user's profile info, fetch users that are potential matches (all from a users collections on Firestore)
    - User: represents a single user object, contains fields like id, name, email, discipline, rank, list of friends, etc.
-   - Record: handles game records for a user, records wins, losses, and draws
+   - Record: handles fight records for a user, records wins, losses, and draws
      
-__Match component__
+ - Match component
    - MatchService: logic to create new matches, record results, update user records based on outcomes.
+     - Uses MatchRepository functions to manage match data
    - MatchRepository: read/write to database about match data
+     - Will use Firebase SDK (@firebase/firestore) to write new matches to a matches collection
    - Match: a Match object contains user ids of fighters and result (winner/loser)
      
-__Chat component__
+ - Chat component
    - ChatService: Handles sending/receiving messages, creating chats between users, and updating chat history
+     - Uses ChatRepository functions to execute messaging logic (sending new messages, retrieving new messages, retrieving chat logs)
    - ChatRepository: handles database operations for writing and reading chat history
+     - Will use Firebase SDK (@firebase/firestore) to read messages from a chats collection on Firestore, write new messages, initialize new chats
    - Chat: a Chat object contains user ids, messages, timestamps
    - Message: represents a single message with sender, recipient, message content, and timestamp
+
+ - Auth
+   - Will use [@firebase/auth](https://www.npmjs.com/package/@firebase/auth) for auth
+   - Can configure screens so only login page is accessible until logged in ([expo router](https://docs.expo.dev/versions/latest/sdk/router/))
+
+__Firebase__
+ - Auth: email/password verification enabled
+   - Once auth is set up, we can use [Security Rules](https://firebase.google.com/docs/rules/rules-and-auth) to only allow db writes from authenticated users
+ - Firestore
+   - users collection
+     - User ID from auth can be used as doc IDs for easy lookup
+   - matches collection
+   - chats collection
+ - Firebase Storage
+   - UserRepository will allow for uploading of profile images, which we store (client interacts via [@firebase/storage](https://www.npmjs.com/package/@firebase/storage)) and allow access via a url in the user's corresponding document in the users collection
 
 
 
