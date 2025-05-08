@@ -7,7 +7,7 @@ import { SwipeCard } from '@/components/SwipeCard';
 import { theme } from '@/styles/theme';
 import DisciplineFilter from '@/components/DisciplineFilter';
 import { Fighter, Discipline } from '@/types/fighter';
-import { addChat, addLikeToUser, fetchUserLikesFromDB, fetchUsersFromDB } from '@/utils/firebaseUtils';
+import { addChat, addLikeToUser, fetchUserDislikesFromDB, addDislikeToUser, fetchUsersFromDB } from '@/utils/firebaseUtils';
 import { filterFightersByDiscipline, filterFightersByLikes } from '@/utils/filterUtils';
 
 const userId = '0'; 
@@ -60,7 +60,8 @@ export default function FightScreen() {
 
   const handleSwipeLeft = (index: number) => {
     triggerHapticFeedback('light');
-    // Skipped, nothing to do here
+    addDislikeToUser(userId, filteredFighters[index].id);
+
   };
 
   const handleSwipe = (index: number) => {

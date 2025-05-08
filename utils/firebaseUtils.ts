@@ -247,8 +247,33 @@ export const fetchUserLikesFromDB = async (targetUserId: string): Promise<string
     const userData = userDocSnap.data();
     return userData.likes || []; // return chats array or empty if undefined
   } catch (error) {
-    console.error('Error fetching user chats from Firestore:', error);
-    throw new Error('Failed to fetch user chats from Firestore.');
+    console.error('Error fetching user likes from Firestore:', error);
+    throw new Error('Failed to fetch user likes from Firestore.');
+  }
+};
+
+
+/**
+ * Fetch the 'likes' array from a specific user document.
+ * 
+ * @param {string} targetUserId - The document ID of the user.
+ * @returns {Promise<string[]>} A promise that resolves to an array of chat IDs.
+ * @throws Throws an error if fetching the user fails.
+ */
+export const fetchUserDislikesFromDB = async (targetUserId: string): Promise<string[]> => {
+  try {
+    const userDocRef = doc(db, 'users', targetUserId);
+    const userDocSnap = await getDoc(userDocRef);
+
+    if (!userDocSnap.exists()) {
+      throw new Error(`User with ID ${targetUserId} does not exist.`);
+    }
+
+    const userData = userDocSnap.data();
+    return userData.dislikes || []; // return chats array or empty if undefined
+  } catch (error) {
+    console.error('Error fetching user dislikes from Firestore:', error);
+    throw new Error('Failed to fetch user dislikes from Firestore.');
   }
 };
 
@@ -298,5 +323,38 @@ export const fetchUserFromDB = async (targetUserId: string): Promise<Fighter> =>
   } catch (error) {
     console.error('Error fetching chat from Firestore:', error);
     throw new Error('No such document!');
+  }
+};
+
+
+/**
+ * Adds a match to the user's matches array
+ * 
+ * 
+ * @param {string} targetUserId - The current document ID of the user.
+ * @param {string} chatId - The user id of the user whose been matched with.
+ * @returns {Promise<boolean>} Resolves to true if the document ID was successfully changed, 
+ *                             or false if the old ID does not exist or the new ID already exists.
+ * @throws Throws an error if an unexpected failure occurs.
+ */
+ export async function addDislikeToUser(userId: string, dislikedUserId: string) {
+  try {
+    const userRef = doc(db, 'users', dislikedUserId);
+
+    await runTransaction(db, async (transaction) => {
+      const userDoc = await transaction.get(userRef);
+
+      if (!userDoc.exists()) {
+        throw new Error(`User with ID ${dislikedUserId} not found.`);
+      }
+
+      // Safely add the matchUserId to the matches array
+      transaction.update(userRef, {
+        dislikes: arrayUnion(userId)
+      });
+    });
+  } catch (error) {
+    console.error('Error adding new chat to user:', error);
+    return false; // Return false if the transaction fails
   }
 };

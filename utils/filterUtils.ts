@@ -1,5 +1,5 @@
 import { Fighter, Discipline } from '@/types/fighter';
-import { fetchUserLikesFromDB } from './firebaseUtils';
+import { fetchUserDislikesFromDB, fetchUserLikesFromDB } from './firebaseUtils';
 
 /**
  * Filters the list of fighters by the selected discipline.
@@ -38,8 +38,11 @@ export async function filterFightersByLikes(fighters: Fighter[], userId: string)
   }
 
   const userLikes = await fetchUserLikesFromDB(userId);
+  const userDislikes = await fetchUserDislikesFromDB(userId);
 
   return fighters.filter(fighter =>
-    !userLikes.includes(fighter.id) && fighter.id !== userId
-  );
+  fighter.id !== userId &&
+  !userLikes.includes(fighter.id) &&
+  !userDislikes.includes(fighter.id)
+);
 }
