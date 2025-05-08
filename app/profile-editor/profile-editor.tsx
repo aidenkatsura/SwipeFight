@@ -1,5 +1,5 @@
 // app/edit-profile.tsx
-import { Image, KeyboardAvoidingView, Text, TextInput, Platform, TouchableOpacity, ScrollView, StyleSheet, SafeAreaView } from 'react-native';
+import { Image, KeyboardAvoidingView, Text, TextInput, Platform, TouchableOpacity, ScrollView, StyleSheet, SafeAreaView, View } from 'react-native';
 import { SelectList } from 'react-native-dropdown-select-list';
 import * as ImagePicker from 'expo-image-picker';
 import { useState } from 'react';
@@ -7,7 +7,6 @@ import { useRouter } from 'expo-router';
 import { theme } from '@/styles/theme';
 import { mockCurrentUser } from '@/data/mockCurrentUser';
 import { Discipline } from '@/types/fighter';
-import { View } from 'lucide-react-native';
 
 export default function EditProfileScreen() {
   const router = useRouter();
@@ -20,9 +19,25 @@ export default function EditProfileScreen() {
   const [photo, setPhoto] = useState(user.photo);
 
   const handleSave = () => {
-    // Implement save logic here (backend API call, etc.)
-    // For now, just log the updated user data
-    console.log('Updated user:', { name, age, location, discipline, photo });
+    // Update the user profile with new values
+    const updatedUser = {
+      ...user,
+      name,
+      age: parseInt(age, 10),
+      location,
+      discipline,
+      photo,
+    };
+
+    // Update the mock user data
+    Object.assign(mockCurrentUser, updatedUser);
+
+    // Force a refresh of the mock user data
+    mockCurrentUser.name = name;
+    mockCurrentUser.age = parseInt(age, 10);
+    mockCurrentUser.location = location;
+    mockCurrentUser.discipline = discipline;
+    mockCurrentUser.photo = photo;
 
     // Go back to profile
     router.back();
@@ -113,9 +128,14 @@ export default function EditProfileScreen() {
                     { label: 'Muay Thai', value: 'Muay Thai' },
                     { label: 'Wrestling', value: 'Wrestling' },   ]}
             />
-          <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-            <Text style={styles.saveButtonText}>Save</Text>
-          </TouchableOpacity>
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity style={styles.cancelButton} onPress={() => router.back()}>
+              <Text style={styles.cancelButtonText}>Cancel</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
+              <Text style={styles.saveButtonText}>Save</Text>
+            </TouchableOpacity>
+          </View>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -166,18 +186,39 @@ const styles = StyleSheet.create({
     marginTop: theme.spacing[1],
     marginHorizontal: theme.spacing[2],
   },
-  saveButton: {
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     marginTop: theme.spacing[6],
+    marginHorizontal: theme.spacing[2],
+    gap: theme.spacing[3],
+    width: '100%',
+  },
+  saveButton: {
+    flex: 1,
     backgroundColor: theme.colors.primary[500],
     padding: theme.spacing[4],
     borderRadius: 10,
     alignItems: 'center',
-    marginHorizontal: theme.spacing[2],
+    minWidth: 120,
+  },
+  cancelButton: {
+    flex: 1,
+    backgroundColor: theme.colors.gray[200],
+    padding: theme.spacing[4],
+    borderRadius: 10,
+    alignItems: 'center',
+    minWidth: 120,
   },
   saveButtonText: {
     fontSize: 16,
     fontFamily: 'Inter-Bold',
     color: theme.colors.white,
+  },
+  cancelButtonText: {
+    fontSize: 16,
+    fontFamily: 'Inter-Bold',
+    color: theme.colors.gray[700],
   },
   selectText: {
     fontSize: 16,
