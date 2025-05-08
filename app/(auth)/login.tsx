@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Link, router } from 'expo-router';
 import { theme } from '@/styles/theme';
 import { auth } from '@/FirebaseConfig';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
 import { ScrollView } from 'react-native-gesture-handler';
 
 export default function LoginScreen() {
@@ -47,6 +47,25 @@ export default function LoginScreen() {
       console.log(error)
       alert('Sign in failed: ' + error.message);
       setError('Sign in failed: ' + error.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const forgotPassword = async () => {
+    try {
+      if (!email) {
+        setError('Please enter your email');
+        return;
+      }
+
+      setLoading(true);
+      await sendPasswordResetEmail(auth, email);
+      alert('Password reset email sent');
+    } catch (error: any) {
+      console.log(error)
+      alert('Failed to send password reset email: ' + error.message);
+      setError('Failed to send password reset email: ' + error.message);
     } finally {
       setLoading(false);
     }
@@ -104,7 +123,7 @@ export default function LoginScreen() {
                 onChangeText={setPassword}
                 secureTextEntry
               />
-              <TouchableOpacity style={styles.forgotPassword}>
+              <TouchableOpacity style={styles.forgotPassword} onPress={forgotPassword}>
                 <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
               </TouchableOpacity>
             </View>
