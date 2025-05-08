@@ -7,7 +7,11 @@ import { SwipeCard } from '@/components/SwipeCard';
 import { theme } from '@/styles/theme';
 import DisciplineFilter from '@/components/DisciplineFilter';
 import { Fighter, Discipline } from '@/types/fighter';
-import { addChat, addMatchToUser, fetchUsersFromDB } from '@/utils/firebaseUtils';
+import { addChat, addLikeToUser, fetchUserLikesFromDB, fetchUsersFromDB } from '@/utils/firebaseUtils';
+import { filterFightersByDiscipline, filterFightersByLikes } from '@/utils/filterUtils';
+
+const userId = '0'; 
+
 
 export default function FightScreen() {
   // All fighters that have not been swiped on
@@ -28,8 +32,9 @@ export default function FightScreen() {
 
       const users: Fighter[] = await fetchUsersFromDB();
       console.log('Fetched users:', users);
-      setAllFighters(users);
-      setFilteredFighters(users);
+      const likeFilteredFighters = await filterFightersByLikes(users, userId);
+      setAllFighters(likeFilteredFighters);
+      setFilteredFighters(likeFilteredFighters);
     } catch (error) {
       console.error('Error fetching users:', error);
     } finally {
@@ -49,8 +54,7 @@ export default function FightScreen() {
       console.log('Challenged fighter:', filteredFighters[index].name);
     }
     //pretend urr user is id "user0"
-    addMatchToUser("0", filteredFighters[index].id);
-    addChat("0", filteredFighters[index].id);
+    like(filteredFighters[index])
     // In production, would send challenge request to API
   };
 
@@ -86,13 +90,9 @@ export default function FightScreen() {
 
   const handleFilterChange = (discipline: Discipline | 'All') => {
     setSelectedDiscipline(discipline);
-    // In production, would fetch fighters by discipline from API
-    if (discipline === 'All') {
-      setFilteredFighters(allFighters);
-    } else {
-      setFilteredFighters(allFighters.filter(fighter => fighter.discipline === discipline));
-    }
-    swiperRef.current?.jumpToCardIndex(0); // reset to start of fighter list
+    const filtered = filterFightersByDiscipline(allFighters, discipline); // Use the filter function
+    setFilteredFighters(filtered);
+    swiperRef.current?.jumpToCardIndex(0);
   };
 
   const handlePressSwipeLeft = () => {
@@ -103,6 +103,15 @@ export default function FightScreen() {
     swiperRef.current?.swipeRight();
   };
 
+
+  const like = (likedUser: Fighter) => {
+    //add like to current user
+    addLikeToUser(userId, likedUser.id);
+    // add chat if other user liked current user
+    if (likedUser.likes.includes(userId)) {
+      addChat(userId, likedUser.id);
+    }
+  };
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>

@@ -100,17 +100,18 @@ export const changeUserDocId = async (oldDocId: string, newDocId: string): Promi
   }
 };
 
+
 /**
- * Adds a match to the user's matches array
+ * Adds a Like to the user's Likes array
  * 
  * 
  * @param {string} targetUserId - The current document ID of the user.
- * @param {string} matchUserId - The user id of the user whose been matched with.
+ * @param {string} likedUserId - The user id of the user whose been Liked with.
  * @returns {Promise<boolean>} Resolves to true if the document ID was successfully changed, 
  *                             or false if the old ID does not exist or the new ID already exists.
  * @throws Throws an error if an unexpected failure occurs.
  */
-export async function addMatchToUser(targetUserId: string, matchUserId: string) {
+export async function addLikeToUser(targetUserId: string, likedUserId: string) {
   try {
     const userRef = doc(db, 'users', targetUserId);
 
@@ -123,7 +124,7 @@ export async function addMatchToUser(targetUserId: string, matchUserId: string) 
 
       // Safely add the matchUserId to the matches array
       transaction.update(userRef, {
-        matches: arrayUnion(matchUserId)
+        likes: arrayUnion(likedUserId)
       });
     });
   } catch (error) {
@@ -228,7 +229,32 @@ export async function addChat(userId1: string, userId2: string) {
 
 
 /**
- * Fetch the 'chats' array from a specific user document.
+ * Fetch the 'likes' array from a specific user document.
+ * 
+ * @param {string} targetUserId - The document ID of the user.
+ * @returns {Promise<string[]>} A promise that resolves to an array of chat IDs.
+ * @throws Throws an error if fetching the user fails.
+ */
+export const fetchUserLikesFromDB = async (targetUserId: string): Promise<string[]> => {
+  try {
+    const userDocRef = doc(db, 'users', targetUserId);
+    const userDocSnap = await getDoc(userDocRef);
+
+    if (!userDocSnap.exists()) {
+      throw new Error(`User with ID ${targetUserId} does not exist.`);
+    }
+
+    const userData = userDocSnap.data();
+    return userData.likes || []; // return chats array or empty if undefined
+  } catch (error) {
+    console.error('Error fetching user chats from Firestore:', error);
+    throw new Error('Failed to fetch user chats from Firestore.');
+  }
+};
+
+
+/**
+ * Fetch the 'likes' array from a specific user document.
  * 
  * @param {string} targetUserId - The document ID of the user.
  * @returns {Promise<string[]>} A promise that resolves to an array of chat IDs.

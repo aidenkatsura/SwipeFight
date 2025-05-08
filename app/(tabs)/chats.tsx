@@ -6,7 +6,7 @@ import { Chat } from '@/types/chat';
 import { theme } from '@/styles/theme';
 import { formatDistanceToNow } from '@/utils/dateUtils';
 import ChatBubble from '@/components/ChatBubble';
-import { fetchChatFromDB, fetchUserChatsFromDB, fetchUserFromDB } from '@/utils/firebaseUtils';
+import { fetchChatFromDB, fetchUserFromDB, fetchUserChatsFromDB } from '@/utils/firebaseUtils';
 import { Fighter } from '@/types/fighter';
 
 
