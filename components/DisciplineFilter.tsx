@@ -4,10 +4,11 @@ import { Discipline } from '@/types/fighter';
 
 interface DisciplineFilterProps {
   selectedDisciplines: Discipline[];
-  onSelectDiscipline: (discipline: Discipline) => void;
+  onSelectDiscipline: (discipline: Discipline | 'All') => void;
 }
 
-const disciplines: Discipline[] = [
+const disciplines: (Discipline | 'All')[] = [
+  'All',
   'Aikido',
   'BJJ',
   'Boxing',
@@ -38,14 +39,14 @@ export default function DisciplineFilter({
           key={discipline}
           style={[
             styles.disciplineButton,
-            selectedDisciplines.includes(discipline) && styles.selectedDiscipline
+            (discipline === 'All' ? selectedDisciplines.length === 0 : selectedDisciplines.includes(discipline)) && styles.selectedDiscipline
           ]}
           onPress={() => onSelectDiscipline(discipline)}
         >
           <Text 
             style={[
               styles.disciplineText,
-              selectedDisciplines.includes(discipline) && styles.selectedDisciplineText
+              (discipline === 'All' ? selectedDisciplines.length === 0 : selectedDisciplines.includes(discipline)) && styles.selectedDisciplineText
             ]}
           >
             {discipline}

@@ -82,7 +82,14 @@ export default function FightScreen() {
     }
   };
 
-  const handleFilterChange = (discipline: Discipline) => {
+  const handleFilterChange = (discipline: Discipline | 'All') => {
+    if (discipline === 'All') {
+      setSelectedDisciplines([]);
+      setFilteredFighters(allFighters);
+      swiperRef.current?.jumpToCardIndex(0);
+      return;
+    }
+
     setSelectedDisciplines(prev => {
       const newDisciplines = prev.includes(discipline)
         ? prev.filter(d => d !== discipline)
