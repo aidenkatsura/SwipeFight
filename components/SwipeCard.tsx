@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View, Image, Dimensions, TouchableOpacity } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { MapPin, Star, Award, Hand, UserX } from 'lucide-react-native';
+import { MapPin, Star, Award } from 'lucide-react-native';
 import { theme } from '@/styles/theme';
 import { Fighter } from '@/types/fighter';
 
@@ -71,14 +71,22 @@ export function SwipeCard({ fighter, onSwipeLeft, onSwipeRight }: SwipeCardProps
             style={[styles.actionButton, styles.skipButton]}
             onPress={onSwipeLeft}
           >
-            <UserX size={32} color={theme.colors.error[500]} strokeWidth={2.5} />
+            <Image
+              source={require('@/assets/images/runningMan.png')}
+              style={styles.actionIcon}
+              resizeMode="contain"
+            />
           </TouchableOpacity>
 
           <TouchableOpacity
             style={[styles.actionButton, styles.challengeButton]}
             onPress={onSwipeRight}
           >
-            <Hand size={32} color={theme.colors.success[500]} strokeWidth={2.5} />
+            <Image
+              source={require('@/assets/images/greenGlove.png')}
+              style={styles.actionIcon}
+              resizeMode="contain"
+            />
           </TouchableOpacity>
         </View>
       </View>
@@ -207,5 +215,9 @@ const styles = StyleSheet.create({
   },
   challengeButton: {
     backgroundColor: theme.colors.white,
+  },
+  actionIcon: {
+    width: 50,
+    height: 50,
   },
 });
