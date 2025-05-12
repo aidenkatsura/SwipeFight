@@ -2,23 +2,53 @@ import { StyleSheet, Text, View, Image, ScrollView, TouchableOpacity, SafeAreaVi
 import { StatusBar } from 'expo-status-bar';
 import { Pencil as EditPencil, Settings, Medal, Trophy, LogOut } from 'lucide-react-native';
 import { theme } from '@/styles/theme';
-import { mockCurrentUser } from '@/data/mockCurrentUser';
-import StatCard from '@/components/StatCard';
-import { router, useFocusEffect } from 'expo-router';
+import { router } from 'expo-router';
 import { Fighter } from '@/types/fighter';
-import { signOut } from 'firebase/auth'; // Import signOut from Firebase
-import { auth } from '@/FirebaseConfig'; // Import your Firebase auth instance
-import { useState, useCallback } from 'react';
+import { signOut } from 'firebase/auth';
+import { auth, db } from '@/FirebaseConfig';
+import { doc, getDoc } from 'firebase/firestore';
+import { useEffect, useState } from 'react';
+import StatCard from '@/components/StatCard';
+
+type UserProfile = Fighter & {
+  achievements?: string[];
+  recentMatches?: {
+    opponentName: string;
+    opponentPhoto: string;
+    date: string;
+    result: 'win' | 'loss' | 'draw';
+  }[];
+};
 
 export default function ProfileScreen() {
-  const [user, setUser] = useState(mockCurrentUser);
+  const [user, setUser] = useState<UserProfile | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Refresh user data when the screen comes into focus
-  useFocusEffect(
-    useCallback(() => {
-      setUser({ ...mockCurrentUser });
-    }, [])
-  );
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        const currentUser = auth.currentUser;
+        if (!currentUser) {
+          throw new Error('No authenticated user found');
+        }
+
+        const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
+        if (userDoc.exists()) {
+          setUser(userDoc.data() as UserProfile);
+        } else {
+          throw new Error('User profile not found');
+        }
+      } catch (error: any) {
+        console.error('Error fetching user profile:', error);
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserProfile();
+  }, []);
 
   const handleEditProfilePress = () => {
     router.push('/profile-editor/profile-editor');
@@ -26,12 +56,28 @@ export default function ProfileScreen() {
 
   const handleSignOut = async () => {
     try {
-      await signOut(auth); // Sign out the user
-      router.replace('/(auth)/login'); // Redirect to the login screen
+      await signOut(auth);
+      router.replace('/(auth)/login');
     } catch (error) {
       console.error('Error signing out:', error);
     }
   };
+
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <Text>Loading profile...</Text>
+      </SafeAreaView>
+    );
+  }
+
+  if (error || !user) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <Text style={styles.errorText}>Error loading profile: {error}</Text>
+      </SafeAreaView>
+    );
+  }
 
   const stats = [
     {
@@ -144,7 +190,6 @@ export default function ProfileScreen() {
           )}
         </View>
 
-        {/* Log Out Button */}
         <TouchableOpacity style={styles.logoutButton} onPress={handleSignOut}>
           <LogOut color={theme.colors.gray[600]} size={20} />
           <Text style={styles.logoutText}>Log Out</Text>
@@ -325,5 +370,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: theme.colors.gray[600],
     marginLeft: theme.spacing[2],
+  },
+  errorText: {
+    fontFamily: 'Inter-Regular',
+    fontSize: 14,
+    color: theme.colors.error[500],
+    textAlign: 'center',
+    paddingVertical: theme.spacing[4],
   },
 });
