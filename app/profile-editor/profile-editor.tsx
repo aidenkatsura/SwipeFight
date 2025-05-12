@@ -7,6 +7,8 @@ import { useRouter } from 'expo-router';
 import { theme } from '@/styles/theme';
 import { mockCurrentUser } from '@/data/mockCurrentUser';
 import { Discipline } from '@/types/fighter';
+import { updateUserInDB } from '@/utils/firebaseUtils';
+import { auth } from '@/FirebaseConfig';
 
 export default function EditProfileScreen() {
   const router = useRouter();
@@ -18,27 +20,26 @@ export default function EditProfileScreen() {
   const [discipline, setDiscipline] = useState<Discipline>(user.discipline);
   const [photo, setPhoto] = useState(user.photo);
 
-  const handleSave = () => {
+  const handleSave = async () => {
     // Update the user profile with new values
-    const updatedUser = {
-      ...user,
-      name,
-      age: parseInt(age, 10),
-      location,
-      discipline,
-      photo,
-    };
 
-    // Update the mock user data
-    Object.assign(mockCurrentUser, updatedUser);
+    // TODO(zzzappy): try/catch error handling for updateUserInDB
+    if (auth.currentUser) {
+      const updatedUser = {
+        ...user,
+        name,
+        age: parseInt(age, 10),
+        location,
+        discipline,
+        photo,
+      };
 
-    // Force a refresh of the mock user data
-    mockCurrentUser.name = name;
-    mockCurrentUser.age = parseInt(age, 10);
-    mockCurrentUser.location = location;
-    mockCurrentUser.discipline = discipline;
-    mockCurrentUser.photo = photo;
-
+      await updateUserInDB(auth.currentUser.uid, updatedUser);
+    } else {
+      console.error('No authenticated user found.');
+      return;
+    }  
+  
     // Go back to profile
     router.back();
   };
