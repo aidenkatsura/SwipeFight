@@ -28,6 +28,11 @@ export default function ChatsScreen() {
   }, [chats]);
 
   const handleChatPress = (chatId: string) => {
+    setChats(prevChats =>
+      prevChats.map(chat =>
+        chat.id === chatId ? { ...chat, unreadCount: 0 } : chat
+      )
+    );
     router.push(`/chat/${chatId}`);
   };
 
