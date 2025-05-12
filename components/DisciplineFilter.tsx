@@ -25,7 +25,7 @@ const disciplines: (Discipline | 'All')[] = [
 ];
 
 export default function DisciplineFilter({ 
-  selectedDisciplines, 
+  selectedDisciplines = [], 
   onSelectDiscipline 
 }: DisciplineFilterProps) {
   return (
