@@ -41,12 +41,14 @@ export default function LoginScreen() {
 
       setLoading(true);
       const user = await createUserWithEmailAndPassword(auth, email, password)
-      if (user) console.log('sign up success');
-      if (user) router.replace('/(tabs)');
+      if (user) {
+        console.log('sign up success');
+        router.replace('/(auth)/account-setup');
+      }
     } catch (error: any) {
       console.log(error)
-      alert('Sign in failed: ' + error.message);
-      setError('Sign in failed: ' + error.message);
+      alert('Sign up failed: ' + error.message);
+      setError('Sign up failed: ' + error.message);
     } finally {
       setLoading(false);
     }
@@ -73,7 +75,7 @@ export default function LoginScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <KeyboardAvoidingView 
+      <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardAvoidContainer}
       >
@@ -82,9 +84,9 @@ export default function LoginScreen() {
           keyboardShouldPersistTaps="handled"
         >
           <View style={styles.headerContainer}>
-            <Image 
-              source={{ uri: 'https://images.pexels.com/photos/4761668/pexels-photo-4761668.jpeg' }} 
-              style={styles.backgroundImage} 
+            <Image
+              source={{ uri: 'https://images.pexels.com/photos/4761668/pexels-photo-4761668.jpeg' }}
+              style={styles.backgroundImage}
             />
             <View style={styles.overlay} />
             <View style={styles.logoContainer}>
@@ -128,7 +130,7 @@ export default function LoginScreen() {
               </TouchableOpacity>
             </View>
 
-            <TouchableOpacity 
+            <TouchableOpacity
               style={[styles.loginButton, loading && styles.loginButtonDisabled]}
               onPress={signIn}
               disabled={loading}
@@ -137,7 +139,7 @@ export default function LoginScreen() {
                 {loading ? 'Logging in...' : 'Login'}
               </Text>
             </TouchableOpacity>
-            <TouchableOpacity 
+            <TouchableOpacity
               style={[styles.loginButton, loading && styles.loginButtonDisabled]}
               onPress={signUp}
               disabled={loading}
