@@ -3,12 +3,11 @@ import { theme } from '@/styles/theme';
 import { Discipline } from '@/types/fighter';
 
 interface DisciplineFilterProps {
-  selectedDiscipline: Discipline | 'All';
-  onSelectDiscipline: (discipline: Discipline | 'All') => void;
+  selectedDisciplines: Discipline[];
+  onSelectDiscipline: (discipline: Discipline) => void;
 }
 
-const disciplines: (Discipline | 'All')[] = [
-  'All', 
+const disciplines: Discipline[] = [
   'Aikido',
   'BJJ',
   'Boxing',
@@ -25,7 +24,7 @@ const disciplines: (Discipline | 'All')[] = [
 ];
 
 export default function DisciplineFilter({ 
-  selectedDiscipline, 
+  selectedDisciplines, 
   onSelectDiscipline 
 }: DisciplineFilterProps) {
   return (
@@ -39,14 +38,14 @@ export default function DisciplineFilter({
           key={discipline}
           style={[
             styles.disciplineButton,
-            selectedDiscipline === discipline && styles.selectedDiscipline
+            selectedDisciplines.includes(discipline) && styles.selectedDiscipline
           ]}
           onPress={() => onSelectDiscipline(discipline)}
         >
           <Text 
             style={[
               styles.disciplineText,
-              selectedDiscipline === discipline && styles.selectedDisciplineText
+              selectedDisciplines.includes(discipline) && styles.selectedDisciplineText
             ]}
           >
             {discipline}
