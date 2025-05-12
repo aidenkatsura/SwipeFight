@@ -17,44 +17,30 @@ describe('Dummy Test: Array', function () {
 describe('Swiping Screen', function () {
   describe('Filter by Discipline', function () {
     it('should only show users with the selected discipline', function () {
-      const selectedDiscipline = 'Boxing';
-
-      // Use the imported filter function instead of manually filtering
-      const filteredFighters = filterFightersByDiscipline(mockFighters, selectedDiscipline);
-
+      const selectedDiscipline = "Boxing";
+      const filteredFighters = filterFightersByDiscipline(mockFighters, [selectedDiscipline]);
       assert.equal(filteredFighters.length, 2);
       assert.equal(filteredFighters[0].discipline, selectedDiscipline);
       assert.equal(filteredFighters[1].discipline, selectedDiscipline);
     });
 
-    it("should return all users when 'All' is selected", function () {
-      const selectedDiscipline = 'All'; // Assuming "All" means no filtering
-
-      const filteredFighters = filterFightersByDiscipline(mockFighters, selectedDiscipline);
-
-      // Assert that all fighters are returned (order preserved)
+    it("should return all users when no disciplines are selected", function () {
+      const filteredFighters = filterFightersByDiscipline(mockFighters, []);
       assert.equal(filteredFighters.length, mockFighters.length);
       assert.deepStrictEqual(filteredFighters, mockFighters);
     });
 
-    it('should return an empty array when the input is empty (with a specific discipline selected)', function () {
+    it('should return an empty array when the input is empty', function () {
       const selectedDiscipline: Discipline = 'Boxing';
       const emptyFighters: Fighter[] = [];
-
-      const filteredFighters = filterFightersByDiscipline(emptyFighters, selectedDiscipline);
-
-      // Assert that the result is an empty array
+      const filteredFighters = filterFightersByDiscipline(emptyFighters, [selectedDiscipline]);
       assert.equal(filteredFighters.length, 0);
       assert.deepStrictEqual(filteredFighters, []);
     });
 
-    it("should return empty array when input is empty (with 'All' selected)", function () {
-      const selectedDiscipline = 'All';
+    it('should return empty array when input is empty (with no disciplines selected)', function () {
       const emptyFighters: Fighter[] = [];
-
-      const filteredFighters = filterFightersByDiscipline(emptyFighters, selectedDiscipline);
-
-      // Assert that the result is an empty array
+      const filteredFighters = filterFightersByDiscipline(emptyFighters, []);
       assert.equal(filteredFighters.length, 0);
       assert.deepStrictEqual(filteredFighters, []);
     });
@@ -63,9 +49,7 @@ describe('Swiping Screen', function () {
     it('should return an empty array when fighters input is null', function () {
       const selectedDiscipline = 'Boxing';
       const fighters = null;
-
-      const filteredFighters = filterFightersByDiscipline(fighters as any, selectedDiscipline);
-
+      const filteredFighters = filterFightersByDiscipline(fighters as any, [selectedDiscipline]);
       assert.deepStrictEqual(filteredFighters, []);
     });
     it('should throw an error when discipline is null or undefined', function () {
@@ -78,9 +62,7 @@ describe('Swiping Screen', function () {
     it('should return an empty array when fighters input is not an array', function () {
       const selectedDiscipline = 'Boxing';
       const fighters = { name: 'Invalid Input' };
-
-      const filteredFighters = filterFightersByDiscipline(fighters as any, selectedDiscipline);
-
+      const filteredFighters = filterFightersByDiscipline(fighters as any, [selectedDiscipline]);
       assert.deepStrictEqual(filteredFighters, []);
     });
   });
@@ -92,12 +74,9 @@ describe('Swiping Screen', function () {
 describe('Leaderboard Rankings', function () {
   describe('Rank based on rating', function () {
     it('should rank each discipline by user ranking', function () {
-      assert.equal(mockFighters.length, 12); // Original length of mockFighters
+      assert.equal(mockFighters.length, 12);
       const selectedDiscipline = 'Boxing';
-
-      // Use the imported filter function instead of manually filtering
-      const filteredFighters = filterFightersByDiscipline(mockFighters, selectedDiscipline);
-
+      const filteredFighters = filterFightersByDiscipline(mockFighters, [selectedDiscipline]);
       assert.equal(filteredFighters.length, 2);
       assert.equal(filteredFighters[0].discipline, selectedDiscipline);
       assert.equal(filteredFighters[1].discipline, selectedDiscipline);
