@@ -5,16 +5,18 @@ import { theme } from '@/styles/theme';
 import { mockChats } from '@/data/mockChats';
 import { ChatMessage, Chat } from '@/types/chat';
 import { formatDistanceToNow } from '@/utils/dateUtils';
-import { Send } from 'lucide-react-native';
+import { Send, Flag } from 'lucide-react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
+import ScorecardModal from '@/components/ScorecardModal';
 
 export default function ChatScreen() {
   const { id } = useLocalSearchParams();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [chat, setChat] = useState<Chat | null>(null);
+  const [isScorecardVisible, setIsScorecardVisible] = useState(false);
   const flatListRef = useRef<FlatList>(null);
   const keyboardHeight = useRef(0);
 
@@ -94,6 +96,14 @@ export default function ChatScreen() {
     }
   };
 
+  const handleSubmitResult = (winnerId: string, videoUri?: string) => {
+    // Here you would typically:
+    // 1. Upload the video to storage if provided
+    // 2. Update the match result in the database
+    // 3. Update both users' stats
+    console.log('Match result submitted:', { winnerId, videoUri });
+  };
+
   const renderMessage = ({ item }: { item: ChatMessage }) => {
     const isCurrentUser = item.senderId === '1'; // Assuming current user's ID is '1'
 
@@ -142,6 +152,13 @@ export default function ChatScreen() {
             style={styles.profileImage}
           />
           <Text style={styles.userName}>{otherParticipant.name}</Text>
+          <TouchableOpacity
+            style={styles.reportButton}
+            onPress={() => setIsScorecardVisible(true)}
+          >
+            <Flag size={24} color={theme.colors.primary[500]} />
+            <Text style={styles.reportButtonText}>Report Result</Text>
+          </TouchableOpacity>
         </View>
 
         <KeyboardAvoidingView
@@ -177,6 +194,13 @@ export default function ChatScreen() {
             </TouchableOpacity>
           </View>
         </KeyboardAvoidingView>
+
+        <ScorecardModal
+          visible={isScorecardVisible}
+          onClose={() => setIsScorecardVisible(false)}
+          onSubmit={handleSubmitResult}
+          participants={chat.participants}
+        />
       </SafeAreaView>
     </GestureHandlerRootView>
   );
@@ -266,5 +290,19 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  reportButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginLeft: 'auto',
+    padding: theme.spacing[2],
+    backgroundColor: theme.colors.primary[50],
+    borderRadius: 8,
+  },
+  reportButtonText: {
+    fontFamily: 'Inter-SemiBold',
+    fontSize: 14,
+    color: theme.colors.primary[500],
+    marginLeft: theme.spacing[1],
   },
 });
