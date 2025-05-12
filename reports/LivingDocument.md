@@ -3,18 +3,24 @@
 ### Members and Roles
  - Aiden => Project Coordinator
    - Organized with deadlines and understanding responsibilities of project and assignments
+   - Main Feature Implementation: Profile
  - Brian => Main Tester
    - Experience in developing, testing and debugging mobile apps
+   - Main Feature Implementation: Live-Chat
  - Calvin => Lead Designer
    - Experience in Figma, Canva and other visual designing software
+   - Main Feature Implementation: UI/UX
  - Josh => Product Manager
    - Creative
    - Able to see the bigger picture of projects
    - Currently taking the product management course
- - Sam => Co-lead Developer (Front-end)
+   - Main Feature Implementation: UI and Project Framework
+ - Sam => Co-lead Developer (Back-end)
    - Experience with similar cross-platform mobile framework (Flutter)
- - Yashveer => Co-lead Developer (Back-end)
-   - Experience with backend web development (331)
+   - Main Feature Implementation: Database and Authentication
+ - Yashveer => Co-lead Developer (Front-end)
+   - Experience with web development (331)
+   - Main Feature Implementation: Matching
 
 ### Relevant Links
  - Repository: https://github.com/aidenkatsura/SwipeFight
@@ -437,18 +443,97 @@ __Describe at what point in your process external feedback will be most useful a
 After implementing each feature, we should have outside members test our app and give feedback on bugs, unintuitive UX or app interactions, or any additional desired changes
 
 ### Test Plan and Bugs
+
+__Testing__
+
 After each task implementation, we will use both __manual__ and __automated__ tests. For automated testing, we will run a series of [Mocha](https://mochajs.org/) tests, a JavaScript testing framework that runs in Node.js. We expect to build a series of tests after each task, maintaining consistency across all tasks while adding new features.
+
 __Benefits__ of using Mocha include:
   - Simple syntax – Easy to write readable test cases
   - Flexible – Works with any assertion library
   - Extensive plugin ecosystem – Allows integration with additional tools and services
   - Configured for React Native – Compatible with React Native projects
 
-We can configure Mocha tests to post a comment on GitHub Issues if a test is failed, allowing us to track bugs during use and testing. For now, since we just have a framework of our codebase, we will have to identify what tests to write initially.
+We can configure Mocha tests to post a comment on GitHub Issues if a test is failed, allowing us to track bugs during use and testing.
+
+To __add a test__ to the code base:
+ 1. From inside the root directory, navigate to test/test.ts
+ 2. Add test case
+ 3. Run test with
+   ```
+   npm test
+   ```
+
+While we chose Mocha due to previous experience, other automated testing applications like [Jest](https://jestjs.io/) or [Detox](https://wix.github.io/Detox/) could also work. Unit testing with Mocha will be used to verify main front-end functionality (e.g., our matching algorithm) and back-end functionality (e.g., user authentication, editing an existing profile, starting a new chat). Integration testing will consist of manual testing (especially early on) and, as we progress, we may consider end-to-end testing tools (e.g., Detox). Since our team has not used those, there will need to be time to research.
 
 For __manual__ tests, a checklist that reflects what our team wants in each feature will be filled. This allows us to remain on task of what we want. __Basic walkthroughs__ will also allow us to test if our UI/UX is consistent across the app, regardless of changes or features.
 
-While we chose Mocha due to previous experience, other automated testing applications like [Jest](https://jestjs.io/) or [Detox](https://wix.github.io/Detox/) could also work. Unit testing with Mocha will be used to verify main front-end functionality (e.g., our matching algorithm) and back-end functionality (e.g., user authentication, editing an existing profile, starting a new chat). Integration testing will consist of manual testing (especially early on) and, as we progress, we may consider end-to-end testing tools (e.g., Detox). Since our team has not used those, there will need to be time to research.
+__Continuous Integration__ <br>
+We considered multiple CI services and came to the following evaluations:
+
+__GitHub Actions__
+
+_Pros_
+ - Directly linked to GitHub
+ - Premade Template
+ - Simple to edit
+ - Well-documented
+
+_Cons_
+ - Difficult to debug
+ - Limits flexibiility with other git providers
+
+__Travis__
+
+_Pros_
+ - Integrates with GitHub and Slack
+ - Tons of features and customizability
+ - Simple Syntax
+ - Open source community support
+ - Offers some free credits for students
+
+_Cons_
+ - Allows limited free use for open source repos, otherwise $15 a month per user base price
+
+__CircleCI__
+
+_Pros_
+ - Free
+ - Works with any Git provider
+ - Fast, efficient and parallelizable
+ - Dynamic pipelines
+
+_Cons_
+ - Limited weekly credits despite being free
+ - Linux-based performance is better than Windows/macOS support
+
+After weighing these options, we decided to use __GitHub Actions__ as our CI service. It is linked to our repository via the file .github/workflows/node.js.yml that we created with one of the provided workflow templates. We chose to use GitHub Actions as our CI service because it was the easiest to implement and link to our repository. It also has a template that specifically works with Node.js.
+
+__Which tests will be executed in a CI build__
+ - Database verification (profile creation, changing profile status, etc)
+ - Algorithm (Who appears on top of stack when searching)
+ - Filtering (Discipline)
+
+__Which development actions trigger a CI build__
+
+It will build and run tests every time that someone pushes to main or creates a pull request to main.
+
+__Recording Code Contributions__
+
+ - Aiden
+   - [Mocha Setup](https://github.com/aidenkatsura/SwipeFight/commit/e9ae8d7a778121e78648e4890b9f6af5259f0f0e)
+   - [Continuous Integration Setup](https://github.com/aidenkatsura/SwipeFight/commit/31aeb7a9b46aca8c7015eb1e335f093c0a84358f)
+   - [Filtering Test Case](https://github.com/aidenkatsura/SwipeFight/commit/09acf566193d813af1e06e9a814d5d3cbed27b0b)
+ - Brian
+   - [Live-Chat Message Received Test Case](https://github.com/aidenkatsura/SwipeFight/commit/781487a38d8074fe7d326dc7b72aa43063cc48f4)
+ - Calvin
+   - [Chat Message Read Case](https://github.com/aidenkatsura/SwipeFight/commit/7ff0ecc856f83ec571aa27a6f71cdb5bfcf86099)
+ - Josh
+   - [Filtering Error Test Cases](https://github.com/aidenkatsura/SwipeFight/commit/de3bf260097c7ee069f6e1b8e0741c05367f66a6)
+ - Sam
+   - [Empty Array Filtering Test Cases](https://github.com/aidenkatsura/SwipeFight/commit/902a685b62f6ce3df3bba8bc76553f6e3d2a1aa3)
+ - Yashveer
+   - [Format Time Test Case](https://github.com/aidenkatsura/SwipeFight/commit/d57bd8f9a7b1215df5f1b91fd40df34d3502bc85)
 
 ### Documentation Plan
 We will incorporate a __User Guide__ that explains how to use the app. Since the app’s functionality may evolve during development, we plan to begin writing the user guide during the final polishing phase when features are more stable and clearly defined. In our user guide, we will outline the app’s functionality, how to use it, and troubleshooting including:
@@ -467,17 +552,22 @@ Documentation within the codebase can make use of standard [JSDoc](https://www.t
 ## Software Architecture
 __Identify and describe the major software components and their functionality at a conceptual level__
  - Mobile Client (iOS/Android): Provides interface between user and app
- - Backend API Server: Manages communication between components
- - Database Server: Holds persistent data
- - Real-Time Messaging: Allows users to communicate with each other after matching
+   - Real-Time Messaging: Allows users to communicate with each other after matching
+ - Firebase: Back-end/database system that stores and manages user data; also provides authentication
+   - Firestore: Stores user profiles, matches, chat information
+   - Auth: Firebase Authentication service
+   - Firebase Storage: More robust storage (user photos)
    
 __Specify the interfaces between components__
-   - Mobile Client <=> Backend API Server: Tapping or swiping sends request to server which sends response back
-   - Backend API Server <=> Database Server: Saving profile, matches, messages
-   - Backend API Server <=> Real-Time Messaging: Send and receive messages
+   - Client sends/receives data (profile info, matches, chats) which is stored with Firestore, retrieved via Firebase SDK
+     - Client sends requests to Firestore to: create profile, edit profile info, (potentially) delete profile
+     - Swiping left/right in client triggers update of matches in db
+     - Real-time updates for chat-related interactions (sending messages, receiving messages, start/end chat)
+   - User-uploaded images stored with Firebase Storage (url retrievable via SDK)
+   - User authentication handled by Firebase Authentication (client interacts via SDK)
 
 __Describe in detail what data your system stores, and how. If it uses a database, give the high level database schema. If not, describe how you are storing the data and its organization__
-   - Using Firebase for the database
+   - Using [Firestore](https://firebase.google.com/docs/firestore) for the database
    - The system stores data from chats and sends messages from the sender to the receiver. It also stores user profiles including user location range, logic information (encrypted), friends, user rating, and other user information. <br>
      - User
        - ID (String)
@@ -516,41 +606,76 @@ __If there are particular assumptions underpinning your chosen architecture, ide
 __For each of two decisions pertaining to your software architecture, identify and briefly describe an alternative. For each of the two alternatives, discuss its pros and cons compared to your choice__
    - Firebase (NoSQL) vs SQL
      - Pros of Firebase
-       - Automatic scaling
-       - Built in authentication integration
-       - Real-time updates built in
+       - Manages backend without the need to manage a server. This is especially useful as we are generally unfamiliar with backend technologies and want to get working in our limited time frame.
+       - Built in authentication integration. We plan to have user sign-up and authentication, so this is a valuable feature.
+       - Automatic scaling, which is good to have if we have many concurrent users of the app
+       - Flexibility of NoSQL/JSON allows for more experimentation during development, makes it easy to make changes
+     - Cons of Firebase
+       - Pricing. While we're unlikely to hit any usage limits that would require us to pay for anything, some features we would like to use (e.g., image storage) require accounts linked with payment methods.
+       - ACID properties not guaranteed for complex operations across collections, which could make data hard to work with if we want to interact with, for example, both user chat info and profile info that are stored in separate collections
      - Pros of Traditional SQL
-       - ACID compliance
-       - Can do more complex queries and joins
-       - More difficult to integrate
-   - Restful API vs GraphQL
-     - Pros of Restful
-       - Simpler, more widely used
-       - Easier to monitor and log requests
-       - Built in HTTP semantics
-     - Pros of GraphQL
-       - Clients request exactly the fields they need
-       - A single GraphQL endpoint handles all queries and mutations
+       - ACID compliance allows for more predictable processing of complex queries, which could be useful if we frequently need to operate across data sets/tables (e.g., users, their chats, their matches)
+       - Relational model has data integrity benefits (e.g., using foreign keys would be useful to track data corresponding to users across tables)
+       - Previous experience with SQL (CSE344) could make for an easier transition
+     - Cons of Traditional SQL
+       - More work to update database schema, which is not ideal as we're trying things out
+       - No built-in real-time updating, making features like live chat more difficult
+       - Requires more complex setup and backend management, which could be time consuming and not ideal for our time frame
+   - Firestore for realtime chat vs WebSockets
+     - Pros of Firestore for realtime chat
+       - Real-time updates are built-in to Firebase, which would be useful for features like live chat
+       - With other compelling reasons to use Firebase in general, it would be easier to stay within the Firebase ecosystem for live chat
+     - Cons of Firestore for realtime chat
+       - Active chats require many document reads, potentially racking up operations and costs
+       - Does not have built-in presence tracking, which is a desirable chat feature
+     - Pros of WebSockets
+       - Provides low latency, which makes for a better real-time chat experience
+       - Efficiency and scalability are also desirable in general, especially as messaging requires a lot of data
+     - Cons of WebSockets
+       - Much more complexity and management required compared to Firestore, which is not ideal given our inexperience and time frame
+       - Requires a dedicated server - not as simple as being available in the Firebase ecosystem
 
 ## Software Design
 __Provide a detailed definition of each of the software components you identified above__
 
-__User component__
+__Mobile Client__
+ - User component
    - UserService: handles logic for creating, updating, retrieving user profiles
+     - Utilizes functions from UserRepository to get user data, implement client-side logic (e.g., matching)
    - UserRepository: handles user data read and write to/from the database
+     - Functions that use [@firebase/firestore](https://www.npmjs.com/package/@firebase/firestore) to fetch a user by id, create a new user, edit a user's profile info, fetch users that are potential matches (all from a users collections on Firestore)
    - User: represents a single user object, contains fields like id, name, email, discipline, rank, list of friends, etc.
-   - Record: handles game records for a user, records wins, losses, and draws
+   - Record: handles fight records for a user, records wins, losses, and draws
      
-__Match component__
+ - Match component
    - MatchService: logic to create new matches, record results, update user records based on outcomes.
+     - Uses MatchRepository functions to manage match data
    - MatchRepository: read/write to database about match data
+     - Will use Firebase SDK (@firebase/firestore) to write new matches to a matches collection
    - Match: a Match object contains user ids of fighters and result (winner/loser)
      
-__Chat component__
+ - Chat component
    - ChatService: Handles sending/receiving messages, creating chats between users, and updating chat history
+     - Uses ChatRepository functions to execute messaging logic (sending new messages, retrieving new messages, retrieving chat logs)
    - ChatRepository: handles database operations for writing and reading chat history
+     - Will use Firebase SDK (@firebase/firestore) to read messages from a chats collection on Firestore, write new messages, initialize new chats
    - Chat: a Chat object contains user ids, messages, timestamps
    - Message: represents a single message with sender, recipient, message content, and timestamp
+
+ - Auth
+   - Will use [@firebase/auth](https://www.npmjs.com/package/@firebase/auth) for auth
+   - Can configure screens so only login page is accessible until logged in ([expo router](https://docs.expo.dev/versions/latest/sdk/router/))
+
+__Firebase__
+ - Auth: email/password verification enabled
+   - Once auth is set up, we can use [Security Rules](https://firebase.google.com/docs/rules/rules-and-auth) to only allow db writes from authenticated users
+ - Firestore
+   - users collection
+     - User ID from auth can be used as doc IDs for easy lookup
+   - matches collection
+   - chats collection
+ - Firebase Storage
+   - UserRepository will allow for uploading of profile images, which we store (client interacts via [@firebase/storage](https://www.npmjs.com/package/@firebase/storage)) and allow access via a url in the user's corresponding document in the users collection
 
 
 

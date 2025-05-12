@@ -105,7 +105,7 @@ export default function ChatsScreen() {
             ]}
             numberOfLines={1}
           >
-            {/*item.lastMessage.message */}
+            {item.chat.lastMessage.message}
           </Text>
         </View>
       </TouchableOpacity>

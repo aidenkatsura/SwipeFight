@@ -1,5 +1,6 @@
-import { Tabs } from 'expo-router';
+import { Redirect, router, Tabs } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
+import { useEffect, useState } from 'react';
 import {
   Dumbbell,
   MessageSquare,
@@ -7,9 +8,31 @@ import {
   User
 } from 'lucide-react-native';
 import { theme } from '@/styles/theme';
-
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+  
 export default function TabLayout() {
+  const [loading, setLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(getAuth(), (user) => {
+      setIsAuthenticated(!!user);
+      setLoading(false);
+    });
+    return unsubscribe;
+  }, []);
+
+  useEffect(() => {
+    if (!loading && !isAuthenticated) {
+      router.replace('/(auth)/login');
+    }
+  }, [loading, isAuthenticated]);
+
+  if (loading) return null;
+
   return (
+    <GestureHandlerRootView style={styles.container}>
     <Tabs
       screenOptions={{
         headerShown: false,
@@ -56,10 +79,14 @@ export default function TabLayout() {
         }}
       />
     </Tabs>
+    </GestureHandlerRootView>
   );
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
   tabBar: {
     backgroundColor: theme.colors.white,
     borderTopColor: theme.colors.gray[200],

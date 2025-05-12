@@ -12,4 +12,5 @@ export interface Chat {
   participants: string[];
   messages: ChatMessage[];
   unreadCount: number;
+  lastMessage: ChatMessage;
 }
