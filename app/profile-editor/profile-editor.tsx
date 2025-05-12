@@ -1,5 +1,6 @@
 // app/edit-profile.tsx
-import { Image, KeyboardAvoidingView, Text, TextInput, Picker, Platform, TouchableOpacity, ScrollView, StyleSheet, SafeAreaView } from 'react-native';
+import { Image, KeyboardAvoidingView, Text, TextInput, Platform, TouchableOpacity, ScrollView, StyleSheet, SafeAreaView, View } from 'react-native';
+import { SelectList } from 'react-native-dropdown-select-list';
 import * as ImagePicker from 'expo-image-picker';
 import { useState } from 'react';
 import { useRouter } from 'expo-router';
@@ -18,9 +19,25 @@ export default function EditProfileScreen() {
   const [photo, setPhoto] = useState(user.photo);
 
   const handleSave = () => {
-    // Implement save logic here (backend API call, etc.)
-    // For now, just log the updated user data
-    console.log('Updated user:', { name, age, location, discipline, photo });
+    // Update the user profile with new values
+    const updatedUser = {
+      ...user,
+      name,
+      age: parseInt(age, 10),
+      location,
+      discipline,
+      photo,
+    };
+
+    // Update the mock user data
+    Object.assign(mockCurrentUser, updatedUser);
+
+    // Force a refresh of the mock user data
+    mockCurrentUser.name = name;
+    mockCurrentUser.age = parseInt(age, 10);
+    mockCurrentUser.location = location;
+    mockCurrentUser.discipline = discipline;
+    mockCurrentUser.photo = photo;
 
     // Go back to profile
     router.back();
@@ -89,32 +106,36 @@ export default function EditProfileScreen() {
           />
 
           <Text style={styles.label}>Discipline</Text>
-          <Picker
-            selectedValue={discipline}
-            style={styles.input}
-            onValueChange={(itemValue: Discipline) => setDiscipline(itemValue as Discipline)}
-          >
-            <Picker.Item label="Aikido" value="Aikido" />
-            <Picker.Item label="BJJ" value="BJJ" />
-            <Picker.Item label="Boxing" value="Boxing" />
-            <Picker.Item label="Judo" value="Judo" />
-            <Picker.Item label="Karate" value="Karate" />
-            <Picker.Item label="Kendo" value="Kendo" />
-            <Picker.Item label="Kickboxing" value="Kickboxing" />
-            <Picker.Item label="Kung Fu" value="Kung Fu" />
-            <Picker.Item label="Krav Maga" value="Krav Maga" />
-            <Picker.Item label="Taekwondo" value="Taekwondo" />
-            <Picker.Item label="MMA" value="MMA" />
-            <Picker.Item label="Muay Thai" value="Muay Thai" />
-            <Picker.Item label="Wrestling" value="Wrestling" />
-          </Picker>
-
-          
-
-          <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-            <Text style={styles.saveButtonText}>Save</Text>
-          </TouchableOpacity>
-          
+          <SelectList
+            inputStyles={styles.selectText}
+            boxStyles={styles.input}
+            dropdownStyles={styles.input}
+            dropdownItemStyles={styles.dropdownText}
+            setSelected={setDiscipline}
+            search={false}
+            placeholder='Select your discipline'
+            data={[ { label: 'Aikido', value: 'Aikido' },
+                    { label: 'BJJ', value: 'BJJ' },
+                    { label: 'Boxing', value: 'Boxing' },
+                    { label: 'Judo', value: 'Judo' },
+                    { label: 'Karate', value: 'Karate' },
+                    { label: 'Kendo', value: 'Kendo' },
+                    { label: 'Kickboxing', value: 'Kickboxing' },
+                    { label: 'Kung Fu', value: 'Kung Fu' },
+                    { label: 'Krav Maga', value: 'Krav Maga' },
+                    { label: 'Taekwondo', value: 'Taekwondo' },
+                    { label: 'MMA', value: 'MMA' },
+                    { label: 'Muay Thai', value: 'Muay Thai' },
+                    { label: 'Wrestling', value: 'Wrestling' },   ]}
+            />
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity style={styles.cancelButton} onPress={() => router.back()}>
+              <Text style={styles.cancelButtonText}>Cancel</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
+              <Text style={styles.saveButtonText}>Save</Text>
+            </TouchableOpacity>
+          </View>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -140,7 +161,7 @@ const styles = StyleSheet.create({
     marginLeft: theme.spacing[3],
   },
   label: {
-    fontSize: 16,
+    fontSize: 20,
     fontFamily: 'Inter-SemiBold',
     color: theme.colors.gray[800],
     marginTop: theme.spacing[3],
@@ -163,21 +184,49 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: 'Inter-Regular',
     marginTop: theme.spacing[1],
-    marginLeft: theme.spacing[2],
-    marginRight: theme.spacing[2],
+    marginHorizontal: theme.spacing[2],
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: theme.spacing[6],
+    marginHorizontal: theme.spacing[2],
+    gap: theme.spacing[3],
+    width: '100%',
   },
   saveButton: {
-    marginTop: theme.spacing[6],
+    flex: 1,
     backgroundColor: theme.colors.primary[500],
     padding: theme.spacing[4],
     borderRadius: 10,
     alignItems: 'center',
-    marginLeft: theme.spacing[2],
-    marginRight: theme.spacing[2],
+    minWidth: 120,
+  },
+  cancelButton: {
+    flex: 1,
+    backgroundColor: theme.colors.gray[200],
+    padding: theme.spacing[4],
+    borderRadius: 10,
+    alignItems: 'center',
+    minWidth: 120,
   },
   saveButtonText: {
     fontSize: 16,
     fontFamily: 'Inter-Bold',
     color: theme.colors.white,
+  },
+  cancelButtonText: {
+    fontSize: 16,
+    fontFamily: 'Inter-Bold',
+    color: theme.colors.gray[700],
+  },
+  selectText: {
+    fontSize: 16,
+    fontFamily: 'Inter-Regular',
+    color: theme.colors.gray[800],
+  },
+  dropdownText: {
+    color: theme.colors.gray[800],
+    padding: theme.spacing[4],
   },
 });

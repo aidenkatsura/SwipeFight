@@ -4,13 +4,21 @@ import { Pencil as EditPencil, Settings, Medal, Trophy, LogOut } from 'lucide-re
 import { theme } from '@/styles/theme';
 import { mockCurrentUser } from '@/data/mockCurrentUser';
 import StatCard from '@/components/StatCard';
-import { router } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import { Fighter } from '@/types/fighter';
 import { signOut } from 'firebase/auth'; // Import signOut from Firebase
 import { auth } from '@/FirebaseConfig'; // Import your Firebase auth instance
+import { useState, useCallback } from 'react';
 
 export default function ProfileScreen() {
-  const user = mockCurrentUser;
+  const [user, setUser] = useState(mockCurrentUser);
+
+  // Refresh user data when the screen comes into focus
+  useFocusEffect(
+    useCallback(() => {
+      setUser({ ...mockCurrentUser });
+    }, [])
+  );
 
   const handleEditProfilePress = () => {
     router.push('/profile-editor/profile-editor');
