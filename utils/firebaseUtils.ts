@@ -1,7 +1,7 @@
 import { collection, getDocs, doc, getDoc, setDoc, deleteDoc, addDoc, runTransaction, arrayUnion } from 'firebase/firestore';
 import { db } from '@/FirebaseConfig';
 import { Fighter } from '@/types/fighter';
-import { Chat, ChatMessage } from '@/types/chat';
+import { Chat, ChatMessage} from '@/types/chat';
 
 /**
  * Fetch all users from the Firestore database.
@@ -102,35 +102,28 @@ export const changeUserDocId = async (oldDocId: string, newDocId: string): Promi
 
 
 /**
- * Adds a Like to the user's Likes array
+ * Adds a Like to the target user's Likes array
+ * 
+ * @param {string} userId1 - The current document ID of the user.
+ * @param {string} userId1 - The user id of the user whose been Liked with.
+ * @returns {Promise<boolean>} Resolves to true if successful
+ * @throws Throws an error if an unexpected failure occurs.
+ */
+export async function addLikeToUser(userId1: string, userId2: string) {
+  return addToUserArray(userId1, userId2, "likes");
+};
+
+/**
+ * Adds a match to the user's matches array
  * 
  * 
  * @param {string} targetUserId - The current document ID of the user.
- * @param {string} likedUserId - The user id of the user whose been Liked with.
- * @returns {Promise<boolean>} Resolves to true if the document ID was successfully changed, 
- *                             or false if the old ID does not exist or the new ID already exists.
+ * @param {string} dislikedUserId - The user id of the user whose been matched with.
+ * @returns {Promise<boolean>} Resolves to true if successful
  * @throws Throws an error if an unexpected failure occurs.
  */
-export async function addLikeToUser(targetUserId: string, likedUserId: string) {
-  try {
-    const userRef = doc(db, 'users', targetUserId);
-
-    await runTransaction(db, async (transaction) => {
-      const userDoc = await transaction.get(userRef);
-
-      if (!userDoc.exists()) {
-        throw new Error(`User with ID ${targetUserId} not found.`);
-      }
-
-      // Safely add the matchUserId to the matches array
-      transaction.update(userRef, {
-        likes: arrayUnion(likedUserId)
-      });
-    });
-  } catch (error) {
-    console.error('Error adding new match to user:', error);
-    return false; // Return false if the transaction fails
-  }
+ export async function addDislikeToUser(userId1: string, userId2: string){
+  return addToUserArray(userId1, userId2, "dislikes");
 };
 
 /**
@@ -158,7 +151,9 @@ export const fetchChatFromDB = async (targetChatId: string): Promise<Chat> => {
 
 
 /**
- * Adds a match to the user's matches array
+ * creates a chat between two users
+ * adds it a chat into the chat collection
+ * adds the chat id to both user's chat array
  * 
  * 
  * @param {string} userId1 - user 1's id
@@ -168,140 +163,24 @@ export const fetchChatFromDB = async (targetChatId: string): Promise<Chat> => {
  * @throws Throws an error if an unexpected failure occurs.
  */
 export async function addChat(userId1: string, userId2: string) {
-  try {
-    // Create a reference to a new document in the 'chats' collection
-    const chatDocRef = doc(collection(db, 'chats'));
-    const chatId = chatDocRef.id;
+  // Create a reference to a new document in the 'chats' collection
+  const chatDocRef = doc(collection(db, 'chats'));
+  const chatId = chatDocRef.id;
 
-    const chat: Chat = {
-      id: chatId,
-      participants: [userId1, userId2],
-      messages: [],
-      unreadCount: 0,
-    };
+  const chat: Chat = {
+    id: chatId,
+    participants: [userId1, userId2],
+    messages: [],
+    unreadCount: 0,
+  };
 
-    await runTransaction(db, async (transaction) => {
-      // Optionally check for existing chats here
-
-      // Create the new chat document
-      transaction.set(chatDocRef, chat);
-    });
-    addChatToUser(userId1, chatId);
-    addChatToUser(userId2, chatId);
-    return true;
-  } catch (error) {
-    console.error('Error creating new chat:', error);
-    return false;
-  }
+  await runTransaction(db, async (transaction) => {
+    // Create the new chat document
+    transaction.set(chatDocRef, chat);
+  });
+  addToUserArray(userId1, chatId, "chats");
+  addToUserArray(userId2, chatId, "chats");
 };
-
-/**
- * Adds a match to the user's matches array
- * 
- * 
- * @param {string} targetUserId - The current document ID of the user.
- * @param {string} chatId - The user id of the user whose been matched with.
- * @returns {Promise<boolean>} Resolves to true if the document ID was successfully changed, 
- *                             or false if the old ID does not exist or the new ID already exists.
- * @throws Throws an error if an unexpected failure occurs.
- */
- async function addChatToUser(targetUserId: string, chatId: string) {
-  try {
-    const userRef = doc(db, 'users', targetUserId);
-
-    await runTransaction(db, async (transaction) => {
-      const userDoc = await transaction.get(userRef);
-
-      if (!userDoc.exists()) {
-        throw new Error(`User with ID ${targetUserId} not found.`);
-      }
-
-      // Safely add the matchUserId to the matches array
-      transaction.update(userRef, {
-        chats: arrayUnion(chatId)
-      });
-    });
-  } catch (error) {
-    console.error('Error adding new chat to user:', error);
-    return false; // Return false if the transaction fails
-  }
-};
-
-
-/**
- * Fetch the 'likes' array from a specific user document.
- * 
- * @param {string} targetUserId - The document ID of the user.
- * @returns {Promise<string[]>} A promise that resolves to an array of chat IDs.
- * @throws Throws an error if fetching the user fails.
- */
-export const fetchUserLikesFromDB = async (targetUserId: string): Promise<string[]> => {
-  try {
-    const userDocRef = doc(db, 'users', targetUserId);
-    const userDocSnap = await getDoc(userDocRef);
-
-    if (!userDocSnap.exists()) {
-      throw new Error(`User with ID ${targetUserId} does not exist.`);
-    }
-
-    const userData = userDocSnap.data();
-    return userData.likes || []; // return chats array or empty if undefined
-  } catch (error) {
-    console.error('Error fetching user likes from Firestore:', error);
-    throw new Error('Failed to fetch user likes from Firestore.');
-  }
-};
-
-
-/**
- * Fetch the 'likes' array from a specific user document.
- * 
- * @param {string} targetUserId - The document ID of the user.
- * @returns {Promise<string[]>} A promise that resolves to an array of chat IDs.
- * @throws Throws an error if fetching the user fails.
- */
-export const fetchUserDislikesFromDB = async (targetUserId: string): Promise<string[]> => {
-  try {
-    const userDocRef = doc(db, 'users', targetUserId);
-    const userDocSnap = await getDoc(userDocRef);
-
-    if (!userDocSnap.exists()) {
-      throw new Error(`User with ID ${targetUserId} does not exist.`);
-    }
-
-    const userData = userDocSnap.data();
-    return userData.dislikes || []; // return chats array or empty if undefined
-  } catch (error) {
-    console.error('Error fetching user dislikes from Firestore:', error);
-    throw new Error('Failed to fetch user dislikes from Firestore.');
-  }
-};
-
-
-/**
- * Fetch the 'likes' array from a specific user document.
- * 
- * @param {string} targetUserId - The document ID of the user.
- * @returns {Promise<string[]>} A promise that resolves to an array of chat IDs.
- * @throws Throws an error if fetching the user fails.
- */
-export const fetchUserChatsFromDB = async (targetUserId: string): Promise<string[]> => {
-  try {
-    const userDocRef = doc(db, 'users', targetUserId);
-    const userDocSnap = await getDoc(userDocRef);
-
-    if (!userDocSnap.exists()) {
-      throw new Error(`User with ID ${targetUserId} does not exist.`);
-    }
-
-    const userData = userDocSnap.data();
-    return userData.chats || []; // return chats array or empty if undefined
-  } catch (error) {
-    console.error('Error fetching user chats from Firestore:', error);
-    throw new Error('Failed to fetch user chats from Firestore.');
-  }
-};
-
 
 /**
  * Fetch a specific chat from the Firestore database.
@@ -326,35 +205,97 @@ export const fetchUserFromDB = async (targetUserId: string): Promise<Fighter> =>
   }
 };
 
+/**
+ * Fetch the 'likes' array from a specific user document.
+ * 
+ * @param {string} targetUserId - The document ID of the user.
+ * @returns {Promise<string[]>} A promise that resolves to an array of chat IDs.
+ * @throws Throws an error if fetching the user fails.
+ */
+export const fetchUserLikesFromDB = async (targetUserId: string): Promise<string[]> => {
+  return fetchUserArray(targetUserId, "likes");
+};
+
 
 /**
- * Adds a match to the user's matches array
+ * Fetch the 'likes' array from a specific user document.
  * 
- * 
- * @param {string} targetUserId - The current document ID of the user.
- * @param {string} chatId - The user id of the user whose been matched with.
- * @returns {Promise<boolean>} Resolves to true if the document ID was successfully changed, 
- *                             or false if the old ID does not exist or the new ID already exists.
- * @throws Throws an error if an unexpected failure occurs.
+ * @param {string} targetUserId - The document ID of the user.
+ * @returns {Promise<string[]>} A promise that resolves to an array of chat IDs.
+ * @throws Throws an error if fetching the user fails.
  */
- export async function addDislikeToUser(userId: string, dislikedUserId: string) {
+export const fetchUserDislikesFromDB = async (targetUserId: string): Promise<string[]> => {
+  return fetchUserArray(targetUserId, "dislikes");
+};
+
+
+/**
+ * Fetch the 'chats' array from a specific user document.
+ * 
+ * @param {string} targetUserId - The document ID of the user.
+ * @returns {Promise<string[]>} A promise that resolves to an array of chat IDs.
+ * @throws Throws an error if fetching the user fails.
+ */
+export const fetchUserChatsFromDB = async (targetUserId: string): Promise<string[]> => {
+  return fetchUserArray(targetUserId, "chats");
+};
+
+
+/**
+ * Adds a user ID to a specific array field in another user's document.
+ *
+ * @param {string} targetUserId - The user document to update.
+ * @param {string} userIdToAdd - The user ID to add to the array.
+ * @param {string} arrayField - The name of the array field to update (e.g., 'matches', 'likes').
+ * @returns {Promise<boolean>} Resolves to true if successful, false otherwise.
+ */
+async function addToUserArray(targetUserId: string, userIdToAdd: string, arrayField: string): 
+                                                                          Promise<boolean> {
   try {
-    const userRef = doc(db, 'users', dislikedUserId);
+    const userRef = doc(db, 'users', targetUserId);
 
     await runTransaction(db, async (transaction) => {
-      const userDoc = await transaction.get(userRef);
+      const userSnap = await transaction.get(userRef);
 
-      if (!userDoc.exists()) {
-        throw new Error(`User with ID ${dislikedUserId} not found.`);
+      if (!userSnap.exists()) {
+        throw new Error(`User with ID ${targetUserId} does not exist.`);
       }
 
-      // Safely add the matchUserId to the matches array
       transaction.update(userRef, {
-        dislikes: arrayUnion(userId)
+        [arrayField]: arrayUnion(userIdToAdd),
       });
     });
+
+    return true;
   } catch (error) {
-    console.error('Error adding new chat to user:', error);
-    return false; // Return false if the transaction fails
+    console.error(`Error adding ${userIdToAdd} to ${arrayField} for user ${targetUserId}:`, error);
+    return false;
+  }
+};
+
+/**
+ * Fetch the chosen array from a specific user document.
+ * 
+ * @param {string} targetUserId - The document ID of the user.
+ * @param {string} targetArray - The name of the array field to fetch.
+ * @returns {Promise<string[]>} A promise that resolves to the desired array
+ * @throws Throws an error if fetching the user fails.
+ */
+const fetchUserArray = async (targetUserId: string, targetArray: string): Promise<string[]> => {
+  try {
+    const userDocRef = doc(db, 'users', targetUserId);
+    const userDocSnap = await getDoc(userDocRef);
+
+    if (!userDocSnap.exists()) {
+      throw new Error(`User with ID ${targetUserId} does not exist.`);
+    }
+
+    const userData = userDocSnap.data();
+    const arrayData = userData[targetArray];
+
+    return Array.isArray(arrayData) ? arrayData : [];
+  } catch (error) {
+    console.error(`Error fetching user ${targetUserId}'s ${targetArray} array from Firestore:`, error);
+    throw new Error('Failed to fetch user array from Firestore.');
   }
 };

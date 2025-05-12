@@ -25,24 +25,45 @@ export function filterFightersByDiscipline(fighters: Fighter[], discipline: 'All
 
 
 /**
+ * filters the user's fighters list
+ * Filters out:
+ *    - The user
+ *    - Fighters already liked or disliked by user
+ *    - Fighters who've disliked user
+ * 
  * @param {Fighter[]} fighters - The array of fighters to filter. Each fighter is an object of type `Fighter`.
- * @param {string} userId - The ID of the user whose liked fighters should be excluded.
+ * @param {string} userId - The ID of the user whose fighter's list is being filtered
  * @returns {Promise<Fighter[]>} A Promise that resolves to a new array of fighters filtered by user likes.
  */
 export async function filterFightersByLikes(fighters: Fighter[], userId: string): Promise<Fighter[]> {
   if (!fighters || !Array.isArray(fighters)) {
     return [];
   }
-  if (userId == null) {
+  if (!userId) {
     throw new Error('userId cannot be null or undefined');
   }
 
   const userLikes = await fetchUserLikesFromDB(userId);
   const userDislikes = await fetchUserDislikesFromDB(userId);
 
-  return fighters.filter(fighter =>
-  fighter.id !== userId &&
-  !userLikes.includes(fighter.id) &&
-  !userDislikes.includes(fighter.id)
-);
+  const visibleFighters = await Promise.all(
+    fighters.map(async (fighter) => {
+      if (
+        fighter.id === userId ||
+        userLikes.includes(fighter.id) ||
+        userDislikes.includes(fighter.id)
+      ) {
+        return null;
+      }
+
+      const fighterDislikes = await fetchUserDislikesFromDB(fighter.id);
+      if (fighterDislikes.includes(userId)) {
+        return null;
+      }
+
+      return fighter;
+    })
+  );
+
+  return visibleFighters.filter((fighter): fighter is Fighter => fighter !== null);
 }
