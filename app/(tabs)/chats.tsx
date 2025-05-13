@@ -8,9 +8,10 @@ import { formatDistanceToNow } from '@/utils/dateUtils';
 import ChatBubble from '@/components/ChatBubble';
 import { fetchChatFromDB, fetchUserFromDB, fetchUserChatsFromDB } from '@/utils/firebaseUtils';
 import { Fighter } from '@/types/fighter';
+import { getAuth } from 'firebase/auth';
 
-
-const userId = '0'; // Replace with auth context or prop
+const auth = getAuth();
+const userId = auth.currentUser?.uid;
 
 export default function ChatsScreen() {
   const [loading, setLoading] = useState(true);
@@ -21,6 +22,11 @@ export default function ChatsScreen() {
   useEffect(() => {
     const loadChats = async () => {
       try {
+        if (!userId) {
+          console.warn("User ID is undefined. User might not be logged in.");
+          return;
+        }
+        
         const chatIds = await fetchUserChatsFromDB(userId);
   
         const chatPromises = chatIds.map((id: string) => fetchChatFromDB(id));

@@ -12,8 +12,10 @@ import { Fighter } from '@/types/fighter';
 import { Ionicons } from '@expo/vector-icons';
 import { Timestamp } from 'firebase/firestore';
 import ScorecardModal from '@/components/ScorecardModal';
+import { getAuth } from 'firebase/auth';
 
-const userId = '0'; // Replace with auth context or prop
+const auth = getAuth();
+const userId = auth.currentUser?.uid;
 
 export default function ChatScreen() {
   const { id } = useLocalSearchParams();
@@ -82,6 +84,10 @@ export default function ChatScreen() {
   }, [id]); 
 
   const handleSend = () => {
+    if (!userId) {
+      console.warn("User ID is undefined. User might not be logged in.");
+      return;
+    }
     if (!chat) {
       return null;
     }
