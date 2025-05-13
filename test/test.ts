@@ -3,6 +3,7 @@ import { mockFighters } from '../data/mockFighters';
 import { filterFightersByDiscipline } from '../utils/filterUtils';
 import { ChatMessage } from '../types/chat';
 import { Discipline, Fighter } from '@/types/fighter';
+import { Timestamp } from 'firebase/firestore';
 
 var assert = require('assert');
 describe('Dummy Test: Array', function () {
@@ -151,7 +152,7 @@ describe('Chat Feature', function () {
       senderId: 'user1',
       receiverId: 'user2',
       message: 'Hello!',
-      timestamp: new Date(),
+      timestamp:  Timestamp.fromDate(new Date()),
       read: false,
     };
 
@@ -175,7 +176,7 @@ describe('Chat Feature', function () {
       senderId: 'user1',
       receiverId: 'user2',
       message: 'Hello!',
-      timestamp: new Date(),
+      timestamp:  Timestamp.fromDate(new Date()),
       read: false,
     };
 
@@ -199,7 +200,7 @@ describe('Chat Feature', function () {
         senderId: 'user1',
         receiverId: 'user2',
         message: 'Hello!',
-        timestamp: new Date(),
+        timestamp:  Timestamp.fromDate(new Date()),
         read: false,
       },
     ];
