@@ -1,5 +1,5 @@
 import { collection, getDocs, doc, getDoc, setDoc, deleteDoc, addDoc, runTransaction, arrayUnion, Timestamp} from 'firebase/firestore';
-import { db } from '@/FirebaseConfig';
+import { db } from '../FirebaseConfig';
 import { Fighter } from '@/types/fighter';
 import { Chat, ChatMessage} from '@/types/chat';
 
