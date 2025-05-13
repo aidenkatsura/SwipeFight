@@ -9,9 +9,10 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { fetchChatFromDB, fetchUserFromDB, sendMessage } from '@/utils/firebaseUtils';
 import { Fighter } from '@/types/fighter';
 import { Ionicons } from '@expo/vector-icons';
-import { Timestamp } from 'firebase/firestore';
+import { doc, onSnapshot, Timestamp } from 'firebase/firestore';
 import ScorecardModal from '@/components/ScorecardModal';
 import { getAuth } from 'firebase/auth';
+import { db } from '@/FirebaseConfig';
 
 export default function ChatScreen() {
   const { id } = useLocalSearchParams();
@@ -28,40 +29,34 @@ export default function ChatScreen() {
   
   const [chat, setChat] = useState<EnrichedChat | null>(null);
   
-  const fetchChat = async () => {
+  useEffect(() => {
     const auth = getAuth();
     const userId = auth.currentUser?.uid;
-    try {
-      if (!id || typeof id !== 'string') {
-        console.error('Invalid chat ID:', id);
-        return;
-      }
-      
-      const chat: Chat = await fetchChatFromDB(id);
-      
+    if (!id || typeof id !== 'string' || !userId) return;
+
+    const chatRef = doc(db, 'chats', id);
+
+    const unsubscribe = onSnapshot(chatRef, async (snapshot) => {
+      if (!snapshot.exists()) return;
+
+      const chatData = snapshot.data() as Chat;
+
       const otherUserId =
-        (userId === chat.participants[0].id)
-          ? chat.participants[1].id
-          : chat.participants[0].id;
-      
+        userId === chatData.participants[0].id
+          ? chatData.participants[1].id
+          : chatData.participants[0].id;
+
       const otherParticipant = await fetchUserFromDB(otherUserId);
-      
+
       const enriched: EnrichedChat = {
-        chat,
+        chat: chatData,
         otherParticipant,
       };
-  
+
       setChat(enriched);
-      setMessages(chat.messages);
-    } catch (error) {
-      console.error('Error fetching chat or user:', error);
-    }
-  };
-  
-    // Fetch users when the component mounts
-    useEffect(() => {
-      fetchChat();
-    // Add keyboard listeners
+      setMessages(chatData.messages); // live update
+    });
+
     const keyboardWillShow = Keyboard.addListener(
       Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
       (e) => {
@@ -77,10 +72,11 @@ export default function ChatScreen() {
     );
 
     return () => {
+      unsubscribe(); // Cleanup Firestore listener
       keyboardWillShow.remove();
       keyboardWillHide.remove();
     };
-  }, [id]); 
+  }, [id]);
 
   const handleSend = () => {
     const auth = getAuth();
