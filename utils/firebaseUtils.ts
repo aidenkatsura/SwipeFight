@@ -92,7 +92,6 @@ export const changeUserDocId = async (oldDocId: string, newDocId: string): Promi
       transaction.delete(oldDocRef);
     });
 
-    console.log(`Document ID changed from ${oldDocId} to ${newDocId}`);
     return true; // Change successful
   } catch (error) {
     console.error('Error changing document ID:', error);
@@ -193,7 +192,6 @@ export const fetchUserLikesFromDB = async (targetUserId: string): Promise<string
  * @throws Throws an error if fetching the user fails.
  */
 export const fetchUserDislikesFromDB = async (targetUserId: string): Promise<string[]> => {
-  console.log(targetUserId);
   return fetchUserArray(targetUserId, "dislikes");
 };
 
