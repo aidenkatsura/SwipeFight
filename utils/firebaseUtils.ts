@@ -92,7 +92,6 @@ export const changeUserDocId = async (oldDocId: string, newDocId: string): Promi
       transaction.delete(oldDocRef);
     });
 
-    console.log(`Document ID changed from ${oldDocId} to ${newDocId}`);
     return true; // Change successful
   } catch (error) {
     console.error('Error changing document ID:', error);
@@ -114,7 +113,7 @@ export async function addLikeToUser(userId1: string, userId2: string) {
 };
 
 /**
- * Adds a match to the user's matches array
+ * Adds a dislike to the user's dislike array
  * 
  * 
  * @param {string} targetUserId - The current document ID of the user.
@@ -186,14 +185,13 @@ export const fetchUserLikesFromDB = async (targetUserId: string): Promise<string
 
 
 /**
- * Fetch the 'likes' array from a specific user document.
+ * Fetch the 'dislikes' array from a specific user document.
  * 
  * @param {string} targetUserId - The document ID of the user.
  * @returns {Promise<string[]>} A promise that resolves to an array of chat IDs.
  * @throws Throws an error if fetching the user fails.
  */
 export const fetchUserDislikesFromDB = async (targetUserId: string): Promise<string[]> => {
-  console.log(targetUserId);
   return fetchUserArray(targetUserId, "dislikes");
 };
 

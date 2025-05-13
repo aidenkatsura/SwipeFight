@@ -164,7 +164,9 @@ export default function AccountSetupScreen() {
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Discipline</Text>
             <View style={styles.disciplineContainer}>
-              {['MMA', 'Boxing', 'BJJ', 'Muay Thai', 'Wrestling'].map((d) => (
+              {['Aikido', 'BJJ', 'Boxing', 'Judo', 'Karate',
+                'Kendo', 'Kickboxing', 'Kung Fu', 'Krav Maga',
+                'Taekwondo', 'MMA', 'Muay Thai', 'Wrestling'].map((d) => (
                 <TouchableOpacity
                   key={d}
                   style={[

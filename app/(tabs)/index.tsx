@@ -7,10 +7,9 @@ import { SwipeCard } from '@/components/SwipeCard';
 import { theme } from '@/styles/theme';
 import DisciplineFilter from '@/components/DisciplineFilter';
 import { Fighter, Discipline } from '@/types/fighter';
-import { addChat, addLikeToUser, fetchUserDislikesFromDB, addDislikeToUser, fetchUsersFromDB } from '@/utils/firebaseUtils';
+import { addChat, addLikeToUser, addDislikeToUser, fetchUsersFromDB } from '@/utils/firebaseUtils';
 import { filterFightersByDiscipline, filterFightersByLikes } from '@/utils/filterUtils';
-
-const userId = '0'; 
+import { getAuth } from 'firebase/auth';
 
 
 export default function FightScreen() {
@@ -27,11 +26,16 @@ export default function FightScreen() {
 
   // Get all users from db
   const fetchUsers = async () => {
+    const auth = getAuth();
+    const userId = auth.currentUser?.uid;
+    if (!userId) {
+      console.warn("User ID is undefined. User might not be logged in.");
+      return;
+    }
     try {
       setIsLoading(true); // Set loading to true so spinner shows while fetching
 
       const users: Fighter[] = await fetchUsersFromDB();
-      console.log('Fetched users:', users);
       const likeFilteredFighters = await filterFightersByLikes(users, userId);
       setAllFighters(likeFilteredFighters);
       setFilteredFighters(likeFilteredFighters);
@@ -59,9 +63,14 @@ export default function FightScreen() {
   };
 
   const handleSwipeLeft = (index: number) => {
+    const auth = getAuth();
+    const userId = auth.currentUser?.uid;
+    if (!userId) {
+      console.warn("User ID is undefined. User might not be logged in.");
+      return;
+    }
     triggerHapticFeedback('light');
     addDislikeToUser(userId, filteredFighters[index].id);
-
   };
 
   const handleSwipe = (index: number) => {
@@ -120,6 +129,12 @@ export default function FightScreen() {
 
 
   const like = (likedUser: Fighter) => {
+    const auth = getAuth();
+    const userId = auth.currentUser?.uid;
+    if (!userId) {
+      console.warn("User ID is undefined. User might not be logged in.");
+      return;
+    }
     //add like to current user
     addLikeToUser(userId, likedUser.id);
     // add chat if other user liked current user
