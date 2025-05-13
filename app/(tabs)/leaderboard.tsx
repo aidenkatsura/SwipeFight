@@ -1,10 +1,10 @@
 import { StyleSheet, Text, View, SectionList, Image, TouchableOpacity, SafeAreaView } from 'react-native';
-import { useState } from 'react';
-import { mockFighters } from '@/data/mockFighters';
+import { useEffect, useState } from 'react';
 import { Fighter, Discipline } from '@/types/fighter';
 import { theme } from '@/styles/theme';
 import DisciplineFilter from '@/components/DisciplineFilter';
 import { Medal } from 'lucide-react-native';
+import { fetchUsersFromDB } from '@/utils/firebaseUtils';
 
 type LeaderboardSection = {
   title: Discipline;
@@ -12,10 +12,24 @@ type LeaderboardSection = {
 };
 
 export default function LeaderboardScreen() {
+  const [fighters, setFighters] = useState<Fighter[]>([]);
   const [selectedDiscipline, setSelectedDiscipline] = useState<Discipline | 'All'>('All');
   
   // Group and sort fighters by discipline and rating
-  const groupedFighters = mockFighters.reduce<Record<string, Fighter[]>>((acc, fighter) => {
+  useEffect(() => {
+    const loadFighters = async () => {
+      try {
+        const users: Fighter[] = await fetchUsersFromDB();
+        setFighters(users);
+      } catch (error) {
+        console.error('Failed to fetch users:', error);
+      }
+    };
+
+    loadFighters();
+  }, []);
+
+  const groupedFighters = fighters.reduce<Record<string, Fighter[]>>((acc, fighter) => {
     if (!acc[fighter.discipline]) {
       acc[fighter.discipline] = [];
     }
@@ -31,7 +45,7 @@ export default function LeaderboardScreen() {
   // Convert to sections format for SectionList
   let sections: LeaderboardSection[] = Object.keys(groupedFighters).map(discipline => ({
     title: discipline as Discipline,
-    data: groupedFighters[discipline].slice(0, 5) // Top 5 per discipline
+    data: groupedFighters[discipline].slice(0, 3)
   }));
   
   // Filter sections if a discipline is selected
