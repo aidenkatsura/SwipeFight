@@ -2,6 +2,10 @@
 
 SwipeFight is a mobile app that connects martial artists with local sparring partners through a fun, swipe-based matchmaking experience. Users can view profiles, challenge opponents, chat to coordinate fight sessions, and compete for rankings on the leaderboard.
 
+__Download Link:__ 
+
+
+
 ---
 
 ## Features
@@ -12,6 +16,21 @@ SwipeFight is a mobile app that connects martial artists with local sparring par
 - 💬 Live in-app chat to coordinate sparring sessions
 - 🥇 Global leaderboard to track fighter rankings
 - 🥋 Support for multiple disciplines like Boxing, Jiu-Jitsu, Muay Thai, and more
+
+---
+
+## Building the App
+
+1. Clone the repo:
+   ```bash
+   git clone https://github.com/<your-username>/swipefight.git
+   cd swipefight
+
+---
+
+## Testing the App
+
+
 
 ---
 
@@ -124,15 +143,6 @@ SwipeFight is a mobile app that connects martial artists with local sparring par
 - **Hosting**: Expo
 
 ---
-
-## Getting Started
-
-1. Clone the repo:
-   ```bash
-   git clone https://github.com/<your-username>/swipefight.git
-   cd swipefight
-   
----
    
 ## Goals
 1) Create connections for marital artists within local community.
@@ -143,44 +153,28 @@ SwipeFight is a mobile app that connects martial artists with local sparring par
 
 ---
 
-## Proposed Repository Layout
+## Current Repository Layout
 
 ```bash
 SwipeFight/
 ├── README.md                    # Overview, setup, and documentation
 ├── .gitignore                   # Files and folders to ignore in Git
-├── .github/workflows            # Continous Integration
+├── .expo/                       # Expo app and router
+├── .github/workflows/           # Continous Integration
 ├── app/                         # React Native mobile application
-│   ├── App.js
 │   ├── (auth)/                  # User Authentication
 │   ├── (tabs)/                  # App screens (Home, Chat, Leaderboard, etc.)
 │   ├── chat/                    # Live chat
 │   ├── profile-editor/          # Edit User Profile
-├── assets/images                # Logos
-├── components                   # Styles
-├── data                         # Mock data
-
-
-├── app/                         # React Native mobile application
-├── app/                         # React Native mobile application
-├── app/                         # React Native mobile application
-├── app/                         # React Native mobile application
-├── app/                         # React Native mobile application
-│   ├── index.js                 # Server entry point
-│   ├── routes/                  # API route definitions (users, matches, chat, etc.)
-│   ├── controllers/             # Business logic for each route
-│   ├── models/                  # Database models / Prisma schema
-│   ├── middleware/              # Authentication, validation, logging, etc.
-│   ├── sockets/                 # Real-time functionalities (Socket.io)
-│   ├── config/                  # Configuration files (database, Firebase, etc.)
-│   └── utils/                   # Helper functions
-├── database/                    # Database related files
-│   ├── schema.prisma            # Prisma schema for PostgreSQL
-│   ├── seed.js                  # Script to seed initial test data
-│   └── migrations/              # Database migration files
-├── public/                      # Static assets for web pages or documentation
-│   └── logo.png                 # App logo
-├── scripts/                     # Deployment, cleanup, or other utility scripts
-│   └── deploy.sh
-├── .env                         # Environment variables for local development
+├── assets/images/               # Logos
+├── components/                  # Components
+├── data/                        # Mock data (for testing)
+├── hooks/                       # Hooks for React
+├── ios/                         # To run on iOS with Xcode
+├── node_modules/                # npm/Node.js
+├── reports/                     # Progress Reports and Living Document
+├── styles/                      # Theme
+├── test/                        # Frontend/Backend Tests
+├── types/                       # Data types
+├── utils/                       # Methods
 └── LICENSE                      # Project license
