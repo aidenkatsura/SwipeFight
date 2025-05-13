@@ -114,7 +114,7 @@ export async function addLikeToUser(userId1: string, userId2: string) {
 };
 
 /**
- * Adds a match to the user's matches array
+ * Adds a dislike to the user's dislike array
  * 
  * 
  * @param {string} targetUserId - The current document ID of the user.
@@ -186,7 +186,7 @@ export const fetchUserLikesFromDB = async (targetUserId: string): Promise<string
 
 
 /**
- * Fetch the 'likes' array from a specific user document.
+ * Fetch the 'dislikes' array from a specific user document.
  * 
  * @param {string} targetUserId - The document ID of the user.
  * @returns {Promise<string[]>} A promise that resolves to an array of chat IDs.
