@@ -39,13 +39,11 @@ export default function ChatScreen() {
         return;
       }
       const chat: Chat = await fetchChatFromDB(id);
-      console.log('Fetched chat:', chat);
       
       const otherUserId =
         userId === chat.participants[0].id
           ? chat.participants[1].id
           : chat.participants[0].id;
-          console.log(otherUserId)
       const otherParticipant = await fetchUserFromDB(otherUserId);
       const enriched: EnrichedChat = {
         chat,
@@ -84,10 +82,6 @@ export default function ChatScreen() {
   }, [id]); 
 
   const handleSend = () => {
-    if (!userId) {
-      console.warn("User ID is undefined. User might not be logged in.");
-      return;
-    }
     if (!chat) {
       return null;
     }
