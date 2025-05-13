@@ -1,60 +1,39 @@
-// app/edit-profile.tsx
 import { Image, KeyboardAvoidingView, Text, TextInput, Platform, TouchableOpacity, ScrollView, StyleSheet, SafeAreaView, View } from 'react-native';
 import { SelectList } from 'react-native-dropdown-select-list';
 import * as ImagePicker from 'expo-image-picker';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'expo-router';
 import { theme } from '@/styles/theme';
-import { fetchUserFromDB, updateUserInDB } from '@/utils/firebaseUtils';
+import { updateUserInDB } from '@/utils/firebaseUtils';
 import { auth } from '@/FirebaseConfig';
-import { Discipline, Fighter } from '@/types/fighter';
+import { Discipline } from '@/types/fighter';
+import { useUser } from '@/context/UserContext';
 
 export default function EditProfileScreen() {
   const router = useRouter();
-  const [userData, setUserData] = useState<Fighter | null>(null);
+  const { user, setUser } = useUser(); // Use shared user state from UserContext
 
-  const [name, setName] = useState('');
-  const [age, setAge] = useState('');
-  const [location, setLocation] = useState('');
-  const [discipline, setDiscipline] = useState<Discipline | undefined>(undefined);
-  const [photo, setPhoto] = useState('');
-
-  // Fetch user data from Firestore, updates local state if successful
-  const fetchUserData = async () => {
-    if (!auth.currentUser) {
-      console.error('No authenticated user found.');
-      return;
-    }
-
-    try {
-      const data = await fetchUserFromDB(auth.currentUser.uid);
-      if (data) {
-        setUserData(data);
-
-        // Populate form fields with user data
-        setName(data.name);
-        setAge(data.age.toString());
-        setLocation(data.location);
-        setDiscipline(data.discipline);
-        setPhoto(data.photo);
-      }
-    } catch (error) {
-      console.error('Error fetching user data:', error);
-    }
-  };
-
-  useEffect(() => {
-    fetchUserData();
-  }, []);
+  // Initialize form fields with user data from context
+  const [name, setName] = useState(user?.name || '');
+  const [age, setAge] = useState(user?.age.toString() || '');
+  const [location, setLocation] = useState(user?.location || '');
+  const [discipline, setDiscipline] = useState<Discipline | undefined>(user?.discipline);
+  const [photo, setPhoto] = useState(user?.photo || '');
 
   const handleSave = async () => {
-    if (!auth.currentUser) {
+    if (!name || !age || !location || !discipline) {
+      alert('Please fill in all required fields');
+      return;
+    } else if (!user) {
+      console.error('user has not been set');
+      return;
+    } else if (!auth.currentUser) {
       console.error('No authenticated user found.');
       return;
     }
 
     const updatedUser = {
-      ...userData,
+      ...user,
       name,
       age: parseInt(age, 10),
       location,
@@ -63,17 +42,19 @@ export default function EditProfileScreen() {
     };
 
     try {
-      const result = await updateUserInDB(auth.currentUser.uid, updatedUser);
+      const result = await updateUserInDB(user.id, updatedUser);
       if (result) {
         console.log('Profile updated successfully.');
+
+        setUser(updatedUser); // Update shared user state
+
+        router.back();
       } else {
-        console.error('Failed to update profile. User may not exist.');
+        console.error('Failed to update profile.');
       }
     } catch (error) {
       console.error('Error updating profile:', error);
     }
-
-    router.back();
   };
 
   const handlePhotoChange = async () => {
