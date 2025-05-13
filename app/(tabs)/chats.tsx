@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View, FlatList, TouchableOpacity, Image, SafeAreaView } from 'react-native';
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useCallback } from 'react';
 import { router } from 'expo-router';
 import { mockChats } from '@/data/mockChats';
 import { Chat } from '@/types/chat';
@@ -9,6 +9,7 @@ import ChatBubble from '@/components/ChatBubble';
 import { fetchChatFromDB, fetchUserFromDB, fetchUserChatsFromDB } from '@/utils/firebaseUtils';
 import { Fighter } from '@/types/fighter';
 import { getAuth } from 'firebase/auth';
+import { useFocusEffect } from 'expo-router';
 
 const auth = getAuth();
 const userId = auth.currentUser?.uid;
@@ -19,14 +20,11 @@ export default function ChatsScreen() {
   type EnrichedChat = {chat: Chat, otherParticipant: Fighter};
   const [chats, setChats] = useState<EnrichedChat[]>([]);
 
-  useEffect(() => {
+
+  useFocusEffect(
+    useCallback(() => {
     const loadChats = async () => {
       try {
-        if (!userId) {
-          console.warn("User ID is undefined. User might not be logged in.");
-          return;
-        }
-        
         const chatIds = await fetchUserChatsFromDB(userId);
   
         const chatPromises = chatIds.map((id: string) => fetchChatFromDB(id));
@@ -41,7 +39,6 @@ export default function ChatsScreen() {
           ? chat.participants[1].id
           : chat.participants[0].id;
           const otherParticipant = await fetchUserFromDB(otherUserId);
-          console.log(chat);
           return { chat: chat, otherParticipant: otherParticipant };
         });
   
@@ -55,7 +52,7 @@ export default function ChatsScreen() {
     };
   
     loadChats();
-  }, []);
+  }, []));
   
 
   // Sort chats by unread status and timestamp
