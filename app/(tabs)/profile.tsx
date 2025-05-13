@@ -1,16 +1,16 @@
-import { StyleSheet, Text, View, Image, ScrollView, TouchableOpacity, SafeAreaView } from 'react-native';
+import { StyleSheet, Text, View, Image, ScrollView, TouchableOpacity, SafeAreaView, ActivityIndicator } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { Pencil as EditPencil, Settings, Medal, Trophy, LogOut } from 'lucide-react-native';
 import { theme } from '@/styles/theme';
 import { router } from 'expo-router';
 import { Fighter } from '@/types/fighter';
 import { signOut } from 'firebase/auth';
-import { auth, db } from '@/FirebaseConfig';
-import { doc, getDoc } from 'firebase/firestore';
+import { auth } from '@/FirebaseConfig';
 import { useEffect, useState } from 'react';
 import StatCard from '@/components/StatCard';
+import { useUser } from '@/context/UserContext';
 
-type UserProfile = Fighter & {
+export type UserProfile = Fighter & {
   achievements?: string[];
   recentMatches?: {
     opponentName: string;
@@ -21,34 +21,24 @@ type UserProfile = Fighter & {
 };
 
 export default function ProfileScreen() {
-  const [user, setUser] = useState<UserProfile | null>(null);
+  const { user, fetchUser } = useUser(); // Shared user state from UserContext
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Fetches user data once on first mount
   useEffect(() => {
-    const fetchUserProfile = async () => {
+    const loadUser = async () => {
       try {
-        const currentUser = auth.currentUser;
-        if (!currentUser) {
-          throw new Error('No authenticated user found');
-        }
-
-        const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
-        if (userDoc.exists()) {
-          setUser(userDoc.data() as UserProfile);
-        } else {
-          throw new Error('User profile not found');
-        }
-      } catch (error: any) {
-        console.error('Error fetching user profile:', error);
-        setError(error.message);
+        await fetchUser();
+      } catch (err: any) {
+        setError(err.message || 'An unexpected error occurred.');
       } finally {
         setLoading(false);
       }
     };
 
-    fetchUserProfile();
-  }, []);
+    loadUser();
+  }, [fetchUser]); // re-run when fetchUser changes (e.g., auth change)
 
   const handleEditProfilePress = () => {
     router.push('/profile-editor/profile-editor');
@@ -65,16 +55,8 @@ export default function ProfileScreen() {
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.container}>
-        <Text>Loading profile...</Text>
-      </SafeAreaView>
-    );
-  }
-
-  if (error || !user) {
-    return (
-      <SafeAreaView style={styles.container}>
-        <Text style={styles.errorText}>Error loading profile: {error}</Text>
+      <SafeAreaView style={[styles.container, styles.centerContent]}>
+        <ActivityIndicator size={50} color={theme.colors.primary[500]} />
       </SafeAreaView>
     );
   }
@@ -83,28 +65,28 @@ export default function ProfileScreen() {
     {
       id: '1',
       title: 'Wins',
-      value: user.wins,
+      value: user?.wins || 0,
       iconName: 'trophy',
       color: theme.colors.success[500],
     },
     {
       id: '2',
       title: 'Losses',
-      value: user.losses,
+      value: user?.losses || 0,
       iconName: 'x',
       color: theme.colors.error[500],
     },
     {
       id: '3',
       title: 'Draws',
-      value: user.draws,
+      value: user?.draws || 0,
       iconName: 'minus',
       color: theme.colors.warning[500],
     },
     {
       id: '4',
       title: 'Rating',
-      value: user.rating,
+      value: user?.rating || 0,
       iconName: 'star',
       color: theme.colors.gold,
     },
@@ -113,88 +95,94 @@ export default function ProfileScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar style="dark" />
-
-      <View style={styles.settingsContainer}>
-        <TouchableOpacity style={styles.settingsButton}>
-          <Settings color={theme.colors.gray[700]} size={24} />
-        </TouchableOpacity>
-      </View>
-
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <View style={styles.profileHeader}>
-          <View style={styles.profileImageContainer}>
-            <Image source={{ uri: user.photo }} style={styles.profileImage} />
-            <TouchableOpacity style={styles.editProfileButton} onPress={handleEditProfilePress}>
-              <EditPencil color={theme.colors.white} size={18} />
+      {error || !user ? (
+        // Loading error or no user data
+        <Text style={styles.errorText}>Error loading profile: {error}</Text>
+      ) : (
+        // Main profile content
+        <>
+          <View style={styles.settingsContainer}>
+            <TouchableOpacity style={styles.settingsButton}>
+              <Settings color={theme.colors.gray[700]} size={24} />
             </TouchableOpacity>
           </View>
-
-          <Text style={styles.name}>{user.name}, {user.age}</Text>
-          <View style={styles.disciplineBadge}>
-            <Text style={styles.disciplineText}>{user.discipline}</Text>
-          </View>
-          <Text style={styles.rank}>{user.rank}</Text>
-          <Text style={styles.location}>{user.location}</Text>
-
-          <View style={styles.statsGrid}>
-            {stats.map(stat => (
-              <StatCard
-                key={stat.id}
-                title={stat.title}
-                value={stat.value}
-                iconName={stat.iconName}
-                color={stat.color}
-              />
-            ))}
-          </View>
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Recent Achievements</Text>
-          {user.achievements && user.achievements.length > 0 ? (
-            user.achievements.map((achievement, index) => (
-              <View key={index} style={styles.achievementItem}>
-                <Medal color={theme.colors.primary[500]} size={20} />
-                <Text style={styles.achievementText}>{achievement}</Text>
+          <ScrollView contentContainerStyle={styles.scrollContent}>
+            <View style={styles.profileHeader}>
+              <View style={styles.profileImageContainer}>
+                <Image source={{ uri: user.photo }} style={styles.profileImage} />
+                <TouchableOpacity style={styles.editProfileButton} onPress={handleEditProfilePress}>
+                  <EditPencil color={theme.colors.white} size={18} />
+                </TouchableOpacity>
               </View>
-            ))
-          ) : (
-            <Text style={styles.emptyText}>No achievements yet</Text>
-          )}
-        </View>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Recent Matches</Text>
-          {user.recentMatches && user.recentMatches.length > 0 ? (
-            user.recentMatches.map((match, index) => (
-              <View key={index} style={styles.matchItem}>
-                <Image source={{ uri: match.opponentPhoto }} style={styles.matchOpponentImage} />
-                <View style={styles.matchDetails}>
-                  <Text style={styles.matchOpponent}>{match.opponentName}</Text>
-                  <Text style={styles.matchDate}>{match.date}</Text>
-                </View>
-                <View style={[
-                  styles.matchResultBadge,
-                  match.result === 'win' ? styles.winBadge :
-                  match.result === 'loss' ? styles.lossBadge :
-                  styles.drawBadge
-                ]}>
-                  <Text style={styles.matchResultText}>
-                    {match.result.toUpperCase()}
-                  </Text>
-                </View>
+              <Text style={styles.name}>{user.name}, {user.age}</Text>
+              <View style={styles.disciplineBadge}>
+                <Text style={styles.disciplineText}>{user.discipline}</Text>
               </View>
-            ))
-          ) : (
-            <Text style={styles.emptyText}>No recent matches</Text>
-          )}
-        </View>
+              <Text style={styles.rank}>{user.rank}</Text>
+              <Text style={styles.location}>{user.location}</Text>
 
-        <TouchableOpacity style={styles.logoutButton} onPress={handleSignOut}>
-          <LogOut color={theme.colors.gray[600]} size={20} />
-          <Text style={styles.logoutText}>Log Out</Text>
-        </TouchableOpacity>
-      </ScrollView>
+              <View style={styles.statsGrid}>
+                {stats.map(stat => (
+                  <StatCard
+                    key={stat.id}
+                    title={stat.title}
+                    value={stat.value}
+                    iconName={stat.iconName}
+                    color={stat.color} />
+                ))}
+              </View>
+            </View>
+
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Recent Achievements</Text>
+              {user.achievements && user.achievements.length > 0 ? (
+                user.achievements.map((achievement, index) => (
+                  <View key={index} style={styles.achievementItem}>
+                    <Medal color={theme.colors.primary[500]} size={20} />
+                    <Text style={styles.achievementText}>{achievement}</Text>
+                  </View>
+                ))
+              ) : (
+                <Text style={styles.emptyText}>No achievements yet</Text>
+              )}
+            </View>
+
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Recent Matches</Text>
+              {user.recentMatches && user.recentMatches.length > 0 ? (
+                user.recentMatches.map((match, index) => (
+                  <View key={index} style={styles.matchItem}>
+                    <Image source={{ uri: match.opponentPhoto }} style={styles.matchOpponentImage} />
+                    <View style={styles.matchDetails}>
+                      <Text style={styles.matchOpponent}>{match.opponentName}</Text>
+                      <Text style={styles.matchDate}>{match.date}</Text>
+                    </View>
+                    <View style={[
+                      styles.matchResultBadge,
+                      match.result === 'win' ? styles.winBadge :
+                        match.result === 'loss' ? styles.lossBadge :
+                          styles.drawBadge
+                    ]}>
+                      <Text style={styles.matchResultText}>
+                        {match.result.toUpperCase()}
+                      </Text>
+                    </View>
+                  </View>
+                ))
+              ) : (
+                <Text style={styles.emptyText}>No recent matches</Text>
+              )}
+            </View>
+          </ScrollView>
+        </>
+      )}
+
+      {/* Logout button shows even on error */}
+      <TouchableOpacity style={styles.logoutButton} onPress={handleSignOut}>
+        <LogOut color={theme.colors.gray[600]} size={20} />
+        <Text style={styles.logoutText}>Log Out</Text>
+      </TouchableOpacity>
     </SafeAreaView>
   );
 }
@@ -203,6 +191,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: theme.colors.white,
+  },
+  centerContent: {
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   settingsContainer: {
     paddingHorizontal: theme.spacing[4],

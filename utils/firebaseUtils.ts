@@ -58,6 +58,35 @@ export const addNewUserToDB = async (fighter: Fighter): Promise<boolean> => {
 };
 
 /**
+ * Update a user's data in the Firestore database.
+ * 
+ * @param {string} userId - The ID of the user to update (document ID).
+ * @param {Partial<Fighter>} updatedData - The data to update. Only the provided fields will be updated.
+ * @returns {Promise<boolean>} Resolves to true if the update was successful, or false if the user does not exist.
+ * @throws Throws an error if an unexpected failure occurs.
+ */
+export const updateUserInDB = async (userId: string, updatedData: Partial<Fighter>): Promise<boolean> => {
+  try {
+    const userDocRef = doc(db, 'users', userId);
+
+    // Ensure the document exists before updating
+    const docSnapshot = await getDoc(userDocRef);
+    if (!docSnapshot.exists()) {
+      console.error(`User with ID ${userId} does not exist.`);
+      return false; // User does not exist
+    }
+
+    // Update the user's data
+    await setDoc(userDocRef, updatedData, { merge: true }); // Merge updates with existing data
+    console.log(`User with ID ${userId} successfully updated.`);
+    return true; // Update successful
+  } catch (error) {
+    console.error('Error updating user in Firestore:', error);
+    throw new Error('Unexpected error updating user in Firestore.');
+  }
+}
+
+/**
  * Change the document ID of an existing user in the Firestore database.
  * 
  * **Note:** Intended for development/DB testing purposes. Change Doc IDs with caution.

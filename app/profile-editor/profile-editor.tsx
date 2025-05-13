@@ -1,25 +1,38 @@
-// app/edit-profile.tsx
 import { Image, KeyboardAvoidingView, Text, TextInput, Platform, TouchableOpacity, ScrollView, StyleSheet, SafeAreaView, View } from 'react-native';
 import { SelectList } from 'react-native-dropdown-select-list';
 import * as ImagePicker from 'expo-image-picker';
 import { useState } from 'react';
 import { useRouter } from 'expo-router';
 import { theme } from '@/styles/theme';
-import { mockCurrentUser } from '@/data/mockCurrentUser';
+import { updateUserInDB } from '@/utils/firebaseUtils';
+import { auth } from '@/FirebaseConfig';
 import { Discipline } from '@/types/fighter';
+import { useUser } from '@/context/UserContext';
 
 export default function EditProfileScreen() {
   const router = useRouter();
-  const user = mockCurrentUser;
+  const { user, setUser } = useUser(); // Shared user state from UserContext
+  const [saving, setSaving] = useState(false);
 
-  const [name, setName] = useState(user.name);
-  const [age, setAge] = useState(user.age.toString());
-  const [location, setLocation] = useState(user.location);
-  const [discipline, setDiscipline] = useState<Discipline>(user.discipline);
-  const [photo, setPhoto] = useState(user.photo);
+  // Initialize form fields with user data from context
+  const [name, setName] = useState(user?.name || '');
+  const [age, setAge] = useState(user?.age.toString() || '');
+  const [location, setLocation] = useState(user?.location || '');
+  const [discipline, setDiscipline] = useState<Discipline | undefined>(user?.discipline);
+  const [photo, setPhoto] = useState(user?.photo || '');
 
-  const handleSave = () => {
-    // Update the user profile with new values
+  const handleSave = async () => {
+    if (!name || !age || !location || !discipline) {
+      alert('Please fill in all required fields');
+      return;
+    } else if (!user) {
+      console.error('user has not been set');
+      return;
+    } else if (!auth.currentUser) {
+      console.error('No authenticated user found.');
+      return;
+    }
+
     const updatedUser = {
       ...user,
       name,
@@ -29,50 +42,53 @@ export default function EditProfileScreen() {
       photo,
     };
 
-    // Update the mock user data
-    Object.assign(mockCurrentUser, updatedUser);
+    setSaving(true); // Start saving process
+    try {
+      const result = await updateUserInDB(user.id, updatedUser);
+      if (result) {
+        console.log('Profile updated successfully.');
 
-    // Force a refresh of the mock user data
-    mockCurrentUser.name = name;
-    mockCurrentUser.age = parseInt(age, 10);
-    mockCurrentUser.location = location;
-    mockCurrentUser.discipline = discipline;
-    mockCurrentUser.photo = photo;
+        setUser(updatedUser); // Update shared user state
 
-    // Go back to profile
-    router.back();
+        router.back();
+      } else {
+        console.error('Failed to update profile.');
+      }
+    } catch (error) {
+      console.error('Error updating profile:', error);
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handlePhotoChange = async () => {
-    // Request permission to access media library
     const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (permissionResult.granted === false) {
       alert('Permission to access camera roll is required!');
       return;
     }
-      // Launch the image picker
-      const pickerResult = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [1, 1], // Ensure the image is square
-        quality: 1,
-      });
-  
-      // Ensure the result is not canceled and has the expected structure
-      if (!pickerResult.canceled && pickerResult.assets && pickerResult.assets[0].uri) {
-        setPhoto(pickerResult.assets[0].uri); // Access the URI of the first image asset
-      }
+
+    const pickerResult = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 1,
+    });
+
+    if (!pickerResult.canceled && pickerResult.assets && pickerResult.assets[0].uri) {
+      setPhoto(pickerResult.assets[0].uri);
+    }
   };
 
   return (
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        style={{ flex: 1 }}
       >
         <ScrollView
-        contentContainerStyle={styles.scrollContainer}
-        keyboardShouldPersistTaps="handled"
+          contentContainerStyle={styles.scrollContainer}
+          keyboardShouldPersistTaps="handled"
         >
           <Text style={styles.title}>Edit Profile</Text>
 
@@ -96,6 +112,7 @@ export default function EditProfileScreen() {
             style={styles.input}
             value={age}
             onChangeText={setAge}
+            keyboardType="numeric"
           />
 
           <Text style={styles.label}>Location</Text>
@@ -113,27 +130,35 @@ export default function EditProfileScreen() {
             dropdownItemStyles={styles.dropdownText}
             setSelected={setDiscipline}
             search={false}
-            placeholder='Select your discipline'
-            data={[ { label: 'Aikido', value: 'Aikido' },
-                    { label: 'BJJ', value: 'BJJ' },
-                    { label: 'Boxing', value: 'Boxing' },
-                    { label: 'Judo', value: 'Judo' },
-                    { label: 'Karate', value: 'Karate' },
-                    { label: 'Kendo', value: 'Kendo' },
-                    { label: 'Kickboxing', value: 'Kickboxing' },
-                    { label: 'Kung Fu', value: 'Kung Fu' },
-                    { label: 'Krav Maga', value: 'Krav Maga' },
-                    { label: 'Taekwondo', value: 'Taekwondo' },
-                    { label: 'MMA', value: 'MMA' },
-                    { label: 'Muay Thai', value: 'Muay Thai' },
-                    { label: 'Wrestling', value: 'Wrestling' },   ]}
-            />
+            placeholder="Select your discipline"
+            data={[
+              { label: 'Aikido', value: 'Aikido' },
+              { label: 'BJJ', value: 'BJJ' },
+              { label: 'Boxing', value: 'Boxing' },
+              { label: 'Judo', value: 'Judo' },
+              { label: 'Karate', value: 'Karate' },
+              { label: 'Kendo', value: 'Kendo' },
+              { label: 'Kickboxing', value: 'Kickboxing' },
+              { label: 'Kung Fu', value: 'Kung Fu' },
+              { label: 'Krav Maga', value: 'Krav Maga' },
+              { label: 'Taekwondo', value: 'Taekwondo' },
+              { label: 'MMA', value: 'MMA' },
+              { label: 'Muay Thai', value: 'Muay Thai' },
+              { label: 'Wrestling', value: 'Wrestling' },
+            ]}
+          />
           <View style={styles.buttonContainer}>
             <TouchableOpacity style={styles.cancelButton} onPress={() => router.back()}>
               <Text style={styles.cancelButtonText}>Cancel</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-              <Text style={styles.saveButtonText}>Save</Text>
+            <TouchableOpacity
+              style={[styles.saveButton, saving && styles.saveButtonDisabled]}
+              onPress={handleSave}
+              disabled={saving} // Disable button while waiting on save
+            >
+              <Text style={styles.saveButtonText}>
+                {saving ? 'Saving...' : 'Save'}
+              </Text>
             </TouchableOpacity>
           </View>
         </ScrollView>
@@ -228,5 +253,8 @@ const styles = StyleSheet.create({
   dropdownText: {
     color: theme.colors.gray[800],
     padding: theme.spacing[4],
+  },
+  saveButtonDisabled: {
+    backgroundColor: theme.colors.gray[300],
   },
 });
