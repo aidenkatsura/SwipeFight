@@ -89,9 +89,6 @@ export default function AccountSetupScreen() {
         wins: 0,
         losses: 0,
         draws: 0,
-        likes: [],
-        dislikes: [],
-        chat: [],
         createdAt: new Date().toISOString(),
       });
 
