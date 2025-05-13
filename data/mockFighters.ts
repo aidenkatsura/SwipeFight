@@ -13,7 +13,9 @@ export const mockFighters: Fighter[] = [
     rating: 1840,
     wins: 15,
     losses: 3,
-    draws: 1
+    draws: 1,
+    likes: [],
+    dislikes: []
   },
   {
     id: '2',
@@ -27,7 +29,9 @@ export const mockFighters: Fighter[] = [
     rating: 1720,
     wins: 9,
     losses: 4,
-    draws: 0
+    draws: 0,
+    likes: [],
+    dislikes: []
   },
   {
     id: '3',
@@ -41,7 +45,9 @@ export const mockFighters: Fighter[] = [
     rating: 1915,
     wins: 23,
     losses: 7,
-    draws: 2
+    draws: 2,
+    likes: [],
+    dislikes: []
   },
   {
     id: '4',
@@ -55,7 +61,9 @@ export const mockFighters: Fighter[] = [
     rating: 1650,
     wins: 7,
     losses: 2,
-    draws: 0
+    draws: 0,
+    likes: [],
+    dislikes: []
   },
   {
     id: '5',
@@ -69,7 +77,9 @@ export const mockFighters: Fighter[] = [
     rating: 1880,
     wins: 18,
     losses: 5,
-    draws: 1
+    draws: 1,
+    likes: [],
+    dislikes: []
   },
   {
     id: '6',
@@ -83,7 +93,9 @@ export const mockFighters: Fighter[] = [
     rating: 1750,
     wins: 12,
     losses: 6,
-    draws: 3
+    draws: 3,
+    likes: [],
+    dislikes: []
   },
   {
     id: '7',
@@ -97,7 +109,9 @@ export const mockFighters: Fighter[] = [
     rating: 1970,
     wins: 25,
     losses: 3,
-    draws: 0
+    draws: 0,
+    likes: [],
+    dislikes: []
   },
   {
     id: '8',
@@ -111,7 +125,9 @@ export const mockFighters: Fighter[] = [
     rating: 1820,
     wins: 16,
     losses: 4,
-    draws: 2
+    draws: 2,
+    likes: [],
+    dislikes: []
   },
   {
     id: '9',
@@ -125,7 +141,9 @@ export const mockFighters: Fighter[] = [
     rating: 1895,
     wins: 21,
     losses: 6,
-    draws: 1
+    draws: 1,
+    likes: [],
+    dislikes: []
   },
   {
     id: '10',
@@ -139,7 +157,9 @@ export const mockFighters: Fighter[] = [
     rating: 1780,
     wins: 14,
     losses: 5,
-    draws: 2
+    draws: 2,
+    likes: [],
+    dislikes: []
   },
   {
     id: '11',
@@ -153,7 +173,9 @@ export const mockFighters: Fighter[] = [
     rating: 1710,
     wins: 8,
     losses: 3,
-    draws: 0
+    draws: 0,
+    likes: [],
+    dislikes: []
   },
   {
     id: '12',
@@ -167,6 +189,8 @@ export const mockFighters: Fighter[] = [
     rating: 1765,
     wins: 13,
     losses: 4,
-    draws: 2
+    draws: 2,
+    likes: [],
+    dislikes: []
   }
 ];

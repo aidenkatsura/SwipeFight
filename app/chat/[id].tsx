@@ -1,61 +1,65 @@
 import { StyleSheet, Text, View, FlatList, TextInput, TouchableOpacity, Image, KeyboardAvoidingView, Platform, SafeAreaView, Keyboard } from 'react-native';
-import { useEffect, useState, useRef } from 'react';
-import { useLocalSearchParams } from 'expo-router';
+import React, { useEffect, useState, useRef } from 'react';
+import { router, useLocalSearchParams } from 'expo-router';
 import { theme } from '@/styles/theme';
 import { mockChats } from '@/data/mockChats';
 import { ChatMessage, Chat } from '@/types/chat';
 import { formatDistanceToNow } from '@/utils/dateUtils';
 import { Send, Flag } from 'lucide-react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { fetchChatFromDB, fetchUserFromDB, sendMessage } from '@/utils/firebaseUtils';
+import { Fighter } from '@/types/fighter';
 import { Ionicons } from '@expo/vector-icons';
-import { router } from 'expo-router';
+import { Timestamp } from 'firebase/firestore';
 import ScorecardModal from '@/components/ScorecardModal';
+
+const userId = '0'; // Replace with auth context or prop
 
 export default function ChatScreen() {
   const { id } = useLocalSearchParams();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [newMessage, setNewMessage] = useState('');
-  const [chat, setChat] = useState<Chat | null>(null);
   const [isScorecardVisible, setIsScorecardVisible] = useState(false);
   const flatListRef = useRef<FlatList>(null);
   const keyboardHeight = useRef(0);
 
-  useEffect(() => {
-    // Find the chat with the matching ID
-    const foundChat = mockChats.find(chat => chat.id === id);
-    if (foundChat) {
-      setChat(foundChat);
-      // In a real app, we would fetch messages for this chat
-      // For now, we'll just use some mock messages
-      const mockMessages: ChatMessage[] = [
-        {
-          id: '1',
-          senderId: '1',
-          receiverId: '2',
-          message: 'Hey! Ready for our match?',
-          timestamp: new Date(Date.now() - 3600000),
-          read: true,
-        },
-        {
-          id: '2',
-          senderId: '2',
-          receiverId: '1',
-          message: 'Absolutely! When works for you?',
-          timestamp: new Date(Date.now() - 3500000),
-          read: true,
-        },
-        {
-          id: '3',
-          senderId: '1',
-          receiverId: '2',
-          message: 'How about tomorrow at 3 PM?',
-          timestamp: new Date(Date.now() - 3400000),
-          read: true,
-        },
-      ];
-      setMessages(mockMessages);
+  type EnrichedChat = {
+    chat: Chat;
+    otherParticipant: Fighter;
+  };
+  
+  const [chat, setChat] = useState<EnrichedChat | null>(null);
+  
+  const fetchChat = async () => {
+    try {
+      if (!id || typeof id !== 'string') {
+        console.error('Invalid chat ID:', id);
+        return;
+      }
+      const chat: Chat = await fetchChatFromDB(id);
+      console.log('Fetched chat:', chat);
+      
+      const otherUserId =
+        userId === chat.participants[0].id
+          ? chat.participants[1].id
+          : chat.participants[0].id;
+          console.log(otherUserId)
+      const otherParticipant = await fetchUserFromDB(otherUserId);
+      const enriched: EnrichedChat = {
+        chat,
+        otherParticipant,
+      };
+  
+      setChat(enriched);
+      setMessages(chat.messages);
+    } catch (error) {
+      console.error('Error fetching chat or user:', error);
     }
-
+  };
+  
+    // Fetch users when the component mounts
+    useEffect(() => {
+      fetchChat();
     // Add keyboard listeners
     const keyboardWillShow = Keyboard.addListener(
       Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
@@ -75,20 +79,25 @@ export default function ChatScreen() {
       keyboardWillShow.remove();
       keyboardWillHide.remove();
     };
-  }, [id]);
+  }, [id]); 
 
   const handleSend = () => {
+    if (!chat) {
+      return null;
+    }
     if (newMessage.trim()) {
       const message: ChatMessage = {
         id: Date.now().toString(),
-        senderId: '1', // Current user's ID
-        receiverId: '2', // Other participant's ID
+        senderId: userId, // Current user's ID
+        receiverId: chat?.otherParticipant.id, // Other participant's ID
         message: newMessage.trim(),
-        timestamp: new Date(),
+        timestamp: Timestamp.fromDate(new Date()),
         read: false,
       };
+
       setMessages(prev => [...prev, message]);
       setNewMessage('');
+      sendMessage(chat.chat.id, message);
       // Scroll to bottom
       setTimeout(() => {
         flatListRef.current?.scrollToEnd({ animated: true });
@@ -105,29 +114,32 @@ export default function ChatScreen() {
   };
 
   const renderMessage = ({ item }: { item: ChatMessage }) => {
-    const isCurrentUser = item.senderId === '1'; // Assuming current user's ID is '1'
+    const isCurrentUser = item.senderId === userId; // Assuming current user's ID is '1'
+    if (!chat) {
+    return null; // Or a loading state
+  }
 
     return (
       <View style={{ flexDirection: 'row', alignItems: 'flex-end', marginBottom: theme.spacing[2], justifyContent: isCurrentUser ? 'flex-end' : 'flex-start' }}>
         {!isCurrentUser && (
           <Image
-            source={{ uri: otherParticipant.photo }}
+            source={{uri: chat.otherParticipant.photo}}
             style={{ width: 28, height: 28, borderRadius: 14, marginRight: theme.spacing[2] }}
           />
         )}
-        <View style={[
-          styles.messageContainer,
-          isCurrentUser ? styles.currentUserMessage : styles.otherUserMessage
+      <View style={[
+        styles.messageContainer,
+        isCurrentUser ? styles.currentUserMessage : styles.otherUserMessage
+      ]}>
+        <Text style={[
+          styles.messageText,
+          isCurrentUser ? styles.currentUserText : styles.otherUserText
         ]}>
-          <Text style={[
-            styles.messageText,
-            isCurrentUser ? styles.currentUserText : styles.otherUserText
-          ]}>
-            {item.message}
-          </Text>
-          <Text style={styles.timestamp}>
-            {formatDistanceToNow(item.timestamp)}
-          </Text>
+          {item.message}
+        </Text>
+        <Text style={styles.timestamp}>
+          {formatDistanceToNow(item.timestamp.toDate())}
+        </Text>
         </View>
       </View>
     );
@@ -138,7 +150,7 @@ export default function ChatScreen() {
   }
 
   // Get the other participant (not the current user)
-  const otherParticipant = chat.participants[1];
+  //const otherParticipant = chat.participants[1];
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
@@ -148,10 +160,10 @@ export default function ChatScreen() {
             <Ionicons name="arrow-back" size={28} color={theme.colors.gray[900]} />
           </TouchableOpacity>
           <Image
-            source={{ uri: otherParticipant.photo }}
+            source={{ uri: chat.otherParticipant.photo }}
             style={styles.profileImage}
           />
-          <Text style={styles.userName}>{otherParticipant.name}</Text>
+          <Text style={styles.userName}>{chat.otherParticipant.name}</Text>
           <TouchableOpacity
             style={styles.reportButton}
             onPress={() => setIsScorecardVisible(true)}
@@ -199,7 +211,7 @@ export default function ChatScreen() {
           visible={isScorecardVisible}
           onClose={() => setIsScorecardVisible(false)}
           onSubmit={handleSubmitResult}
-          participants={chat.participants}
+          participants={chat.chat.participants}
         />
       </SafeAreaView>
     </GestureHandlerRootView>

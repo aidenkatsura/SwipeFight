@@ -11,6 +11,8 @@ export interface Fighter {
   wins: number;
   losses: number;
   draws: number;
+  likes: string[];
+  dislikes: string[];
 }
 
 // If adding anything here, make sure to update the DisciplineFilter.tsx file as well
