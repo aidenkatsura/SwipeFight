@@ -18,7 +18,7 @@ export default function FightScreen() {
   // Only updated when a filter is applied - not modified on swipes.
   const [filteredFighters, setFilteredFighters] = useState<Fighter[]>([]);
 
-  const [selectedDiscipline, setSelectedDiscipline] = useState<Discipline | 'All'>('All');
+  const [selectedDisciplines, setSelectedDisciplines] = useState<Discipline[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const swiperRef = useRef<Swiper<Fighter>>(null);
 
@@ -83,10 +83,24 @@ export default function FightScreen() {
   };
 
   const handleFilterChange = (discipline: Discipline | 'All') => {
-    setSelectedDiscipline(discipline);
-    const filtered = filterFightersByDiscipline(allFighters, discipline); // Use the filter function
-    setFilteredFighters(filtered);
-    swiperRef.current?.jumpToCardIndex(0);
+    if (discipline === 'All') {
+      setSelectedDisciplines([]);
+      setFilteredFighters(allFighters);
+      swiperRef.current?.jumpToCardIndex(0);
+      return;
+    }
+
+    setSelectedDisciplines(prev => {
+      const newDisciplines = prev.includes(discipline)
+        ? prev.filter(d => d !== discipline)
+        : [...prev, discipline];
+      
+      const filtered = filterFightersByDiscipline(allFighters, newDisciplines);
+      setFilteredFighters(filtered);
+      swiperRef.current?.jumpToCardIndex(0);
+      
+      return newDisciplines;
+    });
   };
 
   const handlePressSwipeLeft = () => {
@@ -102,7 +116,7 @@ export default function FightScreen() {
       <View style={styles.header}>
         <Text style={styles.title}>Find Fighters</Text>
         <DisciplineFilter
-          selectedDiscipline={selectedDiscipline}
+          selectedDisciplines={selectedDisciplines}
           onSelectDiscipline={handleFilterChange}
         />
       </View>
@@ -153,10 +167,10 @@ export default function FightScreen() {
           />
         ) : (
           <View style={styles.emptyState}>
-            <Text style={styles.emptyStateText}>No fighters found in this discipline</Text>
+            <Text style={styles.emptyStateText}>No fighters found in selected disciplines</Text>
             <TouchableOpacity
               style={styles.emptyStateButton}
-              onPress={() => handleFilterChange('All')}
+              onPress={() => setSelectedDisciplines([])}
             >
               <Text style={styles.emptyStateButtonText}>Show All Fighters</Text>
             </TouchableOpacity>
