@@ -2,78 +2,108 @@
 import { Image, KeyboardAvoidingView, Text, TextInput, Platform, TouchableOpacity, ScrollView, StyleSheet, SafeAreaView, View } from 'react-native';
 import { SelectList } from 'react-native-dropdown-select-list';
 import * as ImagePicker from 'expo-image-picker';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'expo-router';
 import { theme } from '@/styles/theme';
-import { mockCurrentUser } from '@/data/mockCurrentUser';
-import { Discipline } from '@/types/fighter';
-import { updateUserInDB } from '@/utils/firebaseUtils';
+import { fetchUserFromDB, updateUserInDB } from '@/utils/firebaseUtils';
 import { auth } from '@/FirebaseConfig';
+import { Discipline, Fighter } from '@/types/fighter';
 
 export default function EditProfileScreen() {
   const router = useRouter();
-  const user = mockCurrentUser;
+  const [userData, setUserData] = useState<Fighter | null>(null);
 
-  const [name, setName] = useState(user.name);
-  const [age, setAge] = useState(user.age.toString());
-  const [location, setLocation] = useState(user.location);
-  const [discipline, setDiscipline] = useState<Discipline>(user.discipline);
-  const [photo, setPhoto] = useState(user.photo);
+  const [name, setName] = useState('');
+  const [age, setAge] = useState('');
+  const [location, setLocation] = useState('');
+  const [discipline, setDiscipline] = useState<Discipline | undefined>(undefined);
+  const [photo, setPhoto] = useState('');
 
-  const handleSave = async () => {
-    // Update the user profile with new values
-
-    // TODO(zzzappy): try/catch error handling for updateUserInDB
-    if (auth.currentUser) {
-      const updatedUser = {
-        ...user,
-        name,
-        age: parseInt(age, 10),
-        location,
-        discipline,
-        photo,
-      };
-
-      await updateUserInDB(auth.currentUser.uid, updatedUser);
-    } else {
+  // Fetch user data from Firestore, updates local state if successful
+  const fetchUserData = async () => {
+    if (!auth.currentUser) {
       console.error('No authenticated user found.');
       return;
-    }  
-  
-    // Go back to profile
+    }
+
+    try {
+      const data = await fetchUserFromDB(auth.currentUser.uid);
+      if (data) {
+        setUserData(data);
+
+        // Populate form fields with user data
+        setName(data.name);
+        setAge(data.age.toString());
+        setLocation(data.location);
+        setDiscipline(data.discipline);
+        setPhoto(data.photo);
+      }
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchUserData();
+  }, []);
+
+  const handleSave = async () => {
+    if (!auth.currentUser) {
+      console.error('No authenticated user found.');
+      return;
+    }
+
+    const updatedUser = {
+      ...userData,
+      name,
+      age: parseInt(age, 10),
+      location,
+      discipline,
+      photo,
+    };
+
+    try {
+      const result = await updateUserInDB(auth.currentUser.uid, updatedUser);
+      if (result) {
+        console.log('Profile updated successfully.');
+      } else {
+        console.error('Failed to update profile. User may not exist.');
+      }
+    } catch (error) {
+      console.error('Error updating profile:', error);
+    }
+
     router.back();
   };
 
   const handlePhotoChange = async () => {
-    // Request permission to access media library
     const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (permissionResult.granted === false) {
       alert('Permission to access camera roll is required!');
       return;
     }
-      // Launch the image picker
-      const pickerResult = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [1, 1], // Ensure the image is square
-        quality: 1,
-      });
-  
-      // Ensure the result is not canceled and has the expected structure
-      if (!pickerResult.canceled && pickerResult.assets && pickerResult.assets[0].uri) {
-        setPhoto(pickerResult.assets[0].uri); // Access the URI of the first image asset
-      }
+
+    const pickerResult = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 1,
+    });
+
+    if (!pickerResult.canceled && pickerResult.assets && pickerResult.assets[0].uri) {
+      setPhoto(pickerResult.assets[0].uri);
+    }
   };
 
   return (
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        style={{ flex: 1 }}
       >
         <ScrollView
-        contentContainerStyle={styles.scrollContainer}
-        keyboardShouldPersistTaps="handled"
+          contentContainerStyle={styles.scrollContainer}
+          keyboardShouldPersistTaps="handled"
         >
           <Text style={styles.title}>Edit Profile</Text>
 
@@ -97,6 +127,7 @@ export default function EditProfileScreen() {
             style={styles.input}
             value={age}
             onChangeText={setAge}
+            keyboardType="numeric"
           />
 
           <Text style={styles.label}>Location</Text>
@@ -114,21 +145,23 @@ export default function EditProfileScreen() {
             dropdownItemStyles={styles.dropdownText}
             setSelected={setDiscipline}
             search={false}
-            placeholder='Select your discipline'
-            data={[ { label: 'Aikido', value: 'Aikido' },
-                    { label: 'BJJ', value: 'BJJ' },
-                    { label: 'Boxing', value: 'Boxing' },
-                    { label: 'Judo', value: 'Judo' },
-                    { label: 'Karate', value: 'Karate' },
-                    { label: 'Kendo', value: 'Kendo' },
-                    { label: 'Kickboxing', value: 'Kickboxing' },
-                    { label: 'Kung Fu', value: 'Kung Fu' },
-                    { label: 'Krav Maga', value: 'Krav Maga' },
-                    { label: 'Taekwondo', value: 'Taekwondo' },
-                    { label: 'MMA', value: 'MMA' },
-                    { label: 'Muay Thai', value: 'Muay Thai' },
-                    { label: 'Wrestling', value: 'Wrestling' },   ]}
-            />
+            placeholder="Select your discipline"
+            data={[
+              { label: 'Aikido', value: 'Aikido' },
+              { label: 'BJJ', value: 'BJJ' },
+              { label: 'Boxing', value: 'Boxing' },
+              { label: 'Judo', value: 'Judo' },
+              { label: 'Karate', value: 'Karate' },
+              { label: 'Kendo', value: 'Kendo' },
+              { label: 'Kickboxing', value: 'Kickboxing' },
+              { label: 'Kung Fu', value: 'Kung Fu' },
+              { label: 'Krav Maga', value: 'Krav Maga' },
+              { label: 'Taekwondo', value: 'Taekwondo' },
+              { label: 'MMA', value: 'MMA' },
+              { label: 'Muay Thai', value: 'Muay Thai' },
+              { label: 'Wrestling', value: 'Wrestling' },
+            ]}
+          />
           <View style={styles.buttonContainer}>
             <TouchableOpacity style={styles.cancelButton} onPress={() => router.back()}>
               <Text style={styles.cancelButtonText}>Cancel</Text>

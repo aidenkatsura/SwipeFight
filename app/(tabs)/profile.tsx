@@ -5,9 +5,11 @@ import { theme } from '@/styles/theme';
 import { router } from 'expo-router';
 import { Fighter } from '@/types/fighter';
 import { signOut } from 'firebase/auth';
-import { auth, db } from '@/FirebaseConfig';
-import { doc, getDoc } from 'firebase/firestore';
-import { useEffect, useState } from 'react';
+import { auth } from '@/FirebaseConfig';
+import { useState } from 'react';
+import { fetchUserFromDB } from '@/utils/firebaseUtils';
+import { useFocusEffect } from '@react-navigation/native';
+import { useCallback } from 'react';
 import StatCard from '@/components/StatCard';
 
 type UserProfile = Fighter & {
@@ -25,30 +27,35 @@ export default function ProfileScreen() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchUserProfile = async () => {
-      try {
-        const currentUser = auth.currentUser;
-        if (!currentUser) {
-          throw new Error('No authenticated user found');
-        }
-
-        const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
-        if (userDoc.exists()) {
-          setUser(userDoc.data() as UserProfile);
-        } else {
-          throw new Error('User profile not found');
-        }
-      } catch (error: any) {
-        console.error('Error fetching user profile:', error);
-        setError(error.message);
-      } finally {
-        setLoading(false);
+  // Fetch user profile data
+  const fetchUserProfile = async () => {
+    try {
+      const currentUser = auth.currentUser;
+      if (!currentUser) {
+        throw new Error('No authenticated user found');
       }
-    };
 
-    fetchUserProfile();
-  }, []);
+      const userData = await fetchUserFromDB(currentUser.uid);
+      if (userData) {
+        setUser(userData as UserProfile); // Cast to UserProfile if needed
+      } else {
+        throw new Error('User profile not found');
+      }
+    } catch (error: any) {
+      console.error('Error fetching user profile:', error);
+      setError(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // TODO(zzzappy): Change so refresh only occurs on change of profile info
+  useFocusEffect(
+    useCallback(() => {
+      setLoading(true); // Show loading while fetching data
+      fetchUserProfile();
+    }, [])
+  );
 
   const handleEditProfilePress = () => {
     router.push('/profile-editor/profile-editor');

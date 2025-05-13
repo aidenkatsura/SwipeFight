@@ -20,6 +20,29 @@ export const fetchUsersFromDB = async (): Promise<Fighter[]> => {
 };
 
 /**
+ * Fetch user data from Firestore by user ID.
+ * 
+ * @param {string} userId - The ID of the user to fetch.
+ * @returns {Promise<Fighter | null>} The user data if it exists, or null if not found.
+ */
+export const fetchUserFromDB = async (userId: string): Promise<Fighter | null> => {
+  try {
+    const userDocRef = doc(db, 'users', userId);
+    const userDoc = await getDoc(userDocRef);
+
+    if (userDoc.exists()) {
+      return userDoc.data() as Fighter;
+    } else {
+      console.error(`User with ID ${userId} does not exist.`);
+      return null;
+    }
+  } catch (error) {
+    console.error('Error fetching user from Firestore:', error);
+    throw new Error('Unexpected error fetching user from Firestore.');
+  }
+};
+
+/**
  * Add a new fighter to the Firestore database.
  * 
  * The document ID will be the fighter's ID. A fighter will only be added if there is no
