@@ -308,3 +308,38 @@ const fetchUserArray = async (targetUserId: string, targetArray: string): Promis
     throw new Error('Failed to fetch user array from Firestore.');
   }
 };
+
+
+
+/**
+ * Adds a user ID to a specific array field in another user's document.
+ *
+ * @param {string} targetUserId - The user document to update.
+ * @param {string} userIdToAdd - The user ID to add to the array.
+ * @param {string} arrayField - The name of the array field to update (e.g., 'matches', 'likes').
+ * @returns {Promise<boolean>} Resolves to true if successful, false otherwise.
+ */
+export async function sendMessage(chatId: string, message: ChatMessage): 
+                                                                          Promise<boolean> {
+  try {
+    const chatRef = doc(db, 'chats', chatId);
+
+    await runTransaction(db, async (transaction) => {
+      const chatSnap = await transaction.get(chatRef);
+
+      if (!chatSnap.exists()) {
+        throw new Error(`Chat with ID ${chatId} does not exist.`);
+      }
+
+      transaction.update(chatRef, {
+        ["messages"]: arrayUnion(message), ["lastMessage"]: message,
+      });
+      
+    });
+
+    return true;
+  } catch (error) {
+    console.error(`Error adding ${message} to chat ${chatId}:`, error);
+    return false;
+  }
+};

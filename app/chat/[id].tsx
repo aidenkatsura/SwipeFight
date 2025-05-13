@@ -8,7 +8,7 @@ import { ChatMessage, Chat } from '@/types/chat';
 import { formatDistanceToNow } from '@/utils/dateUtils';
 import { Send } from 'lucide-react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { fetchChatFromDB, fetchUserFromDB } from '@/utils/firebaseUtils';
+import { fetchChatFromDB, fetchUserFromDB, sendMessage } from '@/utils/firebaseUtils';
 import { Fighter } from '@/types/fighter';
 import { Ionicons } from '@expo/vector-icons';
 import { Timestamp } from 'firebase/firestore';
@@ -94,8 +94,10 @@ export default function ChatScreen() {
         timestamp: Timestamp.fromDate(new Date()),
         read: false,
       };
+
       setMessages(prev => [...prev, message]);
       setNewMessage('');
+      sendMessage(chat.chat.id, message);
       // Scroll to bottom
       setTimeout(() => {
         flatListRef.current?.scrollToEnd({ animated: true });
