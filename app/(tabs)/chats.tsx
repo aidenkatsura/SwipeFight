@@ -94,7 +94,7 @@ export default function ChatsScreen() {
           <View style={styles.chatHeader}>
             <Text style={styles.userName}>{item.otherParticipant.name}</Text>
             <Text style={styles.timestamp}>
-              {/*formatDistanceToNow(item.lastMessage.timestamp)*/}
+              {formatDistanceToNow(item.chat.lastMessage.timestamp.toDate())}
             </Text>
           </View>
 

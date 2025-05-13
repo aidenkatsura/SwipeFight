@@ -1,4 +1,4 @@
-import { collection, getDocs, doc, getDoc, setDoc, deleteDoc, addDoc, runTransaction, arrayUnion } from 'firebase/firestore';
+import { collection, getDocs, doc, getDoc, setDoc, deleteDoc, addDoc, runTransaction, arrayUnion, Timestamp} from 'firebase/firestore';
 import { db } from '@/FirebaseConfig';
 import { Fighter } from '@/types/fighter';
 import { Chat, ChatMessage} from '@/types/chat';
@@ -172,6 +172,14 @@ export async function addChat(userId1: string, userId2: string) {
     participants: [userId1, userId2],
     messages: [],
     unreadCount: 0,
+    lastMessage: {
+      id: "",
+      senderId: "",
+      receiverId: "",
+      message: "",
+      read: false,
+      timestamp: Timestamp.fromDate(new Date()),
+    }
   };
 
   await runTransaction(db, async (transaction) => {
@@ -225,6 +233,7 @@ export const fetchUserLikesFromDB = async (targetUserId: string): Promise<string
  * @throws Throws an error if fetching the user fails.
  */
 export const fetchUserDislikesFromDB = async (targetUserId: string): Promise<string[]> => {
+  console.log(targetUserId);
   return fetchUserArray(targetUserId, "dislikes");
 };
 

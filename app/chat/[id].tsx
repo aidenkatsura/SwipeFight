@@ -11,6 +11,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { fetchChatFromDB, fetchUserFromDB } from '@/utils/firebaseUtils';
 import { Fighter } from '@/types/fighter';
 import { Ionicons } from '@expo/vector-icons';
+import { Timestamp } from 'firebase/firestore';
 
 
 const userId = '0'; // Replace with auth context or prop
@@ -90,7 +91,7 @@ export default function ChatScreen() {
         senderId: userId, // Current user's ID
         receiverId: chat?.otherParticipant.id, // Other participant's ID
         message: newMessage.trim(),
-        timestamp: new Date(),
+        timestamp: Timestamp.fromDate(new Date()),
         read: false,
       };
       setMessages(prev => [...prev, message]);
@@ -127,7 +128,7 @@ export default function ChatScreen() {
           {item.message}
         </Text>
         <Text style={styles.timestamp}>
-          {/*formatDistanceToNow(item.timestamp)*/}
+          {formatDistanceToNow(item.timestamp.toDate())}
         </Text>
         </View>
       </View>
