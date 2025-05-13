@@ -9,6 +9,8 @@ import { fetchChatFromDB, fetchUserFromDB, fetchUserChatsFromDB } from '@/utils/
 import { Fighter } from '@/types/fighter';
 import { getAuth } from 'firebase/auth';
 import { useFocusEffect } from 'expo-router';
+import { doc, onSnapshot } from 'firebase/firestore';
+import { db } from '@/FirebaseConfig';
 
 export default function ChatsScreen() {
   const [loading, setLoading] = useState(true);
@@ -25,37 +27,57 @@ export default function ChatsScreen() {
         console.warn("User ID is undefined. User might not be logged in.");
         return;
       }
+      let unsubscribeFunctions: (() => void)[] = [];
 
-      const loadChats = async () => {
-        try {
-          const chatIds = await fetchUserChatsFromDB(userId);
+          const subscribeToChats = async () => {
+            try {
+              const chatIds = await fetchUserChatsFromDB(userId);
 
-          const chatPromises = chatIds.map((id: string) => fetchChatFromDB(id));
-          const chatResults = await Promise.all(chatPromises);
-    
-          const validChats = chatResults.filter((chat: any): chat is Chat => !!chat);
-    
-          // Fetch and attach user info
-          const enrichedChatPromises = validChats.map(async (chat) => {
-            // Find the "other" user (assuming current user is always in participants)
-            const otherUserId = userId === chat.participants[0].id
-            ? chat.participants[1].id
-            : chat.participants[0].id;
-            const otherParticipant = await fetchUserFromDB(otherUserId);
-            return { chat: chat, otherParticipant: otherParticipant };
-          });
-    
-          const enrichedChats = await Promise.all(enrichedChatPromises);
-          setChats(enrichedChats);
-        } catch (error) {
-          console.error('Failed to load chats:', error);
-        } finally {
-          setLoading(false);
-        }
-      };
-    
-      loadChats();
-    }, []));
+              const unsubscribeList = await Promise.all(chatIds.map(async (id: string) => {
+                const chatDocRef = doc(db, 'chats', id);
+
+                return onSnapshot(chatDocRef, async (snapshot) => {
+                  if (!snapshot.exists()) return;
+
+                  const chatData = snapshot.data() as Chat;
+
+                  const otherUserId = userId === chatData.participants[0].id
+                    ? chatData.participants[1].id
+                    : chatData.participants[0].id;
+
+                  const otherParticipant = await fetchUserFromDB(otherUserId);
+
+                  setChats(prevChats => {
+                    const existingIndex = prevChats.findIndex(c => c.chat.id === chatData.id);
+
+                    const newEnrichedChat = { chat: chatData, otherParticipant };
+
+                    if (existingIndex === -1) {
+                      return [...prevChats, newEnrichedChat];
+                    } else {
+                      const updatedChats = [...prevChats];
+                      updatedChats[existingIndex] = newEnrichedChat;
+                      return updatedChats;
+                    }
+                  });
+                });
+              }));
+
+              unsubscribeFunctions = unsubscribeList;
+            } catch (error) {
+              console.error('Failed to subscribe to chats:', error);
+            } finally {
+              setLoading(false);
+            }
+          };
+
+          subscribeToChats();
+
+          return () => {
+            unsubscribeFunctions.forEach(unsub => unsub());
+          };
+        }, [])
+      );
   
 
   // Sort chats by unread status and timestamp
