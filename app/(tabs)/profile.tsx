@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Image, ScrollView, TouchableOpacity, SafeAreaView } from 'react-native';
+import { StyleSheet, Text, View, Image, ScrollView, TouchableOpacity, SafeAreaView, ActivityIndicator } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { Pencil as EditPencil, Settings, Medal, Trophy, LogOut } from 'lucide-react-native';
 import { theme } from '@/styles/theme';
@@ -55,8 +55,8 @@ export default function ProfileScreen() {
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.container}>
-        <Text>Loading profile...</Text>
+      <SafeAreaView style={[styles.container, styles.centerContent]}>
+        <ActivityIndicator size={50} color={theme.colors.primary[500]} />
       </SafeAreaView>
     );
   }
@@ -191,6 +191,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: theme.colors.white,
+  },
+  centerContent: {
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   settingsContainer: {
     paddingHorizontal: theme.spacing[4],

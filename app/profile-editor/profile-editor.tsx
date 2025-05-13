@@ -11,7 +11,8 @@ import { useUser } from '@/context/UserContext';
 
 export default function EditProfileScreen() {
   const router = useRouter();
-  const { user, setUser } = useUser(); // Use shared user state from UserContext
+  const { user, setUser } = useUser(); // Shared user state from UserContext
+  const [saving, setSaving] = useState(false);
 
   // Initialize form fields with user data from context
   const [name, setName] = useState(user?.name || '');
@@ -41,6 +42,7 @@ export default function EditProfileScreen() {
       photo,
     };
 
+    setSaving(true); // Start saving process
     try {
       const result = await updateUserInDB(user.id, updatedUser);
       if (result) {
@@ -54,6 +56,8 @@ export default function EditProfileScreen() {
       }
     } catch (error) {
       console.error('Error updating profile:', error);
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -147,8 +151,14 @@ export default function EditProfileScreen() {
             <TouchableOpacity style={styles.cancelButton} onPress={() => router.back()}>
               <Text style={styles.cancelButtonText}>Cancel</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-              <Text style={styles.saveButtonText}>Save</Text>
+            <TouchableOpacity
+              style={[styles.saveButton, saving && styles.saveButtonDisabled]}
+              onPress={handleSave}
+              disabled={saving} // Disable button while waiting on save
+            >
+              <Text style={styles.saveButtonText}>
+                {saving ? 'Saving...' : 'Save'}
+              </Text>
             </TouchableOpacity>
           </View>
         </ScrollView>
@@ -243,5 +253,8 @@ const styles = StyleSheet.create({
   dropdownText: {
     color: theme.colors.gray[800],
     padding: theme.spacing[4],
+  },
+  saveButtonDisabled: {
+    backgroundColor: theme.colors.gray[300],
   },
 });
