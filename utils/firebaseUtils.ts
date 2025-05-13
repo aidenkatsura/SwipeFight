@@ -312,11 +312,10 @@ const fetchUserArray = async (targetUserId: string, targetArray: string): Promis
 
 
 /**
- * Adds a user ID to a specific array field in another user's document.
+ * Adds a chat message to a chat in the database
  *
- * @param {string} targetUserId - The user document to update.
- * @param {string} userIdToAdd - The user ID to add to the array.
- * @param {string} arrayField - The name of the array field to update (e.g., 'matches', 'likes').
+ * @param {string} chatId - The target chat.
+ * @param {ChatMessage} message - The chat message that will be added to the chat.
  * @returns {Promise<boolean>} Resolves to true if successful, false otherwise.
  */
 export async function sendMessage(chatId: string, message: ChatMessage): 
