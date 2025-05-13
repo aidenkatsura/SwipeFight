@@ -1,72 +1,144 @@
 import { StyleSheet, Text, View, FlatList, TouchableOpacity, Image, SafeAreaView } from 'react-native';
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useCallback } from 'react';
 import { router } from 'expo-router';
-import { mockChats } from '@/data/mockChats';
 import { Chat } from '@/types/chat';
 import { theme } from '@/styles/theme';
 import { formatDistanceToNow } from '@/utils/dateUtils';
 import ChatBubble from '@/components/ChatBubble';
+import { fetchChatFromDB, fetchUserFromDB, fetchUserChatsFromDB } from '@/utils/firebaseUtils';
+import { Fighter } from '@/types/fighter';
+import { getAuth } from 'firebase/auth';
+import { useFocusEffect } from 'expo-router';
+import { doc, onSnapshot } from 'firebase/firestore';
+import { db } from '@/FirebaseConfig';
 
 export default function ChatsScreen() {
-  const [chats, setChats] = useState<Chat[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    // Simulate API fetch
-    setChats(mockChats);
-  }, []);
+  type EnrichedChat = {chat: Chat, otherParticipant: Fighter};
+  const [chats, setChats] = useState<EnrichedChat[]>([]);
+
+
+  useFocusEffect(
+    useCallback(() => {
+      const auth = getAuth();
+      const userId = auth.currentUser?.uid;
+      if (!userId) {
+        console.warn("User ID is undefined. User might not be logged in.");
+        return;
+      }
+      let unsubscribeFunctions: (() => void)[] = [];
+
+          const subscribeToChats = async () => {
+            try {
+              const chatIds = await fetchUserChatsFromDB(userId);
+
+              const unsubscribeList = await Promise.all(chatIds.map(async (id: string) => {
+                const chatDocRef = doc(db, 'chats', id);
+
+                return onSnapshot(chatDocRef, async (snapshot) => {
+                  if (!snapshot.exists()) return;
+
+                  const chatData = snapshot.data() as Chat;
+
+                  const otherUserId = userId === chatData.participants[0].id
+                    ? chatData.participants[1].id
+                    : chatData.participants[0].id;
+
+                  const otherParticipant = await fetchUserFromDB(otherUserId);
+
+                  setChats(prevChats => {
+                    const existingIndex = prevChats.findIndex(c => c.chat.id === chatData.id);
+
+                    const newEnrichedChat = { chat: chatData, otherParticipant };
+
+                    if (existingIndex === -1) {
+                      return [...prevChats, newEnrichedChat];
+                    } else {
+                      const updatedChats = [...prevChats];
+                      updatedChats[existingIndex] = newEnrichedChat;
+                      return updatedChats;
+                    }
+                  });
+                });
+              }));
+
+              unsubscribeFunctions = unsubscribeList;
+            } catch (error) {
+              console.error('Failed to subscribe to chats:', error);
+            } finally {
+              setLoading(false);
+            }
+          };
+
+          subscribeToChats();
+
+          return () => {
+            unsubscribeFunctions.forEach(unsub => unsub());
+          };
+        }, [])
+      );
+  
 
   // Sort chats by unread status and timestamp
   const sortedChats = useMemo(() => {
     return [...chats].sort((a, b) => {
       // First sort by unread status
-      if (a.unreadCount > 0 && b.unreadCount === 0) return -1;
-      if (a.unreadCount === 0 && b.unreadCount > 0) return 1;
+      if (a.chat.unreadCount > 0 && b.chat.unreadCount === 0) return -1;
+      if (a.chat.unreadCount === 0 && b.chat.unreadCount > 0) return 1;
 
       // Then sort by timestamp (most recent first)
-      return b.lastMessage.timestamp.getTime() - a.lastMessage.timestamp.getTime();
+      //return b.lastMessage.timestamp.getTime() - a.lastMessage.timestamp.getTime();
+      return 1;
     });
   }, [chats]);
+  
 
   const handleChatPress = (chatId: string) => {
+    setChats(prevChats =>
+      prevChats.map(chat =>
+        chat.chat.id === chatId ? { ...chat, unreadCount: 0 } : chat
+      )
+    );
     router.push(`/chat/${chatId}`);
   };
 
-  const renderChatItem = ({ item }: { item: Chat }) => {
+  const renderChatItem = ({ item }: { item: EnrichedChat }) => {
     // Get the other participant (not the current user)
-    const otherParticipant = item.participants[1]; // Assuming current user is always at index 0
+    //const otherParticipant = item.participants[1]; // Assuming current user is always at index 0
 
     return (
       <TouchableOpacity
         style={styles.chatItem}
-        onPress={() => handleChatPress(item.id)}
+        onPress={() => handleChatPress(item.chat.id)}
       >
         <Image
-          source={{ uri: otherParticipant.photo }}
+          source={{ uri: item.otherParticipant.photo}}
           style={styles.profileImage}
         />
 
-        {item.unreadCount > 0 && (
+        {item.chat.unreadCount > 0 && (
           <View style={styles.unreadBadge}>
-            <Text style={styles.unreadText}>{item.unreadCount}</Text>
+            <Text style={styles.unreadText}>{item.chat.unreadCount}</Text>
           </View>
         )}
 
         <View style={styles.chatContent}>
           <View style={styles.chatHeader}>
-            <Text style={styles.userName}>{otherParticipant.name}</Text>
+            <Text style={styles.userName}>{item.otherParticipant.name}</Text>
             <Text style={styles.timestamp}>
-              {formatDistanceToNow(item.lastMessage.timestamp)}
+              {formatDistanceToNow(item.chat.lastMessage.timestamp.toDate())}
             </Text>
           </View>
 
           <Text
             style={[
               styles.lastMessage,
-              item.unreadCount > 0 && styles.unreadMessage
+              item.chat.unreadCount > 0 && styles.unreadMessage
             ]}
             numberOfLines={1}
           >
-            {item.lastMessage.message}
+            {item.chat.lastMessage.message}
           </Text>
         </View>
       </TouchableOpacity>
@@ -83,7 +155,7 @@ export default function ChatsScreen() {
         <FlatList
           data={sortedChats}
           renderItem={renderChatItem}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => item.chat.id}
           contentContainerStyle={styles.chatsList}
         />
       ) : (

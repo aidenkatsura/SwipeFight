@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { router } from 'expo-router';
 import { theme } from '@/styles/theme';
 import { auth, db } from '@/FirebaseConfig';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, setDoc, Timestamp } from 'firebase/firestore';
 import { Discipline } from '@/types/fighter';
 import * as ImagePicker from 'expo-image-picker';
 
@@ -89,7 +89,10 @@ export default function AccountSetupScreen() {
         wins: 0,
         losses: 0,
         draws: 0,
-        createdAt: new Date().toISOString(),
+        likes: [],
+        dislikes: [],
+        chats: [],
+        createdAt: Timestamp.fromDate(new Date()),
       });
 
       console.log('Profile created successfully, navigating to tabs');
@@ -164,7 +167,9 @@ export default function AccountSetupScreen() {
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Discipline</Text>
             <View style={styles.disciplineContainer}>
-              {['MMA', 'Boxing', 'BJJ', 'Muay Thai', 'Wrestling'].map((d) => (
+              {['Aikido', 'BJJ', 'Boxing', 'Judo', 'Karate',
+                'Kendo', 'Kickboxing', 'Kung Fu', 'Krav Maga',
+                'Taekwondo', 'MMA', 'Muay Thai', 'Wrestling'].map((d) => (
                 <TouchableOpacity
                   key={d}
                   style={[

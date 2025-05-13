@@ -1,60 +1,62 @@
 import { StyleSheet, Text, View, FlatList, TextInput, TouchableOpacity, Image, KeyboardAvoidingView, Platform, SafeAreaView, Keyboard } from 'react-native';
-import { useEffect, useState, useRef } from 'react';
-import { useLocalSearchParams } from 'expo-router';
+import React, { useEffect, useState, useRef } from 'react';
+import { router, useLocalSearchParams } from 'expo-router';
 import { theme } from '@/styles/theme';
-import { mockChats } from '@/data/mockChats';
 import { ChatMessage, Chat } from '@/types/chat';
 import { formatDistanceToNow } from '@/utils/dateUtils';
-import { Send } from 'lucide-react-native';
+import { Send, Flag } from 'lucide-react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { fetchChatFromDB, fetchUserFromDB, sendMessage } from '@/utils/firebaseUtils';
+import { Fighter } from '@/types/fighter';
 import { Ionicons } from '@expo/vector-icons';
-import { router } from 'expo-router';
+import { doc, onSnapshot, Timestamp } from 'firebase/firestore';
+import ScorecardModal from '@/components/ScorecardModal';
+import { getAuth } from 'firebase/auth';
+import { db } from '@/FirebaseConfig';
 
 export default function ChatScreen() {
   const { id } = useLocalSearchParams();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [newMessage, setNewMessage] = useState('');
-  const [chat, setChat] = useState<Chat | null>(null);
+  const [isScorecardVisible, setIsScorecardVisible] = useState(false);
   const flatListRef = useRef<FlatList>(null);
   const keyboardHeight = useRef(0);
 
+  type EnrichedChat = {
+    chat: Chat;
+    otherParticipant: Fighter;
+  };
+  
+  const [chat, setChat] = useState<EnrichedChat | null>(null);
+  
   useEffect(() => {
-    // Find the chat with the matching ID
-    const foundChat = mockChats.find(chat => chat.id === id);
-    if (foundChat) {
-      setChat(foundChat);
-      // In a real app, we would fetch messages for this chat
-      // For now, we'll just use some mock messages
-      const mockMessages: ChatMessage[] = [
-        {
-          id: '1',
-          senderId: '1',
-          receiverId: '2',
-          message: 'Hey! Ready for our match?',
-          timestamp: new Date(Date.now() - 3600000),
-          read: true,
-        },
-        {
-          id: '2',
-          senderId: '2',
-          receiverId: '1',
-          message: 'Absolutely! When works for you?',
-          timestamp: new Date(Date.now() - 3500000),
-          read: true,
-        },
-        {
-          id: '3',
-          senderId: '1',
-          receiverId: '2',
-          message: 'How about tomorrow at 3 PM?',
-          timestamp: new Date(Date.now() - 3400000),
-          read: true,
-        },
-      ];
-      setMessages(mockMessages);
-    }
+    const auth = getAuth();
+    const userId = auth.currentUser?.uid;
+    if (!id || typeof id !== 'string' || !userId) return;
 
-    // Add keyboard listeners
+    const chatRef = doc(db, 'chats', id);
+
+    const unsubscribe = onSnapshot(chatRef, async (snapshot) => {
+      if (!snapshot.exists()) return;
+
+      const chatData = snapshot.data() as Chat;
+
+      const otherUserId =
+        userId === chatData.participants[0].id
+          ? chatData.participants[1].id
+          : chatData.participants[0].id;
+
+      const otherParticipant = await fetchUserFromDB(otherUserId);
+
+      const enriched: EnrichedChat = {
+        chat: chatData,
+        otherParticipant,
+      };
+
+      setChat(enriched);
+      setMessages(chatData.messages); // live update
+    });
+
     const keyboardWillShow = Keyboard.addListener(
       Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
       (e) => {
@@ -70,23 +72,36 @@ export default function ChatScreen() {
     );
 
     return () => {
+      unsubscribe(); // Cleanup Firestore listener
       keyboardWillShow.remove();
       keyboardWillHide.remove();
     };
   }, [id]);
 
   const handleSend = () => {
+    const auth = getAuth();
+    const userId = auth.currentUser?.uid;
+    if (!userId) {
+      console.warn("User ID is undefined. User might not be logged in.");
+      return;
+    }
+    if (!chat) {
+      return null;
+    }
+
     if (newMessage.trim()) {
       const message: ChatMessage = {
         id: Date.now().toString(),
-        senderId: '1', // Current user's ID
-        receiverId: '2', // Other participant's ID
+        senderId: userId, // Current user's ID
+        receiverId: chat?.otherParticipant.id, // Other participant's ID
         message: newMessage.trim(),
-        timestamp: new Date(),
+        timestamp: Timestamp.fromDate(new Date()),
         read: false,
       };
+
       setMessages(prev => [...prev, message]);
       setNewMessage('');
+      sendMessage(chat.chat.id, message);
       // Scroll to bottom
       setTimeout(() => {
         flatListRef.current?.scrollToEnd({ animated: true });
@@ -94,30 +109,43 @@ export default function ChatScreen() {
     }
   };
 
+  const handleSubmitResult = (winnerId: string, videoUri?: string) => {
+    // Here you would typically:
+    // 1. Upload the video to storage if provided
+    // 2. Update the match result in the database
+    // 3. Update both users' stats
+    console.log('Match result submitted:', { winnerId, videoUri });
+  };
+
   const renderMessage = ({ item }: { item: ChatMessage }) => {
-    const isCurrentUser = item.senderId === '1'; // Assuming current user's ID is '1'
+    const auth = getAuth();
+    const userId = auth.currentUser?.uid;
+    const isCurrentUser = item.senderId === userId;
+    if (!chat) {
+    return null; // Or a loading state
+  }
 
     return (
       <View style={{ flexDirection: 'row', alignItems: 'flex-end', marginBottom: theme.spacing[2], justifyContent: isCurrentUser ? 'flex-end' : 'flex-start' }}>
         {!isCurrentUser && (
           <Image
-            source={{ uri: otherParticipant.photo }}
+            source={{uri: chat.otherParticipant.photo}}
             style={{ width: 28, height: 28, borderRadius: 14, marginRight: theme.spacing[2] }}
           />
         )}
-        <View style={[
-          styles.messageContainer,
-          isCurrentUser ? styles.currentUserMessage : styles.otherUserMessage
+      <View style={[
+        styles.messageContainer,
+        isCurrentUser ? styles.currentUserMessage : styles.otherUserMessage
+      ]}>
+        <Text style={[
+          styles.messageText,
+          isCurrentUser ? styles.currentUserText : styles.otherUserText
         ]}>
-          <Text style={[
-            styles.messageText,
-            isCurrentUser ? styles.currentUserText : styles.otherUserText
-          ]}>
-            {item.message}
-          </Text>
-          <Text style={styles.timestamp}>
-            {formatDistanceToNow(item.timestamp)}
-          </Text>
+          {item.message}
+        </Text>
+        <Text style={styles.timestamp}>
+          {formatDistanceToNow(item.timestamp.toDate())}
+        </Text>
         </View>
       </View>
     );
@@ -128,7 +156,7 @@ export default function ChatScreen() {
   }
 
   // Get the other participant (not the current user)
-  const otherParticipant = chat.participants[1];
+  //const otherParticipant = chat.participants[1];
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
@@ -138,10 +166,17 @@ export default function ChatScreen() {
             <Ionicons name="arrow-back" size={28} color={theme.colors.gray[900]} />
           </TouchableOpacity>
           <Image
-            source={{ uri: otherParticipant.photo }}
+            source={{ uri: chat.otherParticipant.photo }}
             style={styles.profileImage}
           />
-          <Text style={styles.userName}>{otherParticipant.name}</Text>
+          <Text style={styles.userName}>{chat.otherParticipant.name}</Text>
+          <TouchableOpacity
+            style={styles.reportButton}
+            onPress={() => setIsScorecardVisible(true)}
+          >
+            <Flag size={24} color={theme.colors.primary[500]} />
+            <Text style={styles.reportButtonText}>Report Result</Text>
+          </TouchableOpacity>
         </View>
 
         <KeyboardAvoidingView
@@ -177,6 +212,13 @@ export default function ChatScreen() {
             </TouchableOpacity>
           </View>
         </KeyboardAvoidingView>
+
+        <ScorecardModal
+          visible={isScorecardVisible}
+          onClose={() => setIsScorecardVisible(false)}
+          onSubmit={handleSubmitResult}
+          participants={chat.chat.participants}
+        />
       </SafeAreaView>
     </GestureHandlerRootView>
   );
@@ -266,5 +308,19 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  reportButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginLeft: 'auto',
+    padding: theme.spacing[2],
+    backgroundColor: theme.colors.primary[50],
+    borderRadius: 8,
+  },
+  reportButtonText: {
+    fontFamily: 'Inter-SemiBold',
+    fontSize: 14,
+    color: theme.colors.primary[500],
+    marginLeft: theme.spacing[1],
   },
 });

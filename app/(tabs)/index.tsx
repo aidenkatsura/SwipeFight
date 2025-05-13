@@ -7,8 +7,10 @@ import { SwipeCard } from '@/components/SwipeCard';
 import { theme } from '@/styles/theme';
 import DisciplineFilter from '@/components/DisciplineFilter';
 import { Fighter, Discipline } from '@/types/fighter';
-import { fetchUsersFromDB } from '@/utils/firebaseUtils';
-import { filterFightersByDiscipline } from '@/utils/filterUtils';
+import { addChat, addLikeToUser, addDislikeToUser, fetchUsersFromDB } from '@/utils/firebaseUtils';
+import { filterFightersByDiscipline, filterFightersByLikes } from '@/utils/filterUtils';
+import { getAuth } from 'firebase/auth';
+
 
 export default function FightScreen() {
   // All fighters that have not been swiped on
@@ -18,19 +20,25 @@ export default function FightScreen() {
   // Only updated when a filter is applied - not modified on swipes.
   const [filteredFighters, setFilteredFighters] = useState<Fighter[]>([]);
 
-  const [selectedDiscipline, setSelectedDiscipline] = useState<Discipline | 'All'>('All');
+  const [selectedDisciplines, setSelectedDisciplines] = useState<Discipline[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const swiperRef = useRef<Swiper<Fighter>>(null);
 
   // Get all users from db
   const fetchUsers = async () => {
+    const auth = getAuth();
+    const userId = auth.currentUser?.uid;
+    if (!userId) {
+      console.warn("User ID is undefined. User might not be logged in.");
+      return;
+    }
     try {
       setIsLoading(true); // Set loading to true so spinner shows while fetching
 
       const users: Fighter[] = await fetchUsersFromDB();
-      console.log('Fetched users:', users);
-      setAllFighters(users);
-      setFilteredFighters(users);
+      const likeFilteredFighters = await filterFightersByLikes(users, userId);
+      setAllFighters(likeFilteredFighters);
+      setFilteredFighters(likeFilteredFighters);
     } catch (error) {
       console.error('Error fetching users:', error);
     } finally {
@@ -49,12 +57,20 @@ export default function FightScreen() {
     if (index >= 0 && index < filteredFighters.length) {
       console.log('Challenged fighter:', filteredFighters[index].name);
     }
+    //pretend urr user is id "user0"
+    like(filteredFighters[index])
     // In production, would send challenge request to API
   };
 
   const handleSwipeLeft = (index: number) => {
+    const auth = getAuth();
+    const userId = auth.currentUser?.uid;
+    if (!userId) {
+      console.warn("User ID is undefined. User might not be logged in.");
+      return;
+    }
     triggerHapticFeedback('light');
-    // Skipped, nothing to do here
+    addDislikeToUser(userId, filteredFighters[index].id);
   };
 
   const handleSwipe = (index: number) => {
@@ -83,10 +99,24 @@ export default function FightScreen() {
   };
 
   const handleFilterChange = (discipline: Discipline | 'All') => {
-    setSelectedDiscipline(discipline);
-    const filtered = filterFightersByDiscipline(allFighters, discipline); // Use the filter function
-    setFilteredFighters(filtered);
-    swiperRef.current?.jumpToCardIndex(0);
+    if (discipline === 'All') {
+      setSelectedDisciplines([]);
+      setFilteredFighters(allFighters);
+      swiperRef.current?.jumpToCardIndex(0);
+      return;
+    }
+
+    setSelectedDisciplines(prev => {
+      const newDisciplines = prev.includes(discipline)
+        ? prev.filter(d => d !== discipline)
+        : [...prev, discipline];
+      
+      const filtered = filterFightersByDiscipline(allFighters, newDisciplines);
+      setFilteredFighters(filtered);
+      swiperRef.current?.jumpToCardIndex(0);
+      
+      return newDisciplines;
+    });
   };
 
   const handlePressSwipeLeft = () => {
@@ -97,12 +127,27 @@ export default function FightScreen() {
     swiperRef.current?.swipeRight();
   };
 
+
+  const like = (likedUser: Fighter) => {
+    const auth = getAuth();
+    const userId = auth.currentUser?.uid;
+    if (!userId) {
+      console.warn("User ID is undefined. User might not be logged in.");
+      return;
+    }
+    //add like to current user
+    addLikeToUser(userId, likedUser.id);
+    // add chat if other user liked current user
+    if (likedUser.likes.includes(userId)) {
+      addChat(userId, likedUser.id);
+    }
+  };
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>Find Fighters</Text>
         <DisciplineFilter
-          selectedDiscipline={selectedDiscipline}
+          selectedDisciplines={selectedDisciplines}
           onSelectDiscipline={handleFilterChange}
         />
       </View>
@@ -153,10 +198,10 @@ export default function FightScreen() {
           />
         ) : (
           <View style={styles.emptyState}>
-            <Text style={styles.emptyStateText}>No fighters found in this discipline</Text>
+            <Text style={styles.emptyStateText}>No fighters found in selected disciplines</Text>
             <TouchableOpacity
               style={styles.emptyStateButton}
-              onPress={() => handleFilterChange('All')}
+              onPress={() => setSelectedDisciplines([])}
             >
               <Text style={styles.emptyStateButtonText}>Show All Fighters</Text>
             </TouchableOpacity>

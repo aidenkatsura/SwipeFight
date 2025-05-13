@@ -1,20 +1,22 @@
+import { Timestamp } from "firebase/firestore";
+
 export interface ChatMessage {
   id: string;
   senderId: string;
   receiverId: string;
   message: string;
-  timestamp: Date;
+  timestamp: Timestamp;
   read: boolean;
 }
 
 export interface Chat {
   id: string;
-  matchId: string;
   participants: {
     id: string;
     name: string;
     photo: string;
   }[];
-  lastMessage: ChatMessage;
+  messages: ChatMessage[];
   unreadCount: number;
+  lastMessage: ChatMessage;
 }

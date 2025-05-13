@@ -29,11 +29,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
     try {
       const userData = await fetchUserFromDB(auth.currentUser.uid);
-      if (userData) {
-        setUser(userData as UserProfile);
-      } else {
-        throw new Error('User profile not found.');
-      }
+      setUser(userData as UserProfile);
     } catch (error) {
       console.error('Error fetching user data:', error);
       throw new Error('Failed to fetch user data.');
