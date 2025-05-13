@@ -11,7 +11,11 @@ export interface ChatMessage {
 
 export interface Chat {
   id: string;
-  participants: string[];
+  participants: {
+    id: string;
+    name: string;
+    photo: string;
+  }[];
   messages: ChatMessage[];
   unreadCount: number;
   lastMessage: ChatMessage;

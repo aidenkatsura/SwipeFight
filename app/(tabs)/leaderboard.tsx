@@ -83,7 +83,7 @@ export default function LeaderboardScreen() {
       <View style={styles.header}>
         <Text style={styles.title}>Leaderboard</Text>
         <DisciplineFilter 
-          selectedDiscipline={selectedDiscipline} 
+          selectedDisciplines={selectedDiscipline === 'All' ? [] : [selectedDiscipline]}
           onSelectDiscipline={setSelectedDiscipline} 
         />
       </View>

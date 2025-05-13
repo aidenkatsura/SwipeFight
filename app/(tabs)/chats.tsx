@@ -31,9 +31,9 @@ export default function ChatsScreen() {
         // Fetch and attach user info
         const enrichedChatPromises = validChats.map(async (chat) => {
           // Find the "other" user (assuming current user is always in participants)
-          const otherUserId = userId === chat.participants[0]
-          ? chat.participants[1]
-          : chat.participants[0];
+          const otherUserId = userId === chat.participants[0].id
+          ? chat.participants[1].id
+          : chat.participants[0].id;
           const otherParticipant = await fetchUserFromDB(otherUserId);
           console.log(chat);
           return { chat: chat, otherParticipant: otherParticipant };
@@ -67,6 +67,11 @@ export default function ChatsScreen() {
   
 
   const handleChatPress = (chatId: string) => {
+    setChats(prevChats =>
+      prevChats.map(chat =>
+        chat.chat.id === chatId ? { ...chat, unreadCount: 0 } : chat
+      )
+    );
     router.push(`/chat/${chatId}`);
   };
 

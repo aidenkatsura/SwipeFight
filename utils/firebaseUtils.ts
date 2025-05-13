@@ -151,46 +151,6 @@ export const fetchChatFromDB = async (targetChatId: string): Promise<Chat> => {
 
 
 /**
- * creates a chat between two users
- * adds it a chat into the chat collection
- * adds the chat id to both user's chat array
- * 
- * 
- * @param {string} userId1 - user 1's id
- * @param {string} userId2 - user 2's id
- * @returns {Promise<boolean>} Resolves to true if the document ID was successfully changed, 
- *                             or false if the old ID does not exist or the new ID already exists.
- * @throws Throws an error if an unexpected failure occurs.
- */
-export async function addChat(userId1: string, userId2: string) {
-  // Create a reference to a new document in the 'chats' collection
-  const chatDocRef = doc(collection(db, 'chats'));
-  const chatId = chatDocRef.id;
-
-  const chat: Chat = {
-    id: chatId,
-    participants: [userId1, userId2],
-    messages: [],
-    unreadCount: 0,
-    lastMessage: {
-      id: "",
-      senderId: "",
-      receiverId: "",
-      message: "",
-      read: false,
-      timestamp: Timestamp.fromDate(new Date()),
-    }
-  };
-
-  await runTransaction(db, async (transaction) => {
-    // Create the new chat document
-    transaction.set(chatDocRef, chat);
-  });
-  addToUserArray(userId1, chatId, "chats");
-  addToUserArray(userId2, chatId, "chats");
-};
-
-/**
  * Fetch a specific chat from the Firestore database.
  *  
  * @param {string} targetUserId - the target id of the Chat
@@ -341,4 +301,85 @@ export async function sendMessage(chatId: string, message: ChatMessage):
     console.error(`Error adding ${message} to chat ${chatId}:`, error);
     return false;
   }
+};
+
+/**
+ * Fetch the chosen string field from a specific user document.
+ * 
+ * @param {string} targetUserId - The document ID of the user.
+ * @param {string} targetField - The name of the string field to fetch.
+ * @returns {Promise<string>} A promise that resolves to the desired string
+ * @throws Throws an error if fetching the user fails or the field is not a string.
+ */
+const fetchUserString = async (targetUserId: string, targetField: string): Promise<string> => {
+  try {
+    const userDocRef = doc(db, 'users', targetUserId);
+    const userDocSnap = await getDoc(userDocRef);
+
+    if (!userDocSnap.exists()) {
+      throw new Error(`User with ID ${targetUserId} does not exist.`);
+    }
+
+    const userData = userDocSnap.data();
+    const stringData = userData[targetField];
+
+    if (typeof stringData !== 'string') {
+      throw new Error(`Field "${targetField}" is not a string.`);
+    }
+
+    return stringData;
+  } catch (error) {
+    console.error(`Error fetching user ${targetUserId}'s ${targetField} string from Firestore:`, error);
+    throw new Error('Failed to fetch user string from Firestore.');
+  }
+};
+
+
+
+  /**
+ * creates a chat between two users
+ * adds it a chat into the chat collection
+ * adds the chat id to both user's chat array
+ * 
+ * 
+ * @param {string} userId1 - user 1's id
+ * @param {string} userId2 - user 2's id
+ * @returns {Promise<boolean>} Resolves to true if the document ID was successfully changed, 
+ *                             or false if the old ID does not exist or the new ID already exists.
+ * @throws Throws an error if an unexpected failure occurs.
+ */
+export async function addChat(userId1: string, userId2: string) {
+  // Create a reference to a new document in the 'chats' collection
+  const chatDocRef = doc(collection(db, 'chats'));
+  const chatId = chatDocRef.id;
+
+  const user1Name = await fetchUserString(userId1, "name");
+  const user1Photo = await fetchUserString(userId1, "photo");
+  const user2Name = await fetchUserString(userId2, "name");
+  const user2Photo = await fetchUserString(userId2, "photo");
+
+  const chat: Chat = {
+    id: chatId,
+    participants: [
+      {id: userId1, name: user1Name, photo: user1Photo}, 
+      {id: userId2, name: user2Name, photo: user2Photo}
+    ],
+    messages: [],
+    unreadCount: 0,
+    lastMessage: {
+      id: "",
+      senderId: "",
+      receiverId: "",
+      message: "",
+      read: false,
+      timestamp: Timestamp.fromDate(new Date()),
+    }
+  };
+
+  await runTransaction(db, async (transaction) => {
+    // Create the new chat document
+    transaction.set(chatDocRef, chat);
+  });
+  addToUserArray(userId1, chatId, "chats");
+  addToUserArray(userId2, chatId, "chats");
 };
