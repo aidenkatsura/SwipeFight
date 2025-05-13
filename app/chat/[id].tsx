@@ -82,6 +82,10 @@ export default function ChatScreen() {
   }, [id]); 
 
   const handleSend = () => {
+    if (!userId) {
+      console.warn("User ID is undefined. User might not be logged in.");
+      return;
+    }
     if (!chat) {
       return null;
     }

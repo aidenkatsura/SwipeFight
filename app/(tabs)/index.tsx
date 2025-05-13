@@ -11,9 +11,6 @@ import { addChat, addLikeToUser, addDislikeToUser, fetchUsersFromDB } from '@/ut
 import { filterFightersByDiscipline, filterFightersByLikes } from '@/utils/filterUtils';
 import { getAuth } from 'firebase/auth';
 
-const auth = getAuth();
-const userId = auth.currentUser?.uid;
-
 
 export default function FightScreen() {
   // All fighters that have not been swiped on
@@ -29,6 +26,12 @@ export default function FightScreen() {
 
   // Get all users from db
   const fetchUsers = async () => {
+    const auth = getAuth();
+    const userId = auth.currentUser?.uid;
+    if (!userId) {
+      console.warn("User ID is undefined. User might not be logged in.");
+      return;
+    }
     try {
       setIsLoading(true); // Set loading to true so spinner shows while fetching
 
@@ -60,6 +63,12 @@ export default function FightScreen() {
   };
 
   const handleSwipeLeft = (index: number) => {
+    const auth = getAuth();
+    const userId = auth.currentUser?.uid;
+    if (!userId) {
+      console.warn("User ID is undefined. User might not be logged in.");
+      return;
+    }
     triggerHapticFeedback('light');
     addDislikeToUser(userId, filteredFighters[index].id);
   };
@@ -120,6 +129,12 @@ export default function FightScreen() {
 
 
   const like = (likedUser: Fighter) => {
+    const auth = getAuth();
+    const userId = auth.currentUser?.uid;
+    if (!userId) {
+      console.warn("User ID is undefined. User might not be logged in.");
+      return;
+    }
     //add like to current user
     addLikeToUser(userId, likedUser.id);
     // add chat if other user liked current user
