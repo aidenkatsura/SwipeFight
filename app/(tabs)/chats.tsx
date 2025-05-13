@@ -1,7 +1,6 @@
 import { StyleSheet, Text, View, FlatList, TouchableOpacity, Image, SafeAreaView } from 'react-native';
 import { useEffect, useState, useMemo, useCallback } from 'react';
 import { router } from 'expo-router';
-import { mockChats } from '@/data/mockChats';
 import { Chat } from '@/types/chat';
 import { theme } from '@/styles/theme';
 import { formatDistanceToNow } from '@/utils/dateUtils';
