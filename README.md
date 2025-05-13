@@ -21,16 +21,27 @@ __Download Link:__
 
 ## Building the App
 
-1. Clone the repo:
-   ```bash
-   git clone https://github.com/<your-username>/swipefight.git
-   cd swipefight
+- Prerequisites
+     - Clone repo (https://github.com/aidenkatsura/SwipeFight)
+     - Install Expo Go and create an account if building on physical device
+     - Have npm/Node.js installed in terminal
+- In terminal, run
+   ```
+   npm install
+   npx expo start
+   ```
+- If running on phone, scan the generated QR code with the camera app which will open SwipeFight in Expo Go
+- If running on web, open localhost with the proper port
+- If running on simulator, click 'i' in terminal to open iOS or 'a' to open Android
 
 ---
 
 ## Testing the App
 
-
+To see our automated tests, navigate to the terminal and run the command 
+   ```
+   npm test
+   ```
 
 ---
 
@@ -39,7 +50,6 @@ __Download Link:__
 <details>
 <summary>Use Case 1 (Filtering)</summary>
 <br>
-
 1. Actors
    - Primary Actor: User
 2. Triggers
@@ -62,13 +72,11 @@ __Download Link:__
    - If the user becomes unauthenticated (session expires), they are asked to login again
    - If no matches are found, user notified and asked to modify/clear filters and try again or be shown the closest possible matches
    - If there is a frontend (UI) or backend (server) failure, the system will attempt to resend the request
-
 </details>
 
 <details>
 <summary>Use Case 2 (Editing Profile Information)</summary>
 <br>
-
 1. Actors
    - Primary actor: User (with an existing account)
 2. Triggers
@@ -99,11 +107,73 @@ __Download Link:__
    - Backend failure prevents saving of changes
       - System informs user of save issue, presents option to retry or exit without saving
       - User can keep retrying, or exit back to profile page with no changes made
-
 </details>
 
 <details>
-<summary>Use Case 3 (Live Chat)</summary>
+<summary>Use Case 3 (Initial Profile Setup)</summary>
+<br>
+1. Actors
+   - Primary Actor: User (without an account)
+2. Triggers
+   - User opens the app for the first time
+3. Preconditions
+   - User does not have an account
+4. Postconditions (success scenario)
+   - User's information is reflected in their profile page
+      - For the user themselves
+      - For users that interact with the user's profile
+5. List of Steps (success scenario)
+   1. User opens app
+   2. User inputs information (email, password)
+   3. User selects sign up option
+   4. User is presented profile fields
+   5. User creates account
+   6. System confirms account creation (informing the user of success), opens home
+6. Extensions/Variations of the Success Scenario
+   - User can select images from their camera roll
+7. Exceptions: Failure Conditions and Scenarios
+   - User wants to choose profile image(s), but app does not have camera roll permissions
+      - If the app has not previously asked for camera roll permissions, user is presented with the option to enable camera roll permissions
+      - If the user has denied permissions, display a message directing them to change their settings, then return to editing page
+   - User exits app without saving profile changes
+     - Changes are lost, not updated on system
+   - Backend failure prevents saving of changes
+     - System informs user of save issue, presents option to retry or exit without saving
+     - User can keep retrying or exit back to the profile page with no changes made
+   - User inputs banned phrase
+     - System informs user of use and prevents account creation
+</details>
+
+<details>
+<summary>Use Case 4 (Swiping)</summary>
+<br>
+1. Actors
+   - Primary Actor: User
+2. Triggers
+   - The user swipes left or right on a potential sparring partner
+3. Preconditions
+   - User’s account is set up
+   - User is on the home/swiping page
+   - User has swipes remaining
+4. Postconditions (success scenario)
+   - If swiped right and other user previously swiped right: The users are matched and a live chat is created in the chats page
+   - If swiped right and other user has not seen: Your profile should show up in the challengers page of the other user
+   - If swiped left: The potential match will go away and will be replaced by a new partner
+     - They will not appear on your page again for a while
+5. List of Steps (success scenario)
+   1. The user swipes right or left on another user
+   2. The correct behavior as expressed by _Postconditions_ occurs
+6. Extensions/Variations of the Success Scenario
+   - If there are no more matches to show, there should be a screen that indicates this
+   - There should be some animation to indicate a match and differentiate from a “like” when they have not swiped on you yet
+7. Exceptions: Failure Conditions and Scenarios
+   - If the user becomes unauthenticated (session expires), they are asked to login again
+   - If the app is closed, the same person should be on the screen
+   - If a decision is rolled back (undo button), the result of the first swipe must be reversible
+</details>
+
+<details>
+<summary>Use Case 5 (Live Chat)</summary>
 <br>
 
 1. Actors
@@ -129,7 +199,6 @@ __Download Link:__
 7. Exceptions: Failure Conditions and Scenarios
    - Chats are only accessible if session is connected and uninterrupted
    - Detection of failed message sent, prompting users to retry
-
 </details>
 
 ## Tech Stack
