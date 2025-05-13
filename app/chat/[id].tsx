@@ -2,7 +2,6 @@ import { StyleSheet, Text, View, FlatList, TextInput, TouchableOpacity, Image, K
 import React, { useEffect, useState, useRef } from 'react';
 import { router, useLocalSearchParams } from 'expo-router';
 import { theme } from '@/styles/theme';
-import { mockChats } from '@/data/mockChats';
 import { ChatMessage, Chat } from '@/types/chat';
 import { formatDistanceToNow } from '@/utils/dateUtils';
 import { Send, Flag } from 'lucide-react-native';
@@ -10,12 +9,10 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { fetchChatFromDB, fetchUserFromDB, sendMessage } from '@/utils/firebaseUtils';
 import { Fighter } from '@/types/fighter';
 import { Ionicons } from '@expo/vector-icons';
-import { Timestamp } from 'firebase/firestore';
+import { doc, onSnapshot, Timestamp } from 'firebase/firestore';
 import ScorecardModal from '@/components/ScorecardModal';
 import { getAuth } from 'firebase/auth';
-
-const auth = getAuth();
-const userId = auth.currentUser?.uid;
+import { db } from '@/FirebaseConfig';
 
 export default function ChatScreen() {
   const { id } = useLocalSearchParams();
@@ -32,35 +29,34 @@ export default function ChatScreen() {
   
   const [chat, setChat] = useState<EnrichedChat | null>(null);
   
-  const fetchChat = async () => {
-    try {
-      if (!id || typeof id !== 'string') {
-        console.error('Invalid chat ID:', id);
-        return;
-      }
-      const chat: Chat = await fetchChatFromDB(id);
-      
+  useEffect(() => {
+    const auth = getAuth();
+    const userId = auth.currentUser?.uid;
+    if (!id || typeof id !== 'string' || !userId) return;
+
+    const chatRef = doc(db, 'chats', id);
+
+    const unsubscribe = onSnapshot(chatRef, async (snapshot) => {
+      if (!snapshot.exists()) return;
+
+      const chatData = snapshot.data() as Chat;
+
       const otherUserId =
-        userId === chat.participants[0].id
-          ? chat.participants[1].id
-          : chat.participants[0].id;
+        userId === chatData.participants[0].id
+          ? chatData.participants[1].id
+          : chatData.participants[0].id;
+
       const otherParticipant = await fetchUserFromDB(otherUserId);
+
       const enriched: EnrichedChat = {
-        chat,
+        chat: chatData,
         otherParticipant,
       };
-  
+
       setChat(enriched);
-      setMessages(chat.messages);
-    } catch (error) {
-      console.error('Error fetching chat or user:', error);
-    }
-  };
-  
-    // Fetch users when the component mounts
-    useEffect(() => {
-      fetchChat();
-    // Add keyboard listeners
+      setMessages(chatData.messages); // live update
+    });
+
     const keyboardWillShow = Keyboard.addListener(
       Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
       (e) => {
@@ -76,12 +72,15 @@ export default function ChatScreen() {
     );
 
     return () => {
+      unsubscribe(); // Cleanup Firestore listener
       keyboardWillShow.remove();
       keyboardWillHide.remove();
     };
-  }, [id]); 
+  }, [id]);
 
   const handleSend = () => {
+    const auth = getAuth();
+    const userId = auth.currentUser?.uid;
     if (!userId) {
       console.warn("User ID is undefined. User might not be logged in.");
       return;
@@ -89,6 +88,7 @@ export default function ChatScreen() {
     if (!chat) {
       return null;
     }
+
     if (newMessage.trim()) {
       const message: ChatMessage = {
         id: Date.now().toString(),
@@ -118,7 +118,9 @@ export default function ChatScreen() {
   };
 
   const renderMessage = ({ item }: { item: ChatMessage }) => {
-    const isCurrentUser = item.senderId === userId; // Assuming current user's ID is '1'
+    const auth = getAuth();
+    const userId = auth.currentUser?.uid;
+    const isCurrentUser = item.senderId === userId;
     if (!chat) {
     return null; // Or a loading state
   }
