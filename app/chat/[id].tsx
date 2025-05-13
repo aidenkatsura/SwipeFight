@@ -2,7 +2,6 @@ import { StyleSheet, Text, View, FlatList, TextInput, TouchableOpacity, Image, K
 import React, { useEffect, useState, useRef } from 'react';
 import { router, useLocalSearchParams } from 'expo-router';
 import { theme } from '@/styles/theme';
-import { mockChats } from '@/data/mockChats';
 import { ChatMessage, Chat } from '@/types/chat';
 import { formatDistanceToNow } from '@/utils/dateUtils';
 import { Send, Flag } from 'lucide-react-native';
@@ -13,9 +12,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { Timestamp } from 'firebase/firestore';
 import ScorecardModal from '@/components/ScorecardModal';
 import { getAuth } from 'firebase/auth';
-
-const auth = getAuth();
-const userId = auth.currentUser?.uid;
 
 export default function ChatScreen() {
   const { id } = useLocalSearchParams();
@@ -33,18 +29,23 @@ export default function ChatScreen() {
   const [chat, setChat] = useState<EnrichedChat | null>(null);
   
   const fetchChat = async () => {
+    const auth = getAuth();
+    const userId = auth.currentUser?.uid;
     try {
       if (!id || typeof id !== 'string') {
         console.error('Invalid chat ID:', id);
         return;
       }
+      
       const chat: Chat = await fetchChatFromDB(id);
       
       const otherUserId =
-        userId === chat.participants[0].id
+        (userId === chat.participants[0].id)
           ? chat.participants[1].id
           : chat.participants[0].id;
+      
       const otherParticipant = await fetchUserFromDB(otherUserId);
+      
       const enriched: EnrichedChat = {
         chat,
         otherParticipant,
@@ -82,6 +83,8 @@ export default function ChatScreen() {
   }, [id]); 
 
   const handleSend = () => {
+    const auth = getAuth();
+    const userId = auth.currentUser?.uid;
     if (!userId) {
       console.warn("User ID is undefined. User might not be logged in.");
       return;
@@ -89,6 +92,7 @@ export default function ChatScreen() {
     if (!chat) {
       return null;
     }
+
     if (newMessage.trim()) {
       const message: ChatMessage = {
         id: Date.now().toString(),
@@ -118,7 +122,9 @@ export default function ChatScreen() {
   };
 
   const renderMessage = ({ item }: { item: ChatMessage }) => {
-    const isCurrentUser = item.senderId === userId; // Assuming current user's ID is '1'
+    const auth = getAuth();
+    const userId = auth.currentUser?.uid;
+    const isCurrentUser = item.senderId === userId;
     if (!chat) {
     return null; // Or a loading state
   }
