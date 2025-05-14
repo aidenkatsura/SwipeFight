@@ -212,7 +212,7 @@ To see our automated tests, navigate to the terminal and run the command
 - **Database**: Firestore
 - **Real-time Messaging**: Firestore
 - **Authentication**: Firebase Auth
-- **Hosting**: Expo
+- **Hosting**: Expo/eas
 
 ---
    
