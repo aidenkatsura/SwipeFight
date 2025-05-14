@@ -10,7 +10,7 @@ __Link to the App:__
 
 ## Features
 
-- 😀 Create an customizable password protected account
+- 😀 Create a customizable password protected account
 - 🔄 Swipe to challenge fighters you think you can beat
 - 🧑‍🤝‍🧑 Match with fighters based on discipline, location, and rating
 - 💬 Live in-app chat to coordinate sparring sessions
@@ -50,6 +50,7 @@ To see our automated tests, navigate to the terminal and run the command
 <details>
 <summary>Use Case 1 (Filtering)</summary>
 <br>
+     
 1. Actors
    - Primary Actor: User
 2. Triggers
@@ -77,6 +78,7 @@ To see our automated tests, navigate to the terminal and run the command
 <details>
 <summary>Use Case 2 (Editing Profile Information)</summary>
 <br>
+     
 1. Actors
    - Primary actor: User (with an existing account)
 2. Triggers
@@ -112,6 +114,7 @@ To see our automated tests, navigate to the terminal and run the command
 <details>
 <summary>Use Case 3 (Initial Profile Setup)</summary>
 <br>
+     
 1. Actors
    - Primary Actor: User (without an account)
 2. Triggers
@@ -147,6 +150,7 @@ To see our automated tests, navigate to the terminal and run the command
 <details>
 <summary>Use Case 4 (Swiping)</summary>
 <br>
+     
 1. Actors
    - Primary Actor: User
 2. Triggers
@@ -204,11 +208,10 @@ To see our automated tests, navigate to the terminal and run the command
 ## Tech Stack
 
 - **Frontend**: React Native
-- **Backend/API**: Node.js + Express
+- **Backend**: Firebase
 - **Database**: Firestore
-- **Real-time Messaging**: Firebase
+- **Real-time Messaging**: Firestore
 - **Authentication**: Firebase Auth
-- **Storage**: Firebase
 - **Hosting**: Expo
 
 ---
