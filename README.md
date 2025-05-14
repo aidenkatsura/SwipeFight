@@ -2,9 +2,9 @@
 
 SwipeFight is a mobile app that connects martial artists with local sparring partners through a fun, swipe-based matchmaking experience. Users can view profiles, challenge opponents, chat to coordinate fight sessions, and compete for rankings on the leaderboard.
 
-__Download Link:__ 
+__Link to the App:__ 
 
-
+(https://swipefight--ia08c3d7xj.expo.app)
 
 ---
 
