@@ -12,7 +12,7 @@ const firebaseErrorMessages: { [key: string]: string } = {
   'auth/user-not-found': 'No account found with this email. Please sign up.',
   'auth/invalid-email': 'The email address is not valid. Please check and try again.',
   'auth/email-already-in-use': 'This email is already in use. Please use a different email.',
-  'auth/weak-password': 'Please use a stronger password.',
+  'auth/weak-password': 'Your password is too weak. Please use a stronger password.',
   'auth/too-many-requests': 'Too many attempts. Please try again later.',
   'auth/network-request-failed': 'Network error. Please check your internet connection and try again.',
   'auth/invalid-credential': 'Login failed. Please check your email and password.',
