@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image, SafeAreaView, KeyboardAvoidingView, Platform } from 'react-native';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image, SafeAreaView, KeyboardAvoidingView, Platform, ActivityIndicator } from 'react-native';
 import { useState } from 'react';
 import { Link, router } from 'expo-router';
 import { theme } from '@/styles/theme';
@@ -11,6 +11,8 @@ export default function LoginScreen() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [imageError, setImageError] = useState(false);
+  const [imageLoading, setImageLoading] = useState(true);
 
   const signIn = async () => {
     try {
@@ -84,9 +86,21 @@ export default function LoginScreen() {
           keyboardShouldPersistTaps="handled"
         >
           <View style={styles.headerContainer}>
+            {imageLoading && (
+              <View style={styles.imageLoadingContainer}>
+                <ActivityIndicator size="large" color={theme.colors.white} />
+              </View>
+            )}
             <Image
-              source={{ uri: 'https://images.pexels.com/photos/4761668/pexels-photo-4761668.jpeg' }}
+              source={imageError ? require('@/assets/images/icon.png') : require('@/assets/images/login-background.jpg')}
               style={styles.backgroundImage}
+              onLoadStart={() => setImageLoading(true)}
+              onLoadEnd={() => setImageLoading(false)}
+              onError={() => {
+                setImageError(true);
+                setImageLoading(false);
+              }}
+              resizeMode="cover"
             />
             <View style={styles.overlay} />
             <View style={styles.logoContainer}>
@@ -171,10 +185,21 @@ const styles = StyleSheet.create({
     position: 'relative',
     justifyContent: 'flex-end',
   },
+  imageLoadingContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: theme.colors.gray[900],
+  },
   backgroundImage: {
     position: 'absolute',
     width: '100%',
     height: '100%',
+    backgroundColor: theme.colors.gray[900],
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,

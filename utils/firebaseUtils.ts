@@ -410,3 +410,67 @@ export async function addChat(userId1: string, userId2: string) {
   addToUserArray(userId1, chatId, "chats");
   addToUserArray(userId2, chatId, "chats");
 };
+
+export async function updateUserWithRetry(userId: string, updateData: any, maxRetries = 3) {
+  let retries = 0;
+  
+  while (retries < maxRetries) {
+    try {
+      await runTransaction(db, async (transaction) => {
+        const userRef = doc(db, 'users', userId);
+        const userDoc = await transaction.get(userRef);
+        
+        if (!userDoc.exists()) {
+          throw new Error('User document does not exist');
+        }
+
+        // Apply the updates within the transaction
+        if (updateData.dislikes) {
+          transaction.update(userRef, {
+            dislikes: arrayUnion(...updateData.dislikes)
+          });
+        }
+        // Add other fields as needed
+      });
+      
+      return true; // Success
+    } catch (error: any) {
+      if (error.code === 'failed-precondition' && retries < maxRetries - 1) {
+        retries++;
+        // Wait for a short time before retrying (exponential backoff)
+        await new Promise(resolve => setTimeout(resolve, Math.pow(2, retries) * 100));
+        continue;
+      }
+      throw error; // Re-throw if max retries reached or different error
+    }
+  }
+  
+  throw new Error('Max retries reached');
+}
+
+/**
+ * Validates and processes an image URI.
+ * Returns a default local image if the URI is invalid or empty.
+ * 
+ * @param {string} uri - The image URI to validate
+ * @returns {string} A valid image URI
+ */
+export const validateImageUri = (uri: string | null | undefined): string => {
+  if (!uri || typeof uri !== 'string') {
+    return require('@/assets/images/icon.png');
+  }
+
+  // Check if it's a local file URI
+  if (uri.startsWith('file://')) {
+    return uri;
+  }
+
+  // Check if it's a valid URL
+  try {
+    new URL(uri);
+    return uri;
+  } catch {
+    // If URI is invalid, return default image
+    return require('@/assets/images/icon.png');
+  }
+};

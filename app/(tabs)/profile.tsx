@@ -1,3 +1,4 @@
+import React from 'react';
 import { StyleSheet, Text, View, Image, ScrollView, TouchableOpacity, SafeAreaView, ActivityIndicator } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { Pencil as EditPencil, Settings, Medal, Trophy, LogOut } from 'lucide-react-native';
@@ -9,6 +10,7 @@ import { auth } from '@/FirebaseConfig';
 import { useEffect, useState } from 'react';
 import StatCard from '@/components/StatCard';
 import { useUser } from '@/context/UserContext';
+import { validateImageUri } from '@/utils/firebaseUtils';
 
 export type UserProfile = Fighter & {
   achievements?: string[];
@@ -24,6 +26,8 @@ export default function ProfileScreen() {
   const { user, fetchUser } = useUser(); // Shared user state from UserContext
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [imageError, setImageError] = useState(false);
+  const [imageLoading, setImageLoading] = useState(true);
 
   // Fetches user data once on first mount
   useEffect(() => {
@@ -109,7 +113,21 @@ export default function ProfileScreen() {
           <ScrollView contentContainerStyle={styles.scrollContent}>
             <View style={styles.profileHeader}>
               <View style={styles.profileImageContainer}>
-                <Image source={{ uri: user.photo }} style={styles.profileImage} />
+                {imageLoading && (
+                  <View style={styles.imageLoadingContainer}>
+                    <ActivityIndicator size="large" color={theme.colors.primary[500]} />
+                  </View>
+                )}
+                <Image
+                  source={imageError ? require('@/assets/images/icon.png') : { uri: validateImageUri(user.photo) }}
+                  style={styles.profileImage}
+                  onLoadStart={() => setImageLoading(true)}
+                  onLoadEnd={() => setImageLoading(false)}
+                  onError={() => {
+                    setImageError(true);
+                    setImageLoading(false);
+                  }}
+                />
                 <TouchableOpacity style={styles.editProfileButton} onPress={handleEditProfilePress}>
                   <EditPencil color={theme.colors.white} size={18} />
                 </TouchableOpacity>
@@ -369,5 +387,15 @@ const styles = StyleSheet.create({
     color: theme.colors.error[500],
     textAlign: 'center',
     paddingVertical: theme.spacing[4],
+  },
+  imageLoadingContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: theme.colors.gray[100],
   },
 });

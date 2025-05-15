@@ -10,6 +10,7 @@ import { Fighter, Discipline } from '@/types/fighter';
 import { addChat, addLikeToUser, addDislikeToUser, fetchUsersFromDB } from '@/utils/firebaseUtils';
 import { filterFightersByDiscipline, filterFightersByLikes } from '@/utils/filterUtils';
 import { getAuth } from 'firebase/auth';
+import { updateUserWithRetry } from '@/utils/firebaseUtils';
 
 
 export default function FightScreen() {
@@ -51,26 +52,31 @@ export default function FightScreen() {
     fetchUsers();
   }, []);  
 
-  const handleSwipeRight = (index: number) => {
-    triggerHapticFeedback('medium');
-    // Check if index is valid to prevent accessing undefined fighter
+  const handleSwipeLeft = async (index: number) => {
+    triggerHapticFeedback('light');
     if (index >= 0 && index < filteredFighters.length) {
-      console.log('Challenged fighter:', filteredFighters[index].name);
+      try {
+        await updateUserWithRetry(getAuth().currentUser?.uid || '', {
+          dislikes: [filteredFighters[index].id]
+        });
+      } catch (error) {
+        console.error('Error updating dislikes:', error);
+      }
     }
-    //pretend urr user is id "user0"
-    like(filteredFighters[index])
-    // In production, would send challenge request to API
   };
 
-  const handleSwipeLeft = (index: number) => {
-    const auth = getAuth();
-    const userId = auth.currentUser?.uid;
-    if (!userId) {
-      console.warn("User ID is undefined. User might not be logged in.");
-      return;
+  const handleSwipeRight = async (index: number) => {
+    triggerHapticFeedback('medium');
+    if (index >= 0 && index < filteredFighters.length) {
+      try {
+        await updateUserWithRetry(getAuth().currentUser?.uid || '', {
+          likes: [filteredFighters[index].id]
+        });
+        console.log('Challenged fighter:', filteredFighters[index].name);
+      } catch (error) {
+        console.error('Error updating likes:', error);
+      }
     }
-    triggerHapticFeedback('light');
-    addDislikeToUser(userId, filteredFighters[index].id);
   };
 
   const handleSwipe = (index: number) => {

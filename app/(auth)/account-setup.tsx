@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image, SafeAreaView, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image, SafeAreaView, KeyboardAvoidingView, Platform, ScrollView, ActivityIndicator } from 'react-native';
 import { useState, useEffect } from 'react';
 import { router } from 'expo-router';
 import { theme } from '@/styles/theme';
@@ -6,6 +6,7 @@ import { auth, db } from '@/FirebaseConfig';
 import { doc, setDoc, Timestamp } from 'firebase/firestore';
 import { Discipline } from '@/types/fighter';
 import * as ImagePicker from 'expo-image-picker';
+import { validateImageUri } from '@/utils/firebaseUtils';
 
 export default function AccountSetupScreen() {
   const [name, setName] = useState('');
@@ -15,6 +16,8 @@ export default function AccountSetupScreen() {
   const [photo, setPhoto] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [imageError, setImageError] = useState(false);
+  const [imageLoading, setImageLoading] = useState(true);
 
   // Check authentication status when component mounts
   useEffect(() => {
@@ -73,7 +76,7 @@ export default function AccountSetupScreen() {
         age: parseInt(age),
         location,
         discipline,
-        photo: photo || 'https://via.placeholder.com/150',
+        photo: photo || require('@/assets/images/icon.png'), // Use local default image
       });
 
       // Create user profile in Firestore
@@ -84,8 +87,8 @@ export default function AccountSetupScreen() {
         age: parseInt(age),
         location,
         discipline,
-        photo: photo || 'https://via.placeholder.com/150', // Default photo if none selected
-        rating: 1000, // Initial rating
+        photo: photo || require('@/assets/images/icon.png'), // Use local default image
+        rating: 1000,
         wins: 0,
         losses: 0,
         draws: 0,
@@ -123,9 +126,20 @@ export default function AccountSetupScreen() {
           )}
 
           <TouchableOpacity onPress={handlePhotoChange} style={styles.photoContainer}>
+            {imageLoading && (
+              <View style={styles.imageLoadingContainer}>
+                <ActivityIndicator size="large" color={theme.colors.primary[500]} />
+              </View>
+            )}
             <Image
-              source={{ uri: photo || 'https://via.placeholder.com/150' }}
+              source={imageError ? require('@/assets/images/icon.png') : { uri: validateImageUri(photo) }}
               style={styles.photo}
+              onLoadStart={() => setImageLoading(true)}
+              onLoadEnd={() => setImageLoading(false)}
+              onError={() => {
+                setImageError(true);
+                setImageLoading(false);
+              }}
             />
             <Text style={styles.photoText}>Add Profile Photo</Text>
           </TouchableOpacity>
@@ -308,5 +322,15 @@ const styles = StyleSheet.create({
     color: theme.colors.error[600],
     fontFamily: 'Inter-Regular',
     fontSize: 14,
+  },
+  imageLoadingContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: theme.colors.gray[100],
   },
 });
