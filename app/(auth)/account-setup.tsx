@@ -15,6 +15,7 @@ export default function AccountSetupScreen() {
   const [photo, setPhoto] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const defaultPhoto = 'https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png';
 
   // Check authentication status when component mounts
   useEffect(() => {
@@ -73,7 +74,7 @@ export default function AccountSetupScreen() {
         age: parseInt(age),
         location,
         discipline,
-        photo: photo || 'https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png',
+        photo: photo || defaultPhoto,
       });
 
       // Create user profile in Firestore
@@ -84,7 +85,7 @@ export default function AccountSetupScreen() {
         age: parseInt(age),
         location,
         discipline,
-        photo: photo || 'https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png', // Default photo if none selected
+        photo: photo || defaultPhoto, // Default photo if none selected
         rating: 1000, // Initial rating
         wins: 0,
         losses: 0,
@@ -124,7 +125,7 @@ export default function AccountSetupScreen() {
 
           <TouchableOpacity onPress={handlePhotoChange} style={styles.photoContainer}>
             <Image
-              source={{ uri: photo || 'https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png' }}
+              source={{ uri: photo || defaultPhoto }}
               style={styles.photo}
             />
             <Text style={styles.photoText}>Add Profile Photo</Text>
