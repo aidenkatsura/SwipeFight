@@ -6,7 +6,7 @@ import { ChatMessage, Chat } from '@/types/chat';
 import { formatDistanceToNow } from '@/utils/dateUtils';
 import { Send, Flag } from 'lucide-react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { fetchChatFromDB, fetchUserFromDB, sendMessage } from '@/utils/firebaseUtils';
+import { fetchUserFromDB, sendMessage } from '@/utils/firebaseUtils';
 import { Fighter } from '@/types/fighter';
 import { Ionicons } from '@expo/vector-icons';
 import { increment, updateDoc, doc, onSnapshot, Timestamp, arrayUnion } from 'firebase/firestore';
@@ -14,6 +14,7 @@ import ScorecardModal from '@/components/ScorecardModal';
 import { getAuth } from 'firebase/auth';
 import { db } from '@/FirebaseConfig';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function ChatScreen() {
   const { id } = useLocalSearchParams();
@@ -81,6 +82,28 @@ export default function ChatScreen() {
     };
   }, [id]);
 
+  useEffect(() => {
+    const checkCooldown = async () => {
+      if (!id) return;
+      const storedCooldown = await AsyncStorage.getItem(`cooldown_${id}`);
+      if (storedCooldown) {
+        const cooldownEnd = parseInt(storedCooldown, 10);
+        const now = Date.now();
+        if (cooldownEnd > now) {
+          setIsCooldown(true);
+          setTimeout(() => {
+            setIsCooldown(false);
+            AsyncStorage.removeItem(`cooldown_${id}`);
+          }, cooldownEnd - now);
+        } else {
+          await AsyncStorage.removeItem(`cooldown_${id}`);
+          setIsCooldown(false);
+        }
+      }
+    };
+    checkCooldown();
+  }, [id]);
+
   const handleSend = () => {
     const auth = getAuth();
     const userId = auth.currentUser?.uid;
@@ -132,10 +155,18 @@ export default function ChatScreen() {
       }
 
       setIsCooldown(true);
-      setTimeout(() => { setIsCooldown(false); }, COOLDOWN_MINUTES * 60 * 1000); // Convert minutes to milliseconds
+      const cooldownEnd = Date.now() + COOLDOWN_MINUTES * 60 * 1000;
+      await AsyncStorage.setItem(
+        `cooldown_${chat.chat.id}`,
+        cooldownEnd.toString()
+      );
+      setTimeout(() => {
+        setIsCooldown(false);
+        AsyncStorage.removeItem(`cooldown_${chat.chat.id}`);
+      }, COOLDOWN_MINUTES * 60 * 1000);
     } catch (error) {
-    console.error('Error submitting result:', error);
-  }
+      console.error('Error submitting result:', error);
+    }
   };
   
   const uploadVideo = async (uri: string, chatId: string) => {
@@ -173,8 +204,8 @@ export default function ChatScreen() {
     const userId = auth.currentUser?.uid;
     const isCurrentUser = item.senderId === userId;
     if (!chat) {
-    return null; // Or a loading state
-  }
+      return null; // Or a loading state
+    }
 
     return (
       <View style={{ flexDirection: 'row', alignItems: 'flex-end', marginBottom: theme.spacing[2], justifyContent: isCurrentUser ? 'flex-end' : 'flex-start' }}>
