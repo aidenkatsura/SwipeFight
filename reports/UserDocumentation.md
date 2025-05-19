@@ -44,7 +44,7 @@ SwipeFight contains four main tabs that you can access once authenticated. These
 
 <img src="/reports/Pictures/Swiper_Page.png" alt="Swiper Page" width="300" height="600"/>
 
-This is the main page of the SwipeFight app and allows users to find possible sparring partners. This page holds a list of possible fighters and filters.
+The Swiper Page is the main page of the SwipeFight app and allows users to find possible sparring partners. This page holds a list of possible fighters and filters.
 
 __Swiping__
 
@@ -72,16 +72,32 @@ On the top of the page, there is a scrollable list of filters that filter throug
 
 ### Chats Page
 
-[Insert Empty Chats Page Picture]: #
+The Chats Page is where you can communicate with your matches and coordinate a sparring session. Before you match with any users, your Chats Page will be empty as shown below.
 
-[Insert Populated Chats Page Picture]: #
+<img src="/reports/Pictures/Empty_Chat.png" alt="Empty Chat List" width="300" height="600"/>
 
-[Insert Chats Picture]: #
+Once you match with a fighter, your chats page will automatically populate with an empty chat with that user.
+
+<img src="/reports/Pictures/List_Chats.png" alt="List of Chats" width="300" height="600"/>
+
+From there, you can click on a chat and start messaging with that user.
+
+<img src="/reports/Pictures/Chat.png" alt="Conversation" width="300" height="600"/>
 
 [Insert Report Results Picture]: #
 
 
 ### Leaderboard Page
+
+The Leaderboard Page is where you can view the best of the best. 
+
+__Filter__
+
+
+
+__Clicking Profile__
+
+If you want a better look at another user beyond the summary that is presented, you can click the profile which will navigate you to the [Other User's Profile Page](#other-user's-profile-page).
 
 [Insert Leaderboard Page Picture]: #
 
