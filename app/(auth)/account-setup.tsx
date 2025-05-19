@@ -73,7 +73,7 @@ export default function AccountSetupScreen() {
         age: parseInt(age),
         location,
         discipline,
-        photo: photo || 'https://via.placeholder.com/150',
+        photo: photo || 'https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png',
       });
 
       // Create user profile in Firestore
@@ -84,7 +84,7 @@ export default function AccountSetupScreen() {
         age: parseInt(age),
         location,
         discipline,
-        photo: photo || 'https://via.placeholder.com/150', // Default photo if none selected
+        photo: photo || 'https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png', // Default photo if none selected
         rating: 1000, // Initial rating
         wins: 0,
         losses: 0,
@@ -124,7 +124,7 @@ export default function AccountSetupScreen() {
 
           <TouchableOpacity onPress={handlePhotoChange} style={styles.photoContainer}>
             <Image
-              source={{ uri: photo || 'https://via.placeholder.com/150' }}
+              source={{ uri: photo || 'https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png' }}
               style={styles.photo}
             />
             <Text style={styles.photoText}>Add Profile Photo</Text>
