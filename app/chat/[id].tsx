@@ -20,6 +20,8 @@ export default function ChatScreen() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [isScorecardVisible, setIsScorecardVisible] = useState(false);
+  const [isCooldown, setIsCooldown] = useState(false);
+  const COOLDOWN_MINUTES = 2;
   const flatListRef = useRef<FlatList>(null);
   const keyboardHeight = useRef(0);
 
@@ -129,10 +131,11 @@ export default function ChatScreen() {
         await updateUserStats(participant.id, didWin);
       }
 
-      console.log('Match result and stats updated successfully.');
+      setIsCooldown(true);
+      setTimeout(() => { setIsCooldown(false); }, COOLDOWN_MINUTES * 60 * 1000); // Convert minutes to milliseconds
     } catch (error) {
-      console.error('Error submitting result:', error);
-    }
+    console.error('Error submitting result:', error);
+  }
   };
   
   const uploadVideo = async (uri: string, chatId: string) => {
@@ -219,11 +222,20 @@ export default function ChatScreen() {
           />
           <Text style={styles.userName}>{chat.otherParticipant.name}</Text>
           <TouchableOpacity
-            style={styles.reportButton}
-            onPress={() => setIsScorecardVisible(true)}
+            style={[styles.reportButton,
+                    isCooldown && { backgroundColor: theme.colors.gray[300] },
+                  ]}
+            onPress={() => !isCooldown && setIsScorecardVisible(true)}
+            disabled={isCooldown}
           >
-            <Flag size={24} color={theme.colors.primary[500]} />
-            <Text style={styles.reportButtonText}>Report Result</Text>
+            <Flag size={24} color={isCooldown ? theme.colors.gray[500] : theme.colors.primary[500]} />
+            <Text style={[
+                  styles.reportButtonText,
+                  isCooldown && { color: theme.colors.gray[500] }
+                ]}
+            >
+              {isCooldown ? 'Please wait...' : 'Report Result'}
+            </Text>
           </TouchableOpacity>
         </View>
 
