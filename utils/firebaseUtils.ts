@@ -410,3 +410,22 @@ export async function addChat(userId1: string, userId2: string) {
   addToUserArray(userId1, chatId, "chats");
   addToUserArray(userId2, chatId, "chats");
 };
+
+
+// Get a user by their user ID
+export const getUserById = async (userId: string): Promise<Fighter | null> => {
+  try {
+    const userDocRef = doc(db, 'users', userId);
+    const userDocSnap = await getDoc(userDocRef);
+
+    if (userDocSnap.exists()) {
+      return userDocSnap.data() as Fighter;
+    } else {
+      console.error(`User with ID ${userId} does not exist.`);
+      return null;
+    }
+  } catch (error) {
+    console.error('Error fetching user from Firestore:', error);
+    return null;
+  }
+}
