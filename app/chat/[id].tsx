@@ -9,10 +9,11 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { fetchChatFromDB, fetchUserFromDB, sendMessage } from '@/utils/firebaseUtils';
 import { Fighter } from '@/types/fighter';
 import { Ionicons } from '@expo/vector-icons';
-import { doc, onSnapshot, Timestamp } from 'firebase/firestore';
+import { increment, updateDoc, doc, onSnapshot, Timestamp, arrayUnion } from 'firebase/firestore';
 import ScorecardModal from '@/components/ScorecardModal';
 import { getAuth } from 'firebase/auth';
 import { db } from '@/FirebaseConfig';
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 export default function ChatScreen() {
   const { id } = useLocalSearchParams();
@@ -109,12 +110,59 @@ export default function ChatScreen() {
     }
   };
 
-  const handleSubmitResult = (winnerId: string, videoUri?: string) => {
-    // Here you would typically:
-    // 1. Upload the video to storage if provided
-    // 2. Update the match result in the database
-    // 3. Update both users' stats
-    console.log('Match result submitted:', { winnerId, videoUri });
+  const handleSubmitResult = async (winnerId: string, videoUri?: string) => {
+    try {
+      const auth = getAuth();
+      const userId = auth.currentUser?.uid;
+      if (!userId || !chat) return;
+
+      let videoUrl: string | undefined;
+
+      if (videoUri) {
+        videoUrl = await uploadVideo(videoUri, chat.chat.id);
+      }
+
+      await addMatchResult(chat.chat.id, winnerId, videoUrl);
+
+      for (const participant of chat.chat.participants) {
+        const didWin = participant.id === winnerId;
+        await updateUserStats(participant.id, didWin);
+      }
+
+      console.log('Match result and stats updated successfully.');
+    } catch (error) {
+      console.error('Error submitting result:', error);
+    }
+  };
+  
+  const uploadVideo = async (uri: string, chatId: string) => {
+    const response = await fetch(uri);
+    const blob = await response.blob();
+    const storage = getStorage();
+    const storageRef = ref(storage, `fightVideos/${chatId}/${Date.now()}.mp4`);
+    await uploadBytes(storageRef, blob);
+    return await getDownloadURL(storageRef);
+  };
+
+  const addMatchResult = async (chatId: string, winnerId: string, videoUrl?: string) => {
+    const chatRef = doc(db, 'chats', chatId);
+    const result = {
+      winnerId,
+      videoUrl: videoUrl || null,
+      submittedAt: Timestamp.now(),
+    };
+    await updateDoc(chatRef, {
+      results: arrayUnion(result),
+    });
+  };
+
+  const updateUserStats = async (userId: string, didWin: boolean) => {
+    const userRef = doc(db, 'users', userId);
+    await updateDoc(userRef, {
+      wins: didWin ? increment(1) : increment(0),
+      losses: didWin ? increment(0) : increment(1),
+      rating: didWin ? increment(10) : increment(-10),
+    });
   };
 
   const renderMessage = ({ item }: { item: ChatMessage }) => {
