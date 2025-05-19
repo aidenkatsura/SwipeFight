@@ -6,7 +6,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { Fighter } from '@/types/fighter';
 import { useEffect, useState } from 'react';
 import StatCard from '@/components/StatCard';
-import { getUserById } from '@/utils/firebaseUtils';
+import { fetchUserFromDB } from '@/utils/firebaseUtils';
 import { Ionicons } from '@expo/vector-icons';
 
 export type UserProfile = Fighter & {
@@ -29,7 +29,7 @@ export default function ProfileScreen() {
   useEffect(() => { 
     const loadProfile = async () => {
       try {
-        const fetchedUser = await getUserById(userId);
+        const fetchedUser = await fetchUserFromDB(userId);
         setProfileUser(fetchedUser);
       } catch (err: any) {
         setError(err.message || 'An unexpected error occurred.');
