@@ -13,7 +13,6 @@ import { increment, updateDoc, doc, onSnapshot, Timestamp, arrayUnion } from 'fi
 import ScorecardModal from '@/components/ScorecardModal';
 import { getAuth } from 'firebase/auth';
 import { db } from '@/FirebaseConfig';
-import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function ChatScreen() {
@@ -135,23 +134,24 @@ export default function ChatScreen() {
     }
   };
 
-  const handleSubmitResult = async (winnerId: string, videoUri?: string) => {
+  const handleSubmitResult = async (winnerId: string) => {
     try {
       const auth = getAuth();
       const userId = auth.currentUser?.uid;
       if (!userId || !chat) return;
 
-      let videoUrl: string | undefined;
+      await addMatchResult(chat.chat.id, winnerId);
 
-      if (videoUri) {
-        videoUrl = await uploadVideo(videoUri, chat.chat.id);
-      }
-
-      await addMatchResult(chat.chat.id, winnerId, videoUrl);
-
+      const draw = winnerId === 'draw';
       for (const participant of chat.chat.participants) {
-        const didWin = participant.id === winnerId;
-        await updateUserStats(participant.id, didWin);
+        if (draw) {
+          await updateDoc(doc(db, 'users', participant.id), {
+            draws: increment(1),
+          });
+        } else {
+          const didWin = participant.id === winnerId;
+          await updateUserStats(participant.id, didWin);
+        }
       }
 
       setIsCooldown(true);
@@ -168,21 +168,11 @@ export default function ChatScreen() {
       console.error('Error submitting result:', error);
     }
   };
-  
-  const uploadVideo = async (uri: string, chatId: string) => {
-    const response = await fetch(uri);
-    const blob = await response.blob();
-    const storage = getStorage();
-    const storageRef = ref(storage, `fightVideos/${chatId}/${Date.now()}.mp4`);
-    await uploadBytes(storageRef, blob);
-    return await getDownloadURL(storageRef);
-  };
 
-  const addMatchResult = async (chatId: string, winnerId: string, videoUrl?: string) => {
+  const addMatchResult = async (chatId: string, winnerId: string) => {
     const chatRef = doc(db, 'chats', chatId);
     const result = {
       winnerId,
-      videoUrl: videoUrl || null,
       submittedAt: Timestamp.now(),
     };
     await updateDoc(chatRef, {
@@ -309,6 +299,7 @@ export default function ChatScreen() {
           onClose={() => setIsScorecardVisible(false)}
           onSubmit={handleSubmitResult}
           participants={chat.chat.participants}
+          
         />
       </SafeAreaView>
     </GestureHandlerRootView>
