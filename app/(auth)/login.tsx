@@ -31,6 +31,12 @@ export default function LoginScreen() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const showError = (error: any) => {
+    console.log(error);
+    const errorCode = error.code || ''; // Extract the error code
+    setError(getFriendlyErrorMessage(errorCode)); // Set a user-friendly error message
+  }
+
   const signIn = async () => {
     try {
       if (!email || !password) {
@@ -45,9 +51,7 @@ export default function LoginScreen() {
         router.replace('/(tabs)');
       }
     } catch (error: any) {
-      console.log(error);
-      const errorCode = error.code || ''; // Extract the error code
-      setError(getFriendlyErrorMessage(errorCode)); // Set a user-friendly error message
+      showError(error);
     } finally {
       setLoading(false);
     }
@@ -67,9 +71,7 @@ export default function LoginScreen() {
         router.replace('/(auth)/account-setup');
       }
     } catch (error: any) {
-      console.log(error);
-      const errorCode = error.code || ''; // Extract the error code
-      setError(getFriendlyErrorMessage(errorCode)); // Set a user-friendly error message
+      showError(error);
     } finally {
       setLoading(false);
     }
@@ -86,9 +88,7 @@ export default function LoginScreen() {
       await sendPasswordResetEmail(auth, email);
       alert('Password reset email sent');
     } catch (error: any) {
-      console.log(error);
-      const errorCode = error.code || ''; // Extract the error code
-      setError(getFriendlyErrorMessage(errorCode)); // Set a user-friendly error message
+      showError(error);
     } finally {
       setLoading(false);
     }
