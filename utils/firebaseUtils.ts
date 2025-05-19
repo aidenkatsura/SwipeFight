@@ -179,9 +179,9 @@ export const fetchChatFromDB = async (targetChatId: string): Promise<Chat> => {
 
 
 /**
- * Fetch a specific chat from the Firestore database.
+ * Fetch a specific user from the Firestore database.
  *  
- * @param {string} targetUserId - the target id of the Chat
+ * @param {string} targetUserId - the target id of the user
  * 
  * @returns {Promise<Fighter>} A promise that resolves to an array of Fighter objects.
  * @throws Throws an error if fetching users fails.
@@ -193,11 +193,11 @@ export const fetchUserFromDB = async (targetUserId: string): Promise<Fighter> =>
     if (docSnap.exists()) {
       return docSnap.data() as Fighter;
     } else {
-      throw new Error('No such document!');
+      throw new Error('No such user!');
     }
   } catch (error) {
-    console.error('Error fetching chat from Firestore:', error);
-    throw new Error('No such document!');
+    console.error('Error fetching user from Firestore:', error);
+    throw new Error('No such user!');
   }
 };
 
@@ -410,22 +410,3 @@ export async function addChat(userId1: string, userId2: string) {
   addToUserArray(userId1, chatId, "chats");
   addToUserArray(userId2, chatId, "chats");
 };
-
-
-// Get a user by their user ID
-export const getUserById = async (userId: string): Promise<Fighter | null> => {
-  try {
-    const userDocRef = doc(db, 'users', userId);
-    const userDocSnap = await getDoc(userDocRef);
-
-    if (userDocSnap.exists()) {
-      return userDocSnap.data() as Fighter;
-    } else {
-      console.error(`User with ID ${userId} does not exist.`);
-      return null;
-    }
-  } catch (error) {
-    console.error('Error fetching user from Firestore:', error);
-    return null;
-  }
-}
