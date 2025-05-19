@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View, Image, ScrollView, TouchableOpacity, SafeAreaView, ActivityIndicator } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import { Pencil as EditPencil, Settings, Medal, Trophy, LogOut } from 'lucide-react-native';
+import { Pencil as EditPencil, Medal, LogOut } from 'lucide-react-native';
 import { theme } from '@/styles/theme';
 import { router } from 'expo-router';
 import { Fighter } from '@/types/fighter';
@@ -101,10 +101,7 @@ export default function ProfileScreen() {
       ) : (
         // Main profile content
         <>
-          <View style={styles.settingsContainer}>
-            <TouchableOpacity style={styles.settingsButton}>
-              <Settings color={theme.colors.gray[700]} size={24} />
-            </TouchableOpacity>
+          <View style={styles.headingContainer}>
           </View>
           <ScrollView contentContainerStyle={styles.scrollContent}>
             <View style={styles.profileHeader}>
@@ -196,20 +193,18 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  settingsContainer: {
+  headingContainer: {
     paddingHorizontal: theme.spacing[4],
     paddingTop: theme.spacing[4],
     paddingBottom: theme.spacing[2],
     alignItems: 'flex-end',
-  },
-  settingsButton: {
-    padding: theme.spacing[2],
   },
   scrollContent: {
     paddingBottom: theme.spacing[8],
   },
   profileHeader: {
     alignItems: 'center',
+    paddingTop: theme.spacing[8],
     paddingHorizontal: theme.spacing[4],
   },
   profileImageContainer: {
