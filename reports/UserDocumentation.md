@@ -19,13 +19,13 @@ Upon entering the app, you will be brought to the [User Authentication Page](#us
 
 ### User Authentication Page
 
-[Insert Login Page Picture]: #
+<img src="/reports/Pictures/Login_Page.png" alt="Login Page" width="300" height="600"/>
 
 From here, you should enter your email and password. If you do not already have a SwipeFight account, press the 'Create Account' button to be brought to the [Profile Creation Page](#profile-creation-page). If have already signed up for a SwipeFight account, press the 'Login' button to enter the app and be brought to the [Swiper Page](#swiper-page). If you do not remember your password, enter your email and click the 'Forgot Password?' button and a password reset link will be sent to your email.
 
 ### Profile Creation Page
 
-[Insert Profile Creation Page Picture]: #
+<img src="/reports/Pictures/Profile_Creation_Page.png" alt="Profile Creation Page" width="300" height="600"/>
 
 [Maybe add back button]: #
 
@@ -42,28 +42,28 @@ SwipeFight contains four main tabs that you can access once authenticated. These
 
 ### Swiper Page
 
-[Insert Swiper Page Picture]: #
+<img src="/reports/Pictures/Swiper_Page.png" alt="Swiper Page" width="300" height="600"/>
 
 This is the main page of the SwipeFight app and allows users to find possible sparring partners. This page holds a list of possible fighters and filters.
 
 __Swiping__
 
-[Insert SKIP Swiper Page Picture]: #
+<img src="/reports/Pictures/Skip.png" alt="Skip" width="300" height="600"/>
 
 Swiping the fighter card to the left or pressing the red running man will skip the fighter.
 
-[Insert CHALLENGE Page Picture]: #
+<img src="/reports/Pictures/Challenge.png" alt="Challenge" width="300" height="600"/>
 
 Swiping the fighter card to the right or pressing the green boxing glove will challenge the fighter.
 
-[Insert Empty Stack]: #
+<img src="/reports/Pictures/Empty_Swiper.png" alt="Empty Swiper" width="300" height="600"/>
 
 Once there are no further fighters to view, the page will reflect this.
 
 
 __Filtering__
 
-[Insert Filtered Swiper Page Picture]: #
+<img src="/reports/Pictures/Filter.png" alt="Filter Swiper" width="300" height="600"/>
 
 On the top of the page, there is a scrollable list of filters that filter through the possible fighters that you can see. Multiple filters may be pressed at once and it will combine the filters together (Pressing Aikido and BJJ filters will only show fighters that practice Aikido __OR__ BJJ). Pressing the 'All' filter will reset all of the filters and show all possible fighters. The list of fighters that may appear on your list do not include any users that you have already skipped or challenged.
 
