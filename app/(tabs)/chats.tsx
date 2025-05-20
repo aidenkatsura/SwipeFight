@@ -9,7 +9,7 @@ import { fetchChatFromDB, fetchUserFromDB, fetchUserChatsFromDB } from '@/utils/
 import { Fighter } from '@/types/fighter';
 import { getAuth } from 'firebase/auth';
 import { useFocusEffect } from 'expo-router';
-import { doc, onSnapshot } from 'firebase/firestore';
+import { doc, onSnapshot, updateDoc } from 'firebase/firestore';
 import { db } from '@/FirebaseConfig';
 
 export default function ChatsScreen() {
@@ -17,7 +17,8 @@ export default function ChatsScreen() {
 
   type EnrichedChat = {chat: Chat, otherParticipant: Fighter};
   const [chats, setChats] = useState<EnrichedChat[]>([]);
-
+ // const auth = getAuth();
+  //const currentUserId = auth.currentUser?.uid;
 
   useFocusEffect(
     useCallback(() => {
@@ -84,8 +85,10 @@ export default function ChatsScreen() {
   const sortedChats = useMemo(() => {
     return [...chats].sort((a, b) => {
       // First sort by unread status
-      if (a.chat.unreadCount !== b.chat.unreadCount) {
-        return b.chat.unreadCount - a.chat.unreadCount; // Unread chats first
+      const aUnread = a.chat.unreadCounts?.[currentUserId];
+      const bUnread = b.chat.unreadCounts?.[currentUserId];
+      if (aUnread !== bUnread) {
+        return bUnread - aUnread;
       }
 
       // If unread status is the same, sort by last message timestamp
@@ -96,12 +99,30 @@ export default function ChatsScreen() {
   }, [chats]);
   
 
-  const handleChatPress = (chatId: string) => {
+  const handleChatPress = async (chatId: string) => {
+    if (!currentUserId) return;
+
     setChats(prevChats =>
       prevChats.map(chat =>
-        chat.chat.id === chatId ? { ...chat, unreadCount: 0 } : chat
+        chat.chat.id === chatId
+          ? {
+              ...chat,
+              chat: {
+                ...chat.chat,
+                unreadCounts: {
+                  ...chat.chat.unreadCounts,
+                  [currentUserId]: 0
+                }
+              }
+            }
+          : chat
       )
     );
+
+    await updateDoc(doc(db, 'chats', chatId), {
+      [`unreadCounts.${currentUserId}`]: 0,
+    });
+
     router.push(`/chat/${chatId}`);
   };
 
@@ -119,9 +140,9 @@ export default function ChatsScreen() {
           style={styles.profileImage}
         />
 
-        {item.chat.unreadCount > 0 && (
+        {item.chat.unreadCounts?.[currentUserId] > 0 && (
           <View style={styles.unreadBadge}>
-            <Text style={styles.unreadText}>{item.chat.unreadCount}</Text>
+            <Text style={styles.unreadText}>{item.chat.unreadCounts[currentUserId]}</Text>
           </View>
         )}
 
@@ -136,7 +157,7 @@ export default function ChatsScreen() {
           <Text
             style={[
               styles.lastMessage,
-              item.chat.unreadCount > 0 && styles.unreadMessage
+              item.chat.unreadCounts?.[currentUserId] > 0 && styles.unreadMessage
             ]}
             numberOfLines={1}
           >
