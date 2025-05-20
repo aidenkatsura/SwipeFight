@@ -19,4 +19,7 @@ ___Developer Documentation___
 
 4. __Build the software__
 
+   eas build --profile development --platform ios
+
+
    
