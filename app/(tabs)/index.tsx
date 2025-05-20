@@ -23,6 +23,7 @@ export default function FightScreen() {
   const [selectedDisciplines, setSelectedDisciplines] = useState<Discipline[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const swiperRef = useRef<Swiper<Fighter>>(null);
+  const [alert, setAlert] = useState<boolean>(false);
 
   // Get all users from db
   const fetchUsers = async () => {
@@ -139,7 +140,11 @@ export default function FightScreen() {
     addLikeToUser(userId, likedUser.id);
     // add chat if other user liked current user
     if (likedUser.likes.includes(userId)) {
+      setAlert(true);
       addChat(userId, likedUser.id);
+      setTimeout(() => {
+        setAlert(false);
+      }, 3000); // Hide alert after 3 seconds
     }
   };
   return (
@@ -151,6 +156,12 @@ export default function FightScreen() {
           onSelectDiscipline={handleFilterChange}
         />
       </View>
+      
+      {alert && (
+        <View style={styles.alertContainer}>
+          <Text style={styles.alertContainer}>Just Matched with a Fighter!</Text>
+        </View>
+      )}
 
       <View style={styles.swiperContainer}>
         {isLoading ? ( // Loading spinner while fetching users
@@ -290,5 +301,16 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-SemiBold',
     color: theme.colors.white,
     fontSize: 16,
+  },
+  alertContainer: {
+    backgroundColor: theme.colors.success[500],
+    padding: theme.spacing[3],
+    borderRadius: 8,
+    marginBottom: theme.spacing[4],
+  },
+  alertText: {
+    color: theme.colors.gray[950],
+    fontFamily: 'Inter-Regular',
+    fontSize: 14,
   },
 });
