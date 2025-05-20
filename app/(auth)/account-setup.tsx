@@ -12,6 +12,7 @@ export default function AccountSetupScreen() {
   const [age, setAge] = useState('');
   const [location, setLocation] = useState('');
   const [discipline, setDiscipline] = useState<Discipline>('MMA');
+  const [rank, setRank] = useState<string>('Beginner');
   const [photo, setPhoto] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -55,7 +56,7 @@ export default function AccountSetupScreen() {
 
   const handleCompleteSetup = async () => {
     try {
-      if (!name || !age || !location || !discipline) {
+      if (!name || !age || !location || !discipline || !rank) {
         setError('Please fill in all required fields');
         return;
       }
@@ -74,6 +75,7 @@ export default function AccountSetupScreen() {
         age: parseInt(age),
         location,
         discipline,
+        rank,
         photo: photo || defaultPhoto,
       });
 
@@ -85,6 +87,7 @@ export default function AccountSetupScreen() {
         age: parseInt(age),
         location,
         discipline,
+        rank,
         photo: photo || defaultPhoto, // Default photo if none selected
         rating: 1000, // Initial rating
         wins: 0,
@@ -186,6 +189,31 @@ export default function AccountSetupScreen() {
                     ]}
                   >
                     {d}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Rank</Text>
+            <View style={styles.disciplineContainer}>
+              {['Beginner', 'Intermediate', 'Pro'].map((r) => (
+                <TouchableOpacity
+                  key={r}
+                  style={[
+                    styles.disciplineButton,
+                    rank === r && styles.disciplineButtonSelected,
+                  ]}
+                  onPress={() => setRank(r as string)}
+                >
+                  <Text
+                    style={[
+                      styles.disciplineButtonText,
+                      rank === r && styles.disciplineButtonTextSelected,
+                    ]}
+                  >
+                    {r}
                   </Text>
                 </TouchableOpacity>
               ))}
