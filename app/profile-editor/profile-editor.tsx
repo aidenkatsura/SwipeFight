@@ -130,7 +130,7 @@ export default function EditProfileScreen() {
             dropdownItemStyles={styles.dropdownText}
             setSelected={setDiscipline}
             search={false}
-            placeholder="Select your discipline"
+            placeholder={ discipline || "Select your discipline" }
             data={[
               { label: 'Aikido', value: 'Aikido' },
               { label: 'BJJ', value: 'BJJ' },
@@ -216,7 +216,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginTop: theme.spacing[6],
     marginHorizontal: theme.spacing[2],
-    gap: theme.spacing[3],
     width: '100%',
   },
   saveButton: {
@@ -226,6 +225,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: 'center',
     minWidth: 120,
+    marginHorizontal: theme.spacing[6], // Add spacing from the Cancel button
   },
   cancelButton: {
     flex: 1,
@@ -234,6 +234,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: 'center',
     minWidth: 120,
+    marginHorizontal: theme.spacing[2], // Add spacing from the Save button
   },
   saveButtonText: {
     fontSize: 16,

@@ -1,14 +1,13 @@
 import { StyleSheet, Text, View, Image, ScrollView, TouchableOpacity, SafeAreaView, ActivityIndicator } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import { Pencil as EditPencil, Medal, LogOut } from 'lucide-react-native';
+import { Medal } from 'lucide-react-native';
 import { theme } from '@/styles/theme';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { Fighter } from '@/types/fighter';
-import { signOut } from 'firebase/auth';
-import { auth } from '@/FirebaseConfig';
 import { useEffect, useState } from 'react';
 import StatCard from '@/components/StatCard';
-import { useUser } from '@/context/UserContext';
+import { fetchUserFromDB } from '@/utils/firebaseUtils';
+import { Ionicons } from '@expo/vector-icons';
 
 export type UserProfile = Fighter & {
   achievements?: string[];
@@ -21,15 +20,17 @@ export type UserProfile = Fighter & {
 };
 
 export default function ProfileScreen() {
-  const { user, fetchUser } = useUser(); // Shared user state from UserContext
+  const { userId } = useLocalSearchParams(); // Get userId from URL params
+  const [profileUser, setProfileUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   // Fetches user data once on first mount
-  useEffect(() => {
-    const loadUser = async () => {
+  useEffect(() => { 
+    const loadProfile = async () => {
       try {
-        await fetchUser();
+        const fetchedUser = await fetchUserFromDB(userId);
+        setProfileUser(fetchedUser);
       } catch (err: any) {
         setError(err.message || 'An unexpected error occurred.');
       } finally {
@@ -37,21 +38,8 @@ export default function ProfileScreen() {
       }
     };
 
-    loadUser();
-  }, [fetchUser]); // re-run when fetchUser changes (e.g., auth change)
-
-  const handleEditProfilePress = () => {
-    router.push('/profile-editor/profile-editor');
-  };
-
-  const handleSignOut = async () => {
-    try {
-      await signOut(auth);
-      router.replace('/(auth)/login');
-    } catch (error) {
-      console.error('Error signing out:', error);
-    }
-  };
+    loadProfile();
+  }, [userId]); // re-run when userId changes (e.g., different profile clicked)
 
   if (loading) {
     return (
@@ -65,28 +53,28 @@ export default function ProfileScreen() {
     {
       id: '1',
       title: 'Wins',
-      value: user?.wins || 0,
+      value: profileUser?.wins || 0,
       iconName: 'trophy',
       color: theme.colors.success[500],
     },
     {
       id: '2',
       title: 'Losses',
-      value: user?.losses || 0,
+      value: profileUser?.losses || 0,
       iconName: 'x',
       color: theme.colors.error[500],
     },
     {
       id: '3',
       title: 'Draws',
-      value: user?.draws || 0,
+      value: profileUser?.draws || 0,
       iconName: 'minus',
       color: theme.colors.warning[500],
     },
     {
       id: '4',
       title: 'Rating',
-      value: user?.rating || 0,
+      value: profileUser?.rating || 0,
       iconName: 'star',
       color: theme.colors.gold,
     },
@@ -95,29 +83,29 @@ export default function ProfileScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar style="dark" />
-      {error || !user ? (
+      {error || !profileUser ? (
         // Loading error or no user data
         <Text style={styles.errorText}>Error loading profile: {error}</Text>
       ) : (
         // Main profile content
         <>
-          <View style={styles.headingContainer}>
+          <View style={styles.backContainer}>
+            <TouchableOpacity onPress={() => router.back()} style={{ marginLeft: theme.spacing[3] }}>
+              <Ionicons name="arrow-back" size={28} color={theme.colors.gray[900]} />
+            </TouchableOpacity>
           </View>
           <ScrollView contentContainerStyle={styles.scrollContent}>
             <View style={styles.profileHeader}>
               <View style={styles.profileImageContainer}>
-                <Image source={{ uri: user.photo }} style={styles.profileImage} />
-                <TouchableOpacity style={styles.editProfileButton} onPress={handleEditProfilePress}>
-                  <EditPencil color={theme.colors.white} size={18} />
-                </TouchableOpacity>
+                <Image source={{ uri: profileUser.photo }} style={styles.profileImage} />
               </View>
 
-              <Text style={styles.name}>{user.name}, {user.age}</Text>
+              <Text style={styles.name}>{profileUser.name}, {profileUser.age}</Text>
               <View style={styles.disciplineBadge}>
-                <Text style={styles.disciplineText}>{user.discipline}</Text>
+                <Text style={styles.disciplineText}>{profileUser.discipline}</Text>
               </View>
-              <Text style={styles.rank}>{user.rank}</Text>
-              <Text style={styles.location}>{user.location}</Text>
+              <Text style={styles.rank}>{profileUser.rank}</Text>
+              <Text style={styles.location}>{profileUser.location}</Text>
 
               <View style={styles.statsGrid}>
                 {stats.map(stat => (
@@ -133,8 +121,8 @@ export default function ProfileScreen() {
 
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Recent Achievements</Text>
-              {user.achievements && user.achievements.length > 0 ? (
-                user.achievements.map((achievement, index) => (
+              {profileUser.achievements && profileUser.achievements.length > 0 ? (
+                profileUser.achievements.map((achievement, index) => (
                   <View key={index} style={styles.achievementItem}>
                     <Medal color={theme.colors.primary[500]} size={20} />
                     <Text style={styles.achievementText}>{achievement}</Text>
@@ -147,8 +135,8 @@ export default function ProfileScreen() {
 
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Recent Matches</Text>
-              {user.recentMatches && user.recentMatches.length > 0 ? (
-                user.recentMatches.map((match, index) => (
+              {profileUser.recentMatches && profileUser.recentMatches.length > 0 ? (
+                profileUser.recentMatches.map((match, index) => (
                   <View key={index} style={styles.matchItem}>
                     <Image source={{ uri: match.opponentPhoto }} style={styles.matchOpponentImage} />
                     <View style={styles.matchDetails}>
@@ -174,12 +162,6 @@ export default function ProfileScreen() {
           </ScrollView>
         </>
       )}
-
-      {/* Logout button shows even on error */}
-      <TouchableOpacity style={styles.logoutButton} onPress={handleSignOut}>
-        <LogOut color={theme.colors.gray[600]} size={20} />
-        <Text style={styles.logoutText}>Log Out</Text>
-      </TouchableOpacity>
     </SafeAreaView>
   );
 }
@@ -193,18 +175,18 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  headingContainer: {
+  backContainer: {
     paddingHorizontal: theme.spacing[4],
     paddingTop: theme.spacing[4],
     paddingBottom: theme.spacing[2],
-    alignItems: 'flex-end',
+    alignItems: 'flex-start',
   },
   scrollContent: {
     paddingBottom: theme.spacing[8],
   },
   profileHeader: {
     alignItems: 'center',
-    paddingTop: theme.spacing[8],
+    paddingTop: theme.spacing[4],
     paddingHorizontal: theme.spacing[4],
   },
   profileImageContainer: {
@@ -215,19 +197,6 @@ const styles = StyleSheet.create({
     height: 100,
     borderRadius: 50,
     borderWidth: 4,
-    borderColor: theme.colors.white,
-  },
-  editProfileButton: {
-    position: 'absolute',
-    bottom: 0,
-    right: 0,
-    backgroundColor: theme.colors.primary[500],
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 2,
     borderColor: theme.colors.white,
   },
   name: {
@@ -343,20 +312,6 @@ const styles = StyleSheet.create({
     color: theme.colors.gray[600],
     textAlign: 'center',
     paddingVertical: theme.spacing[4],
-  },
-  logoutButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: theme.spacing[6],
-    marginBottom: theme.spacing[4],
-    padding: theme.spacing[3],
-  },
-  logoutText: {
-    fontFamily: 'Inter-SemiBold',
-    fontSize: 16,
-    color: theme.colors.gray[600],
-    marginLeft: theme.spacing[2],
   },
   errorText: {
     fontFamily: 'Inter-Regular',

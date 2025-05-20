@@ -5,6 +5,7 @@ import { theme } from '@/styles/theme';
 import DisciplineFilter from '@/components/DisciplineFilter';
 import { Medal } from 'lucide-react-native';
 import { fetchUsersFromDB } from '@/utils/firebaseUtils';
+import { router } from 'expo-router';
 
 type LeaderboardSection = {
   title: Discipline;
@@ -70,7 +71,8 @@ export default function LeaderboardScreen() {
     ) : null;
     
     return (
-      <TouchableOpacity style={styles.fighterItem}>
+      <TouchableOpacity style={styles.fighterItem}
+                onPress={() => router.push({ pathname: '../other_profile/other_profile', params: { userId: item.id } })}>
         <Text style={styles.rank}>{index + 1}</Text>
         {medal && <View style={styles.medalContainer}>{medal}</View>}
         <Image source={{ uri: item.photo }} style={styles.fighterImage} />
