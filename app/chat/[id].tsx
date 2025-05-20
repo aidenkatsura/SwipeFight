@@ -6,19 +6,22 @@ import { ChatMessage, Chat } from '@/types/chat';
 import { formatDistanceToNow } from '@/utils/dateUtils';
 import { Send, Flag } from 'lucide-react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { fetchChatFromDB, fetchUserFromDB, sendMessage } from '@/utils/firebaseUtils';
+import { fetchUserFromDB, sendMessage } from '@/utils/firebaseUtils';
 import { Fighter } from '@/types/fighter';
 import { Ionicons } from '@expo/vector-icons';
-import { doc, onSnapshot, Timestamp } from 'firebase/firestore';
+import { increment, updateDoc, doc, onSnapshot, Timestamp, arrayUnion } from 'firebase/firestore';
 import ScorecardModal from '@/components/ScorecardModal';
 import { getAuth } from 'firebase/auth';
 import { db } from '@/FirebaseConfig';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function ChatScreen() {
   const { id } = useLocalSearchParams();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [isScorecardVisible, setIsScorecardVisible] = useState(false);
+  const [isCooldown, setIsCooldown] = useState(false);
+  const COOLDOWN_MINUTES = 2;
   const flatListRef = useRef<FlatList>(null);
   const keyboardHeight = useRef(0);
 
@@ -78,6 +81,28 @@ export default function ChatScreen() {
     };
   }, [id]);
 
+  useEffect(() => {
+    const checkCooldown = async () => {
+      if (!id) return;
+      const storedCooldown = await AsyncStorage.getItem(`cooldown_${id}`);
+      if (storedCooldown) {
+        const cooldownEnd = parseInt(storedCooldown, 10);
+        const now = Date.now();
+        if (cooldownEnd > now) {
+          setIsCooldown(true);
+          setTimeout(() => {
+            setIsCooldown(false);
+            AsyncStorage.removeItem(`cooldown_${id}`);
+          }, cooldownEnd - now);
+        } else {
+          await AsyncStorage.removeItem(`cooldown_${id}`);
+          setIsCooldown(false);
+        }
+      }
+    };
+    checkCooldown();
+  }, [id]);
+
   const handleSend = () => {
     const auth = getAuth();
     const userId = auth.currentUser?.uid;
@@ -109,12 +134,59 @@ export default function ChatScreen() {
     }
   };
 
-  const handleSubmitResult = (winnerId: string, videoUri?: string) => {
-    // Here you would typically:
-    // 1. Upload the video to storage if provided
-    // 2. Update the match result in the database
-    // 3. Update both users' stats
-    console.log('Match result submitted:', { winnerId, videoUri });
+  const handleSubmitResult = async (winnerId: string) => {
+    try {
+      const auth = getAuth();
+      const userId = auth.currentUser?.uid;
+      if (!userId || !chat) return;
+
+      await addMatchResult(chat.chat.id, winnerId);
+
+      const draw = winnerId === 'draw';
+      for (const participant of chat.chat.participants) {
+        if (draw) {
+          await updateDoc(doc(db, 'users', participant.id), {
+            draws: increment(1),
+          });
+        } else {
+          const didWin = participant.id === winnerId;
+          await updateUserStats(participant.id, didWin);
+        }
+      }
+
+      setIsCooldown(true);
+      const cooldownEnd = Date.now() + COOLDOWN_MINUTES * 60 * 1000;
+      await AsyncStorage.setItem(
+        `cooldown_${chat.chat.id}`,
+        cooldownEnd.toString()
+      );
+      setTimeout(() => {
+        setIsCooldown(false);
+        AsyncStorage.removeItem(`cooldown_${chat.chat.id}`);
+      }, COOLDOWN_MINUTES * 60 * 1000);
+    } catch (error) {
+      console.error('Error submitting result:', error);
+    }
+  };
+
+  const addMatchResult = async (chatId: string, winnerId: string) => {
+    const chatRef = doc(db, 'chats', chatId);
+    const result = {
+      winnerId,
+      submittedAt: Timestamp.now(),
+    };
+    await updateDoc(chatRef, {
+      results: arrayUnion(result),
+    });
+  };
+
+  const updateUserStats = async (userId: string, didWin: boolean) => {
+    const userRef = doc(db, 'users', userId);
+    await updateDoc(userRef, {
+      wins: didWin ? increment(1) : increment(0),
+      losses: didWin ? increment(0) : increment(1),
+      rating: didWin ? increment(10) : increment(-10),
+    });
   };
 
   const renderMessage = ({ item }: { item: ChatMessage }) => {
@@ -122,8 +194,8 @@ export default function ChatScreen() {
     const userId = auth.currentUser?.uid;
     const isCurrentUser = item.senderId === userId;
     if (!chat) {
-    return null; // Or a loading state
-  }
+      return null; // Or a loading state
+    }
 
     return (
       <View style={{ flexDirection: 'row', alignItems: 'flex-end', marginBottom: theme.spacing[2], justifyContent: isCurrentUser ? 'flex-end' : 'flex-start' }}>
@@ -171,11 +243,20 @@ export default function ChatScreen() {
           />
           <Text style={styles.userName}>{chat.otherParticipant.name}</Text>
           <TouchableOpacity
-            style={styles.reportButton}
-            onPress={() => setIsScorecardVisible(true)}
+            style={[styles.reportButton,
+                    isCooldown && { backgroundColor: theme.colors.gray[300] },
+                  ]}
+            onPress={() => !isCooldown && setIsScorecardVisible(true)}
+            disabled={isCooldown}
           >
-            <Flag size={24} color={theme.colors.primary[500]} />
-            <Text style={styles.reportButtonText}>Report Result</Text>
+            <Flag size={24} color={isCooldown ? theme.colors.gray[500] : theme.colors.primary[500]} />
+            <Text style={[
+                  styles.reportButtonText,
+                  isCooldown && { color: theme.colors.gray[500] }
+                ]}
+            >
+              {isCooldown ? 'Please wait...' : 'Report Result'}
+            </Text>
           </TouchableOpacity>
         </View>
 
@@ -218,6 +299,7 @@ export default function ChatScreen() {
           onClose={() => setIsScorecardVisible(false)}
           onSubmit={handleSubmitResult}
           participants={chat.chat.participants}
+          
         />
       </SafeAreaView>
     </GestureHandlerRootView>

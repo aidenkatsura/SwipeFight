@@ -1,14 +1,13 @@
 import { StyleSheet, View, Text, Modal, TouchableOpacity, Platform } from 'react-native';
 import { theme } from '@/styles/theme';
 import { Picker } from '@react-native-picker/picker';
-import * as ImagePicker from 'expo-image-picker';
 import { useState } from 'react';
-import { X, Upload } from 'lucide-react-native';
+import { X } from 'lucide-react-native';
 
 interface ScorecardModalProps {
   visible: boolean;
   onClose: () => void;
-  onSubmit: (winnerId: string, videoUri?: string) => void;
+  onSubmit: (winnerId: string) => void;
   participants: {
     id: string;
     name: string;
@@ -18,27 +17,10 @@ interface ScorecardModalProps {
 
 export default function ScorecardModal({ visible, onClose, onSubmit, participants }: ScorecardModalProps) {
   const [selectedWinner, setSelectedWinner] = useState<string>('');
-  const [videoUri, setVideoUri] = useState<string | undefined>();
-
-  const handleVideoPick = async () => {
-    try {
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Videos,
-        allowsEditing: true,
-        quality: 1,
-      });
-
-      if (!result.canceled && result.assets[0]) {
-        setVideoUri(result.assets[0].uri);
-      }
-    } catch (error) {
-      console.error('Error picking video:', error);
-    }
-  };
 
   const handleSubmit = () => {
-    if (selectedWinner) {
-      onSubmit(selectedWinner, videoUri);
+    if (selectedWinner !== '') {
+      onSubmit(selectedWinner);
       onClose();
     }
   };
@@ -75,23 +57,10 @@ export default function ScorecardModal({ visible, onClose, onSubmit, participant
                     value={participant.id}
                   />
                 ))}
+                <Picker.Item label="Draw" value="draw" />
               </Picker>
             </View>
           </View>
-
-          <TouchableOpacity
-            style={styles.uploadButton}
-            onPress={handleVideoPick}
-          >
-            <Upload size={24} color={theme.colors.primary[500]} />
-            <Text style={styles.uploadText}>
-              {videoUri ? 'Change Video' : 'Upload Match Video (Optional)'}
-            </Text>
-          </TouchableOpacity>
-
-          {videoUri && (
-            <Text style={styles.videoSelected}>Video selected ✓</Text>
-          )}
 
           <TouchableOpacity
             style={[
