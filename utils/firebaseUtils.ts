@@ -23,18 +23,19 @@ export const fetchUsersFromDB = async (): Promise<Fighter[]> => {
 /**
  * Add a new fighter to the Firestore database.
  * 
- * The document ID will be the fighter's ID. A fighter will only be added if there is no
- * fighter with the same ID in the database.
+ * The document ID will be the fighter's ID. If a fighter with the same ID already exists,
+ * the document will be overwritten.
  * 
- * @param {string} userID - The new user's id
+ * @param {string} userId - The new user's id
  * @param {string} name - The new user's name
  * @param {string} age - The new user's age
  * @param {string} location - The new user's location
  * @param {Discipline} discipline - The new user's discipline
+ * @param {string} rank - The new user's rank
  * @param {string|null} photo - The new user's photo
  * @throws Throws an error if an unexpected failure occurs.
  */
-export const addNewUserToDB = async (userId: string, name: string, age: string, location: string, discipline: Discipline, photo: string|null) => {
+export const addNewUserToDB = async (userId: string, name: string, age: string, location: string, discipline: Discipline, rank: string, photo: string|null) => {
   const defaultPhoto = 'https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png';
   console.log('Creating user profile with data:', {
     id: userId,
@@ -53,6 +54,7 @@ export const addNewUserToDB = async (userId: string, name: string, age: string, 
     age: parseInt(age),
     location,
     discipline,
+    rank,
     photo: photo || defaultPhoto, // Default photo if none selected
     rating: 1000, // Initial rating
     wins: 0,
@@ -63,7 +65,6 @@ export const addNewUserToDB = async (userId: string, name: string, age: string, 
     chats: [],
     createdAt: Timestamp.fromDate(new Date()),
   });
-    
 };
 
 /**

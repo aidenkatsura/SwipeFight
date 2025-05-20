@@ -237,10 +237,12 @@ export default function ChatScreen() {
           <TouchableOpacity onPress={() => router.back()} style={{ marginRight: theme.spacing[3] }}>
             <Ionicons name="arrow-back" size={28} color={theme.colors.gray[900]} />
           </TouchableOpacity>
-          <Image
-            source={{ uri: chat.otherParticipant.photo }}
-            style={styles.profileImage}
-          />
+          <TouchableOpacity onPress={() => router.push({ pathname: '../other_profile/other_profile', params: { userId: chat.otherParticipant.id } })}>
+            <Image
+              source={{ uri: chat.otherParticipant.photo }}
+              style={styles.profileImage}
+            />
+          </TouchableOpacity>
           <Text style={styles.userName}>{chat.otherParticipant.name}</Text>
           <TouchableOpacity
             style={[styles.reportButton,

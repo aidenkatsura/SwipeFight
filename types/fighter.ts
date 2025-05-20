@@ -6,7 +6,6 @@ export interface Fighter {
   discipline: Discipline;
   rank: string;
   location: string;
-  distance: number; // in miles/km
   rating: number;
   wins: number;
   losses: number;
