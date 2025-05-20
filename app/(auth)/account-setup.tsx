@@ -60,6 +60,11 @@ export default function AccountSetupScreen() {
         setError('Please fill in all required fields');
         return;
       }
+      const parsedAge = parseInt(age, 10);
+      if (isNaN(parsedAge) || parsedAge <= 0 || parsedAge >= 150) {
+        setError('Please enter a valid age (1-149)');
+        return;
+      }
 
       setLoading(true);
       const user = auth.currentUser;
@@ -72,7 +77,7 @@ export default function AccountSetupScreen() {
       console.log('Creating user profile with data:', {
         id: user.uid,
         name,
-        age: parseInt(age),
+        age: parsedAge,
         location,
         discipline,
         rank,
@@ -84,7 +89,7 @@ export default function AccountSetupScreen() {
       await setDoc(userRef, {
         id: user.uid,
         name,
-        age: parseInt(age),
+        age: parsedAge,
         location,
         discipline,
         rank,

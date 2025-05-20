@@ -33,11 +33,17 @@ export default function EditProfileScreen() {
       console.error('No authenticated user found.');
       return;
     }
+    
+    const parsedAge = parseInt(age, 10);
+    if (isNaN(parsedAge) || parsedAge <= 0 || parsedAge >= 150) {
+      console.error('Please enter a valid age (1-149)');
+      return;
+    }
 
     const updatedUser = {
       ...user,
       name,
-      age: parseInt(age, 10),
+      age: parsedAge,
       location,
       discipline,
       rank,
