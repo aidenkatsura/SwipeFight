@@ -32,6 +32,23 @@ ___Developer Documentation___
    ```
    npm test
    ```
-   And the test suite will show the test and pass/fails
+   And the test suite will show all tests along with pass/fails
+
+5. __Add new tests__
+
+   Navigate to ./test/test.ts and all tests will be displayed. When adding a test for an existing feature, add a specific test within the associated feature. 
+   ```
+   it("<test description here>", function () {
+      <test code here>
+   }
+   ```
+
+   If adding a test for a brand new feature, add a new suite function using:
+   ```
+   describe("<Feature name>", function () {
+      it(...) {...}
+   }
+   ```
+   
 
    
