@@ -36,7 +36,7 @@ ___Developer Documentation___
 
 6. __Add new tests__
 
-   Navigate to ./test/test.ts and all tests will be displayed. When adding a test for an existing feature, add a specific test within the associated feature. 
+   We are using the Mocha test framework and Typescript as the test language. Navigate to ./test/test.ts and all tests will be displayed. When adding a test for an existing feature, add a specific test within the associated feature. 
    ```
    it("<test description here>", function () {
       <test code here>
