@@ -19,7 +19,6 @@ export const mockCurrentUser: UserProfile = {
   discipline: 'MMA',
   rank: 'Intermediate, 3 years',
   location: 'Brooklyn, NY',
-  distance: 0,
   rating: 1750,
   wins: 8,
   losses: 4,
@@ -48,5 +47,7 @@ export const mockCurrentUser: UserProfile = {
       date: '2 weeks ago',
       result: 'draw'
     }
-  ]
+  ],
+  likes: [],
+  dislikes: []
 };
