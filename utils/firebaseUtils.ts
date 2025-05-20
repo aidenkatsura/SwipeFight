@@ -23,8 +23,8 @@ export const fetchUsersFromDB = async (): Promise<Fighter[]> => {
 /**
  * Add a new fighter to the Firestore database.
  * 
- * The document ID will be the fighter's ID. A fighter will only be added if there is no
- * fighter with the same ID in the database.
+ * The document ID will be the fighter's ID. If a fighter with the same ID already exists,
+ * the document will be overwritten.
  * 
  * @param {string} userId - The new user's id
  * @param {string} name - The new user's name
