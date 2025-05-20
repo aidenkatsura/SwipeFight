@@ -84,12 +84,14 @@ export default function ChatsScreen() {
   const sortedChats = useMemo(() => {
     return [...chats].sort((a, b) => {
       // First sort by unread status
-      if (a.chat.unreadCount > 0 && b.chat.unreadCount === 0) return -1;
-      if (a.chat.unreadCount === 0 && b.chat.unreadCount > 0) return 1;
+      if (a.chat.unreadCount !== b.chat.unreadCount) {
+        return b.chat.unreadCount - a.chat.unreadCount; // Unread chats first
+      }
 
-      // Then sort by timestamp (most recent first)
-      //return b.lastMessage.timestamp.getTime() - a.lastMessage.timestamp.getTime();
-      return 1;
+      // If unread status is the same, sort by last message timestamp
+      const aDate = a.chat.lastMessage.timestamp.toDate();
+      const bDate = b.chat.lastMessage.timestamp.toDate();
+      return bDate.getTime() - aDate.getTime();
     });
   }, [chats]);
   
