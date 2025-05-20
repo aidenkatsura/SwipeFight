@@ -7,7 +7,7 @@ ___Developer Documentation___
    git clone https://github.com/aidenkatsura/SwipeFight.git
    ```
 
- 3. __Directory structure__
+ 2. __Directory structure__
 
    Source code: ./app
    
@@ -17,7 +17,7 @@ ___Developer Documentation___
    
    Data files: ./data
 
-4. __Build the software__
+3. __Build the software__
    
    eas build --profile development --platform ios
 
