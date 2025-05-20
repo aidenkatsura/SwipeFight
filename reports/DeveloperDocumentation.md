@@ -18,8 +18,13 @@ ___Developer Documentation___
    Data files: ./data
 
 4. __Build the software__
-
+   
    eas build --profile development --platform ios
 
+   After cloning the repository, run the command:
+   ```
+   npm install
+   npx expo start
+   ```
 
    
