@@ -17,8 +17,8 @@ export default function ChatsScreen() {
 
   type EnrichedChat = {chat: Chat, otherParticipant: Fighter};
   const [chats, setChats] = useState<EnrichedChat[]>([]);
- // const auth = getAuth();
-  //const currentUserId = auth.currentUser?.uid;
+  const auth = getAuth();
+  const currentUserId = auth.currentUser?.uid;
 
   useFocusEffect(
     useCallback(() => {
@@ -81,22 +81,30 @@ export default function ChatsScreen() {
       );
   
 
-  // Sort chats by unread status and timestamp
-  const sortedChats = useMemo(() => {
+    const sortedChats = useMemo(() => {
     return [...chats].sort((a, b) => {
-      // First sort by unread status
-      const aUnread = a.chat.unreadCounts?.[currentUserId];
-      const bUnread = b.chat.unreadCounts?.[currentUserId];
+      // Sort by unread count first
+      const aUnread = a.chat.unreadCounts?.[currentUserId] || 0;
+      const bUnread = b.chat.unreadCounts?.[currentUserId] || 0;
       if (aUnread !== bUnread) {
         return bUnread - aUnread;
       }
 
-      // If unread status is the same, sort by last message timestamp
-      const aDate = a.chat.lastMessage.timestamp.toDate();
-      const bDate = b.chat.lastMessage.timestamp.toDate();
-      return bDate.getTime() - aDate.getTime();
+      // Then sort by last message timestamp
+      const aTimestamp = a.chat.lastMessage?.timestamp?.toDate?.();
+      const bTimestamp = b.chat.lastMessage?.timestamp?.toDate?.();
+
+      if (aTimestamp && bTimestamp) {
+        return bTimestamp.getTime() - aTimestamp.getTime();
+      } else if (aTimestamp) {
+        return -1;
+      } else if (bTimestamp) {
+        return 1;
+      } else {
+        return 0;
+      }
     });
-  }, [chats]);
+  }, [chats, currentUserId]);
   
 
   const handleChatPress = async (chatId: string) => {
