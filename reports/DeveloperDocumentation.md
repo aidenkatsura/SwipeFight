@@ -9,15 +9,15 @@ ___Developer Documentation___
 
  2. __Directory structure__
 
-   Source code: ./app
-   
-   Testing: ./testing
-   
-   Documentation: ./reports
-   
-   Data files: ./data
+    Source code: ./app
 
-3. __Build the software__
+    Testing: ./testing
+
+    Documentation: ./reports
+
+    Data files: ./data
+
+4. __Build the software__
    
    eas build --profile development --platform ios
 
@@ -26,7 +26,7 @@ ___Developer Documentation___
    npm install
    npx expo start
    ```
-4. __Test the software__
+5. __Test the software__
    
    To test, run the command:
    ```
@@ -34,7 +34,7 @@ ___Developer Documentation___
    ```
    And the test suite will show all tests along with pass/fails
 
-5. __Add new tests__
+6. __Add new tests__
 
    Navigate to ./test/test.ts and all tests will be displayed. When adding a test for an existing feature, add a specific test within the associated feature. 
    ```
