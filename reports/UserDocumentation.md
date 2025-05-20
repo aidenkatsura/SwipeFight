@@ -8,10 +8,26 @@ SwipeFight is an application that helps martial artists connect with local sparr
 
 [How to install the software. If your system has prerequisites (e.g., tools, libraries, emulators, third-party applications, etc.), your instructions should list all of them and indicate how to install and configure them. Make sure to indicate what specific version requirements these prerequisites must satisfy. If running the system requires the installation of, e.g., a virtual machine, a database, or an emulator, make sure to provide clear step-by-step instructions.]: #
 
+To install the app on your device you must:
+ 1. Clone the GitHub Repository and cd into it (https://github.com/aidenkatsura/SwipeFight)
+ 2. Install the [Expo Go](https://expo.dev/go) app and make an account
+ 3. Install an simulator on [Windows](https://docs.expo.dev/tutorial/eas/android-development-build/) or [Mac](https://docs.expo.dev/workflow/ios-simulator/).
+ 4. Install [Node.js/npm](https://nodejs.org/en/download)
+ 5. In the terminal, run
+```
+npm install
+npx expo start
+```
 
 ## Run
 
-The app can be accessed through this link: (https://swipefight--ia08c3d7xj.expo.app)
+The latest release of the app can be accessed on any web-enabled device through this link: (https://swipefight--ia08c3d7xj.expo.app)
+
+After running 'npx expo start' the app can be opened by:
+ - Scanning the generated QR code with the camera app which will open SwipeFight in Expo Go.
+ - Pressing 'a' will open Android simulator
+ - Pressing 'i' will open iOS simulator
+ - Pressing 'w' will open web
 
 ## Using the App
 
@@ -89,7 +105,7 @@ The Leaderboard Page is where you can view the best of the best. The 'All' optio
  <img src="/reports/Pictures/Leaderboard_Filter.png" alt="Filtered Leaderboard" width="300" height="600"/>
 </div>
 
-If you want a better look at another user beyond the summary that is presented, you can click the profile which will navigate you to the [Other User's Profile Page](#other-user's-profile-page).
+If you want a better look at another user beyond the summary that is presented, you can click the profile which will navigate you to the [Other User's Profile Page](#other-users-profile-page).
 
 ### Profile Page
 
