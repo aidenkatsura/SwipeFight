@@ -75,7 +75,7 @@ export default function AccountSetupScreen() {
         throw new Error('No authenticated user found');
       }
       
-      addNewUserToDB(user.uid, name, age, location, discipline, photo);
+      addNewUserToDB(user.uid, name, age, location, discipline, rank, photo);
       
       console.log('Profile created successfully, navigating to tabs');
       // Navigate to main app
