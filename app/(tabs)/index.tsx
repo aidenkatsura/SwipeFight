@@ -144,11 +144,17 @@ export default function FightScreen() {
       addChat(userId, likedUser.id);
       setTimeout(() => {
         setAlert(false);
-      }, 3000); // Hide alert after 3 seconds
+      }, 2000); // Hide alert after 2 seconds
     }
   };
   return (
     <SafeAreaView style={styles.container}>
+      {alert && (
+        <View style={styles.alertContainer}>
+          <Text style={styles.alertContainer}>Just Matched with a Fighter!</Text>
+        </View>
+      )}
+
       <View style={styles.header}>
         <Text style={styles.title}>Find Fighters</Text>
         <DisciplineFilter
@@ -156,12 +162,6 @@ export default function FightScreen() {
           onSelectDiscipline={handleFilterChange}
         />
       </View>
-      
-      {alert && (
-        <View style={styles.alertContainer}>
-          <Text style={styles.alertContainer}>Just Matched with a Fighter!</Text>
-        </View>
-      )}
 
       <View style={styles.swiperContainer}>
         {isLoading ? ( // Loading spinner while fetching users
