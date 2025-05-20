@@ -1,4 +1,4 @@
-# User Documentation
+# User Manual
 
 ## Abstract
 
@@ -127,6 +127,15 @@ This page allows you to visit the profiles of other users. It shares the same in
 
 [How to report a bug. This should include not just the mechanics (a pointer to your issue tracker), but also what information is needed. You can set up a bug-report template in your issue tracker, or you can reference a resource about how to write a good bug report. Here is an example for bug reporting guidelines.]: #
 
-## Known Bugs
+If you encounter any bugs while using SwipeFight, let us know using our GitHub Issues following these steps:
+ 1. Navigate to SwipeFight's [GitHub Issues](https://github.com/aidenkatsura/SwipeFight/issues)
+ 2. Click the "New Issue" button
+ 3. Fill in the Bug Report
 
-[Known bugs. Known bugs or limitations should be documented in the bug tracker. A user testing the implemented use case(s) should not encounter trivial bugs (e.g., NPEs) or a large number of bugs that are unlisted in your bug tracker.]: #
+    - Use a title that is clear, concise and descriptive
+    - Describe the expected and actual behavior
+    - Describe how to replicate the bug
+    - Describe the device used when the bug occured
+    - Attach any photos if possible
+
+ 4. Submit the report for review
