@@ -26,5 +26,12 @@ ___Developer Documentation___
    npm install
    npx expo start
    ```
+4. __Test the software__
+   
+   To test, run the command:
+   ```
+   npm test
+   ```
+   And the test suite will show the test and pass/fails
 
    
