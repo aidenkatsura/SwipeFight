@@ -6,6 +6,7 @@ import { auth, db } from '@/FirebaseConfig';
 import { doc, setDoc, Timestamp } from 'firebase/firestore';
 import { Discipline } from '@/types/fighter';
 import * as ImagePicker from 'expo-image-picker';
+import { addNewUserToDB } from '@/utils/firebaseUtils';
 
 export default function AccountSetupScreen() {
   const [name, setName] = useState('');
@@ -73,37 +74,9 @@ export default function AccountSetupScreen() {
         console.error('No authenticated user found');
         throw new Error('No authenticated user found');
       }
-
-      console.log('Creating user profile with data:', {
-        id: user.uid,
-        name,
-        age: parsedAge,
-        location,
-        discipline,
-        rank,
-        photo: photo || defaultPhoto,
-      });
-
-      // Create user profile in Firestore
-      const userRef = doc(db, 'users', user.uid);
-      await setDoc(userRef, {
-        id: user.uid,
-        name,
-        age: parsedAge,
-        location,
-        discipline,
-        rank,
-        photo: photo || defaultPhoto, // Default photo if none selected
-        rating: 1000, // Initial rating
-        wins: 0,
-        losses: 0,
-        draws: 0,
-        likes: [],
-        dislikes: [],
-        chats: [],
-        createdAt: Timestamp.fromDate(new Date()),
-      });
-
+      
+      addNewUserToDB(user.uid, name, age, location, discipline, photo);
+      
       console.log('Profile created successfully, navigating to tabs');
       // Navigate to main app
       router.replace('/(tabs)');

@@ -1,6 +1,6 @@
 import { collection, getDocs, doc, getDoc, setDoc, deleteDoc, addDoc, runTransaction, arrayUnion, Timestamp} from 'firebase/firestore';
 import { db } from '../FirebaseConfig';
-import { Fighter } from '@/types/fighter';
+import { Discipline, Fighter } from '@/types/fighter';
 import { Chat, ChatMessage} from '@/types/chat';
 
 /**
@@ -26,35 +26,44 @@ export const fetchUsersFromDB = async (): Promise<Fighter[]> => {
  * The document ID will be the fighter's ID. A fighter will only be added if there is no
  * fighter with the same ID in the database.
  * 
- * @param {Fighter} fighter - The fighter object to add to the database.
- * @returns {Promise<boolean>} Resolves to true if the fighter was successfully added, 
- *                             or false if the fighter already exists.
+ * @param {string} userID - The new user's id
+ * @param {string} name - The new user's name
+ * @param {string} age - The new user's age
+ * @param {string} location - The new user's location
+ * @param {Discipline} discipline - The new user's discipline
+ * @param {string|null} photo - The new user's photo
  * @throws Throws an error if an unexpected failure occurs.
  */
-export const addNewUserToDB = async (fighter: Fighter): Promise<boolean> => {
-  try {
-    const fighterDocRef = doc(db, 'users', fighter.id);
-
-    // Ensure atomicity with a transaction
-    const result: boolean = await runTransaction(db, async (transaction) => {
-      const docSnapshot = await transaction.get(fighterDocRef);
-
-      // Check if the document already exists
-      if (docSnapshot.exists()) {
-        console.error(`Fighter with ID ${fighter.id} already exists.`);
-        return false; // Fighter already exists - don't override
-      }
-
-      // Add the new fighter
-      transaction.set(fighterDocRef, fighter);
-      return true; // Add successful
-    });
-
-    return result; // Return the result of the transaction
-  } catch (error) {
-    console.error('Error adding fighter to Firestore:', error);
-    throw new Error('Unexpected error adding fighter to Firestore.');
-  }
+export const addNewUserToDB = async (userId: string, name: string, age: string, location: string, discipline: Discipline, photo: string|null) => {
+  const defaultPhoto = 'https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png';
+  console.log('Creating user profile with data:', {
+    id: userId,
+    name,
+    age: parseInt(age),
+    location,
+    discipline,
+    photo: photo || defaultPhoto,
+  });
+    
+  // Create user profile in Firestore
+  const userRef = doc(db, 'users', userId);
+  await setDoc(userRef, {
+    id: userId,
+    name,
+    age: parseInt(age),
+    location,
+    discipline,
+    photo: photo || defaultPhoto, // Default photo if none selected
+    rating: 1000, // Initial rating
+    wins: 0,
+    losses: 0,
+    draws: 0,
+    likes: [],
+    dislikes: [],
+    chats: [],
+    createdAt: Timestamp.fromDate(new Date()),
+  });
+    
 };
 
 /**
