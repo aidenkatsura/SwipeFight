@@ -5,10 +5,11 @@ import { theme } from '@/styles/theme';
 import { router } from 'expo-router';
 import { Fighter } from '@/types/fighter';
 import { signOut } from 'firebase/auth';
-import { auth } from '@/FirebaseConfig';
+import { auth, db } from '@/FirebaseConfig';
 import { useEffect, useState } from 'react';
 import StatCard from '@/components/StatCard';
 import { useUser } from '@/context/UserContext';
+import { doc, onSnapshot } from 'firebase/firestore';
 
 export type UserProfile = Fighter & {
   achievements?: string[];
@@ -38,6 +39,17 @@ export default function ProfileScreen() {
     };
 
     loadUser();
+
+    // Updates Profile Live
+    const userRef = doc(db, 'users', user?.id);
+    const unsubscribe = onSnapshot(userRef, (docSnapshot) => {
+      if (docSnapshot.exists()) {
+          fetchUser();
+      }
+    });
+
+    // Cleanup listener on unmount
+    return () => unsubscribe();
   }, [fetchUser]); // re-run when fetchUser changes (e.g., auth change)
 
   const handleEditProfilePress = () => {
