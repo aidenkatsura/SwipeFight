@@ -86,11 +86,12 @@ export default function LeaderboardScreen() {
         <Image source={{ uri: item.photo }} style={styles.fighterImage} />
         <View style={styles.fighterInfo}>
           <Text style={styles.fighterName}>{item.name}</Text>
-          <Text style={styles.fighterRank}>{item.rank}</Text>
+          <Text style={styles.fighterRank}>{item.discipline}</Text>
         </View>
         <View style={styles.statsContainer}>
           <Text style={styles.rating}>{item.rating}</Text>
           <Text style={styles.record}>{item.wins}W-{item.losses}L-{item.draws}D</Text>
+          <Text style={styles.fighterRank}>{item.rank}</Text>
         </View>
       </TouchableOpacity>
     );
