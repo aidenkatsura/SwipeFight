@@ -1,4 +1,4 @@
-import { collection, getDocs, doc, getDoc, setDoc, deleteDoc, addDoc, runTransaction, arrayUnion, Timestamp} from 'firebase/firestore';
+import { collection, getDocs, doc, getDoc, setDoc, deleteDoc, addDoc, runTransaction, arrayUnion, Timestamp, increment} from 'firebase/firestore';
 import { db } from '../FirebaseConfig';
 import { Discipline, Fighter } from '@/types/fighter';
 import { Chat, ChatMessage} from '@/types/chat';
@@ -327,8 +327,11 @@ export async function sendMessage(chatId: string, message: ChatMessage):
         throw new Error(`Chat with ID ${chatId} does not exist.`);
       }
 
+      const chatData = chatSnap.data();
+      const receiverId = message.receiverId;
+
       transaction.update(chatRef, {
-        ["messages"]: arrayUnion(message), ["lastMessage"]: message,
+        ["messages"]: arrayUnion(message), ["lastMessage"]: message, [`unreadCounts.${receiverId}`]: increment(1),
       });
       
     });
@@ -402,7 +405,10 @@ export async function addChat(userId1: string, userId2: string) {
       {id: userId2, name: user2Name, photo: user2Photo}
     ],
     messages: [],
-    unreadCount: 0,
+    unreadCounts: {
+      [userId1]: 0,
+      [userId2]: 0,
+    },
     lastMessage: {
       id: "",
       senderId: "",
