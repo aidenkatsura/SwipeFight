@@ -36,18 +36,23 @@ ___Developer Documentation___
 
 6. __Add new tests__
 
-   We are using the Mocha test framework and Typescript as the test language. Navigate to ./test/test.ts and all tests will be displayed. When adding a test for an existing feature, add a specific test within the associated feature. 
-   ```
-   it("<test description here>", function () {
-      <test code here>
-   }
+   We are using the [Jest](https://jestjs.io/docs/getting-started) test framework and TypeScript as the test language. Navigate to ./test/ to view the test files. When adding a test for an existing feature, add a specific test within the associated feature. 
+   ```ts
+   test('<test description here>', () => {
+      /* test code here */
+   });
+
+   // Example:
+   test('should return -1 when the value is not present', () => {
+      expect([1, 2, 3].indexOf(4)).toBe(-1);
+   });
    ```
 
    If adding a test for a brand new feature, add a new suite function using:
-   ```
-   describe("<Feature name>", function () {
-      it(...) {...}
-   }
+   ```ts
+   describe('<Feature name>', () => {
+      test('...') {/* ... */}
+   });
    ```
    
 
