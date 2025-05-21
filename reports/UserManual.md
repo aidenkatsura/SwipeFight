@@ -43,9 +43,12 @@ From here, you should enter your email and password. If you do not already have 
 
 [Maybe add back button]: #
 
-When first creating an account, you may set up your Profile Picture, Name, Age, Location, and Discipline. A default Profile Picture is provided if one is not entered, however, the rest of the information must be entered. Once your profile is to your liking, press the 'Complete Setup' button to enter the app and be brought to the [Swiper Page](#swiper-page).
+When first creating an account, you may set up your Profile Picture, Name, Age, Location, Discipline and Rank. A default Profile Picture is provided if one is not entered, however, the rest of the information must be entered. Once your profile is to your liking, press the 'Complete Setup' button to enter the app and be brought to the [Swiper Page](#swiper-page).
 
-<img src="/reports/Pictures/Profile_Creation_Page.png" alt="Profile Creation Page" width="300" height="600"/>
+<div class="row">
+ <img src="/reports/Pictures/Profile_Creation_1.png" alt="Profile Creation Page 1" width="300" height="600"/>
+ <img src="/reports/Pictures/Profile_Creation_2.png" alt="Profile Creation Page 2" width="300" height="600"/>
+</div>
 
 ### Navigation
 
@@ -64,12 +67,13 @@ The Swiper Page is the main page of the SwipeFight app and allows users to find 
 
 __Swiping__
 
-Swiping the fighter card to the left or pressing the red running man will skip the fighter. On the other hand, swiping the fighter card to the right or pressing the green boxing glove will challenge the fighter. Once there are no further fighters to view in your selected filter or overall, the page will reflect this.
+Swiping the fighter card to the left or pressing the red running man will skip the fighter. On the other hand, swiping the fighter card to the right or pressing the green boxing glove will challenge the fighter. Once there are no further fighters to view in your selected filter or overall, the page will reflect this. When you swipe on a fighter that has already challenged you, you will be alerted that you have matched with them and should check the [Chats Page](#chats-page) to coordinate your sparring session.
 
 <div class="row">
  <img src="/reports/Pictures/Skip.png" alt="Skip" width="300" height="600"/>
  <img src="/reports/Pictures/Challenge.png" alt="Challenge" width="300" height="600"/>
  <img src="/reports/Pictures/Empty_Swiper.png" alt="Empty Swiper" width="300" height="600"/>
+ <img src="/reports/Pictures/Match.png" alt="Match" width="300" height="600"/>
 </div>
 
 __Filtering__
@@ -80,15 +84,15 @@ On the top of the page, there is a scrollable list of filters that filter throug
 
 ### Chats Page
 
-The Chats Page is where you can communicate with the other users you have matched with and coordinate a sparring session. Before you match with any users, your Chats Page will be empty. Once you match with a fighter, your chats page will automatically populate with an empty chat with that user. From there, you can click on a chat and start messaging with that user.
+The Chats Page is where you can communicate with the other users you have matched with and coordinate a sparring session. Before you match with any users, your Chats Page will be empty. Once you match with a fighter, your chats page will automatically populate with an empty chat with that user. From there, you can click on a chat and start messaging with that user. Chats are first ordered by the number of unread messages then by most recent.
 
 <div class="row">
  <img src="/reports/Pictures/Empty_Chat.png" alt="Empty Chat List" width="300" height="600"/>
- <img src="/reports/Pictures/List_Chats.png" alt="List of Chats" width="300" height="600"/>
+ <img src="/reports/Pictures/Chat_List.png" alt="List of Chats" width="300" height="600"/>
  <img src="/reports/Pictures/Chat.png" alt="Conversation" width="300" height="600"/>
 </div>
 
-This page also allows you to report the result of the match. When you press the 'Report Result' button, it will open up a pop-up where you can select which of the participants won the match or if it resulted in a draw. This will properly update each user's record and rating. After submitting a match result, there is a cooldown until another result for the two fighters can be entered.
+This page also allows you to report the result of the match. When you press the 'Report Result' button, it will open up a pop-up where you can select which of the participants won the match or if it resulted in a draw. This will properly update each user's record and rating. After submitting a match result, there is a cooldown until another result for the two fighters can be entered. Clicking the other user's profile picture will open up their [profile](#other-users-profile-page).
 
 <div class="row">
  <img src="/reports/Pictures/Report_Result_Default.png" alt="Report Result Default" width="300" height="600"/>
@@ -115,11 +119,14 @@ The final tab on the main screen is the Profile Page. This page contains the aut
 
 Clicking the pencil next to the user's profile picture will allow users to edit their profile information. From this page, you can edit your information as desired and pressing 'Cancel' will return you back to the Profile Page without saving. On the other hand, pressing 'Save' will save the user's information and then redirect them to the Profile Page.
 
-<img src="/reports/Pictures/Edit_Profile.png" alt="Profile Editor" width="300" height="600"/>
+<div class="row">
+ <img src="/reports/Pictures/Profile_Edit_1.png" alt="Profile Editor" width="300" height="600"/>
+ <img src="/reports/Pictures/Profile_Edit_1.png" alt="Profile Editor" width="300" height="600"/>
+</div>
 
 ### Other User's Profile Page
 
-This page allows you to visit the profiles of other users. It shares the same information as the authenticated user's profile page except without the ability to edit the profile or log out. Pressing the back arrow will return the user to the [Leaderboard Page](#leaderboard-page).
+This page allows you to visit the profiles of other users. It shares the same information as the authenticated user's profile page except without the ability to edit the profile or log out. Pressing the back arrow will return the user to the [Leaderboard Page](#leaderboard-page) or [Chat](chats-page).
 
 <img src="/reports/Pictures/Other_Profile.png" alt="Other Profile" width="300" height="600"/>
 
