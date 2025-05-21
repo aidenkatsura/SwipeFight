@@ -29,4 +29,24 @@ describe('ScorecardModal', () => {
     expect(onSubmit).toHaveBeenCalledWith('1');
     expect(onClose).toHaveBeenCalled();
   });
+
+  test('does not call onSubmit/onClose if submit pressed with no selection', () => {
+    const onClose = jest.fn();
+    const onSubmit = jest.fn();
+
+    const { getByTestId } = render(
+      <ScorecardModal
+        visible={true}
+        onClose={onClose}
+        onSubmit={onSubmit}
+        participants={participants}
+      />
+    );
+
+    // Try pressing submit with no selection
+    fireEvent.press(getByTestId('result-submit-button'));
+
+    expect(onSubmit).not.toHaveBeenCalled();
+    expect(onClose).not.toHaveBeenCalled();
+  });
 });
