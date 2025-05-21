@@ -48,6 +48,7 @@ export default function ScorecardModal({ visible, onClose, onSubmit, participant
                 selectedValue={selectedWinner}
                 onValueChange={(value) => setSelectedWinner(value)}
                 style={styles.picker}
+                testID='result-submitter'
               >
                 <Picker.Item label="Select a winner..." value="" />
                 {participants.map((participant) => (
@@ -69,6 +70,7 @@ export default function ScorecardModal({ visible, onClose, onSubmit, participant
             ]}
             onPress={handleSubmit}
             disabled={!selectedWinner}
+            testID='result-submit-button'
           >
             <Text style={styles.submitButtonText}>Submit Result</Text>
           </TouchableOpacity>
