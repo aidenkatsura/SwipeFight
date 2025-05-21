@@ -7,6 +7,7 @@ module.exports = {
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/$1'
   },
+  setupFiles: ["./jestSetup.js"],
   transformIgnorePatterns: [
     "node_modules/(?!(firebase|@firebase|react-native|@react-native|@react-navigation)/)"
   ]
