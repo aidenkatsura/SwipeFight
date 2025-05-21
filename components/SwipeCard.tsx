@@ -48,7 +48,7 @@ export function SwipeCard({ fighter, onSwipeLeft, onSwipeRight }: SwipeCardProps
         <View style={styles.statsContainer}>
           <View style={styles.statItem}>
             <MapPin size={16} color={theme.colors.white} style={styles.icon} />
-            <Text style={styles.statText}>{fighter.distance} miles away</Text>
+            <Text style={styles.statText}>{fighter.location}</Text>
           </View>
 
           <View style={styles.divider} />

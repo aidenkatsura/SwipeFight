@@ -446,6 +446,8 @@ After implementing each feature, we should have outside members test our app and
 
 __Testing__
 
+__*Update (5.20.25):*__ We have pivoted to [Jest](https://jestjs.io/), as we had issues setting up UI tests with Mocha and it was fairly easy to migrate our existing unit tests into Jest. We have working UI tests running with Jest (in addition to the existing unit tests), and Jest provides ways to mock functions that should be useful in mocking dependencies. 
+
 After each task implementation, we will use both __manual__ and __automated__ tests. For automated testing, we will run a series of [Mocha](https://mochajs.org/) tests, a JavaScript testing framework that runs in Node.js. We expect to build a series of tests after each task, maintaining consistency across all tasks while adding new features.
 
 __Benefits__ of using Mocha include:

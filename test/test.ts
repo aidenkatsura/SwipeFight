@@ -5,167 +5,137 @@ import { ChatMessage } from '../types/chat';
 import { Discipline, Fighter } from '@/types/fighter';
 import { Timestamp } from 'firebase/firestore';
 
-var assert = require('assert');
-describe('Dummy Test: Array', function () {
-  describe('#indexOf()', function () {
-    it('should return -1 when the value is not present', function () {
-      assert.equal([1, 2, 3].indexOf(4), -1);
+describe('Dummy Test: Array', () => {
+  describe('#indexOf()', () => {
+    test('should return -1 when the value is not present', () => {
+      expect([1, 2, 3].indexOf(4)).toBe(-1);
     });
   });
 });
 
-
-describe('Swiping Screen', function () {
-  describe('Filter by Discipline', function () {
-    it('should only show users with the selected discipline', function () {
+describe('Swiping Screen', () => {
+  describe('Filter by Discipline', () => {
+    test('should only show users with the selected discipline', () => {
       const selectedDiscipline = "Boxing";
       const filteredFighters = filterFightersByDiscipline(mockFighters, [selectedDiscipline]);
-      assert.equal(filteredFighters.length, 2);
-      assert.equal(filteredFighters[0].discipline, selectedDiscipline);
-      assert.equal(filteredFighters[1].discipline, selectedDiscipline);
+      expect(filteredFighters.length).toBe(2);
+      expect(filteredFighters[0].discipline).toBe(selectedDiscipline);
+      expect(filteredFighters[1].discipline).toBe(selectedDiscipline);
     });
 
-    it("should return all users when no disciplines are selected", function () {
+    test("should return all users when no disciplines are selected", () => {
       const filteredFighters = filterFightersByDiscipline(mockFighters, []);
-      assert.equal(filteredFighters.length, mockFighters.length);
-      assert.deepStrictEqual(filteredFighters, mockFighters);
+      expect(filteredFighters.length).toBe(mockFighters.length);
+      expect(filteredFighters).toEqual(mockFighters);
     });
 
-    it('should return an empty array when the input is empty', function () {
+    test('should return an empty array when the input is empty', () => {
       const selectedDiscipline: Discipline = 'Boxing';
       const emptyFighters: Fighter[] = [];
       const filteredFighters = filterFightersByDiscipline(emptyFighters, [selectedDiscipline]);
-      assert.equal(filteredFighters.length, 0);
-      assert.deepStrictEqual(filteredFighters, []);
+      expect(filteredFighters.length).toBe(0);
+      expect(filteredFighters).toEqual([]);
     });
 
-    it('should return empty array when input is empty (with no disciplines selected)', function () {
+    test('should return empty array when input is empty (with no disciplines selected)', () => {
       const emptyFighters: Fighter[] = [];
       const filteredFighters = filterFightersByDiscipline(emptyFighters, []);
-      assert.equal(filteredFighters.length, 0);
-      assert.deepStrictEqual(filteredFighters, []);
+      expect(filteredFighters.length).toBe(0);
+      expect(filteredFighters).toEqual([]);
     });
   });
-  describe('Error Handling', function () {
-    it('should return an empty array when fighters input is null', function () {
+
+  describe('Error Handling', () => {
+    test('should return an empty array when fighters input is null', () => {
       const selectedDiscipline = 'Boxing';
       const fighters = null;
       const filteredFighters = filterFightersByDiscipline(fighters as any, [selectedDiscipline]);
-      assert.deepStrictEqual(filteredFighters, []);
+      expect(filteredFighters).toEqual([]);
     });
-    it('should throw an error when discipline is null or undefined', function () {
+
+    test('should throw an error when discipline is null or undefined', () => {
       const fighters: Fighter[] = mockFighters;
 
-      assert.throws(() => filterFightersByDiscipline(fighters, null as any), Error);
-      assert.throws(() => filterFightersByDiscipline(fighters, undefined as any), Error);
+      expect(() => filterFightersByDiscipline(fighters, null as any)).toThrow(Error);
+      expect(() => filterFightersByDiscipline(fighters, undefined as any)).toThrow(Error);
     });
 
-    it('should return an empty array when fighters input is not an array', function () {
+    test('should return an empty array when fighters input is not an array', () => {
       const selectedDiscipline = 'Boxing';
       const fighters = { name: 'Invalid Input' };
       const filteredFighters = filterFightersByDiscipline(fighters as any, [selectedDiscipline]);
-      assert.deepStrictEqual(filteredFighters, []);
+      expect(filteredFighters).toEqual([]);
     });
   });
-
 });
 
-
-
-describe('Leaderboard Rankings', function () {
-  describe('Rank based on rating', function () {
-    it('should rank each discipline by user ranking', function () {
-      assert.equal(mockFighters.length, 12);
+describe('Leaderboard Rankings', () => {
+  describe('Rank based on rating', () => {
+    test('should rank each discipline by user ranking', () => {
+      expect(mockFighters.length).toBe(12);
       const selectedDiscipline = 'Boxing';
       const filteredFighters = filterFightersByDiscipline(mockFighters, [selectedDiscipline]);
-      assert.equal(filteredFighters.length, 2);
-      assert.equal(filteredFighters[0].discipline, selectedDiscipline);
-      assert.equal(filteredFighters[1].discipline, selectedDiscipline);
+      expect(filteredFighters.length).toBe(2);
+      expect(filteredFighters[0].discipline).toBe(selectedDiscipline);
+      expect(filteredFighters[1].discipline).toBe(selectedDiscipline);
     });
   });
 });
 
-
-describe('formatDistanceToNow', function () {
-  it('returns "just now" for less than 10 seconds ago', function () {
+describe('formatDistanceToNow', () => {
+  test('returns "just now" for less than 10 seconds ago', () => {
     const date = new Date(Date.now() - 5 * 1000); // 5 seconds ago
-    assert.equal(formatDistanceToNow(date), 'just now');
+    expect(formatDistanceToNow(date)).toBe('just now');
   });
 
-  it('returns "a minute ago" for exactly 60 seconds ago', function () {
+  test('returns "a minute ago" for exactly 60 seconds ago', () => {
     const date = new Date(Date.now() - 60 * 1000); // 1 minute
-    assert.equal(formatDistanceToNow(date), 'a minute ago');
+    expect(formatDistanceToNow(date)).toBe('a minute ago');
   });
 
-  it('returns "2 minutes ago" for 2 minutes ago', function () {
+  test('returns "2 minutes ago" for 2 minutes ago', () => {
     const date = new Date(Date.now() - 2 * 60 * 1000);
-    assert.equal(formatDistanceToNow(date), '2 minutes ago');
+    expect(formatDistanceToNow(date)).toBe('2 minutes ago');
   });
 
-  it('returns "an hour ago" for 1 hour ago', function () {
+  test('returns "an hour ago" for 1 hour ago', () => {
     const date = new Date(Date.now() - 60 * 60 * 1000);
-    assert.equal(formatDistanceToNow(date), 'an hour ago');
+    expect(formatDistanceToNow(date)).toBe('an hour ago');
   });
 
-  it('returns "yesterday" for 1 day ago', function () {
+  test('returns "yesterday" for 1 day ago', () => {
     const date = new Date(Date.now() - 24 * 60 * 60 * 1000);
-    assert.equal(formatDistanceToNow(date), 'yesterday');
+    expect(formatDistanceToNow(date)).toBe('yesterday');
   });
 
-  it('returns "2 days ago" for 2 days ago', function () {
+  test('returns "2 days ago" for 2 days ago', () => {
     const date = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000);
-    assert.equal(formatDistanceToNow(date), '2 days ago');
+    expect(formatDistanceToNow(date)).toBe('2 days ago');
   });
 
-  it('returns "a month ago" for ~30 days ago', function () {
+  test('returns "a month ago" for ~30 days ago', () => {
     const date = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
-    assert.equal(formatDistanceToNow(date), 'a month ago');
+    expect(formatDistanceToNow(date)).toBe('a month ago');
   });
 
-  it('returns "2 months ago" for ~60 days ago', function () {
+  test('returns "2 months ago" for ~60 days ago', () => {
     const date = new Date(Date.now() - 60 * 24 * 60 * 60 * 1000);
-    assert.equal(formatDistanceToNow(date), '2 months ago');
+    expect(formatDistanceToNow(date)).toBe('2 months ago');
   });
 
-  it('returns "a year ago" for ~365 days ago', function () {
+  test('returns "a year ago" for ~365 days ago', () => {
     const date = new Date(Date.now() - 365 * 24 * 60 * 60 * 1000);
-    assert.equal(formatDistanceToNow(date), 'a year ago');
+    expect(formatDistanceToNow(date)).toBe('a year ago');
   });
 
-  it('returns "2 years ago" for ~2 years ago', function () {
+  test('returns "2 years ago" for ~2 years ago', () => {
     const date = new Date(Date.now() - 2 * 365 * 24 * 60 * 60 * 1000);
-    assert.equal(formatDistanceToNow(date), '2 years ago');
+    expect(formatDistanceToNow(date)).toBe('2 years ago');
   });
 });
 
-describe('Chat Feature', function () {
-  it('should receive a message sent by the user', function () {
-    // Simple sendMessage logic for testing
-    function sendMessage(messages: ChatMessage[], newMessage: ChatMessage): ChatMessage[] {
-      return [...messages, { ...newMessage, read: false }];
-    }
-
-    // Simulate a message being sent by the user
-    const initialMessages: ChatMessage[] = [];
-    const newMessage: ChatMessage = {
-      id: '1',
-      senderId: 'user1',
-      receiverId: 'user2',
-      message: 'Hello!',
-      timestamp:  Timestamp.fromDate(new Date()),
-      read: false,
-    };
-
-    const updatedMessages = sendMessage(initialMessages, newMessage);
-
-    assert.equal(updatedMessages.length, 1);
-    assert.equal(updatedMessages[0].message, 'Hello!');
-    assert.equal(updatedMessages[0].read, false);
-  });
-});
-
-describe('Chat Feature', function () {
-  it('should receive a message sent by the user', function () {
+describe('Chat Feature', () => {
+  test('should receive a message sent by the user', () => {
     function sendMessage(messages: ChatMessage[], newMessage: ChatMessage): ChatMessage[] {
       return [...messages, { ...newMessage, read: false }];
     }
@@ -176,18 +146,18 @@ describe('Chat Feature', function () {
       senderId: 'user1',
       receiverId: 'user2',
       message: 'Hello!',
-      timestamp:  Timestamp.fromDate(new Date()),
+      timestamp: Timestamp.fromDate(new Date()),
       read: false,
     };
 
     const updatedMessages = sendMessage(initialMessages, newMessage);
 
-    assert.equal(updatedMessages.length, 1);
-    assert.equal(updatedMessages[0].message, 'Hello!');
-    assert.equal(updatedMessages[0].read, false);
+    expect(updatedMessages.length).toBe(1);
+    expect(updatedMessages[0].message).toBe('Hello!');
+    expect(updatedMessages[0].read).toBe(false);
   });
 
-  it('should mark a message as read', function () {
+  test('should mark a message as read', () => {
     function markAsRead(messages: ChatMessage[], messageId: string): ChatMessage[] {
       return messages.map((msg) =>
         msg.id === messageId ? { ...msg, read: true } : msg
@@ -200,14 +170,14 @@ describe('Chat Feature', function () {
         senderId: 'user1',
         receiverId: 'user2',
         message: 'Hello!',
-        timestamp:  Timestamp.fromDate(new Date()),
+        timestamp: Timestamp.fromDate(new Date()),
         read: false,
       },
     ];
 
     const updatedMessages = markAsRead(initialMessages, '1');
 
-    assert.equal(updatedMessages[0].read, true);
-    assert.equal(updatedMessages[0].message, 'Hello!');
+    expect(updatedMessages[0].read).toBe(true);
+    expect(updatedMessages[0].message).toBe('Hello!');
   });
 });

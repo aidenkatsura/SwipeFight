@@ -1,61 +1,69 @@
-import { StyleSheet, Text, View, SectionList, Image, TouchableOpacity, SafeAreaView } from 'react-native';
+import { StyleSheet, Text, View, Image, TouchableOpacity, SafeAreaView } from 'react-native';
 import { useEffect, useState } from 'react';
 import { Fighter, Discipline } from '@/types/fighter';
 import { theme } from '@/styles/theme';
 import DisciplineFilter from '@/components/DisciplineFilter';
+import { filterFightersByDiscipline } from '@/utils/filterUtils';
 import { Medal } from 'lucide-react-native';
 import { fetchUsersFromDB } from '@/utils/firebaseUtils';
 import { router } from 'expo-router';
-
-type LeaderboardSection = {
-  title: Discipline;
-  data: Fighter[];
-};
+import { FlatList } from 'react-native-gesture-handler';
 
 export default function LeaderboardScreen() {
-  const [fighters, setFighters] = useState<Fighter[]>([]);
-  const [selectedDiscipline, setSelectedDiscipline] = useState<Discipline | 'All'>('All');
-  
-  // Group and sort fighters by discipline and rating
-  useEffect(() => {
-    const loadFighters = async () => {
+  // All fighters that have not been swiped on
+  const [allFighters, setAllFighters] = useState<Fighter[]>([]);
+
+  // Fighters from allFighters that matched the most recent filter.
+  // Only updated when a filter is applied - not modified on swipes.
+  const [filteredFighters, setFilteredFighters] = useState<Fighter[]>([]);
+   const [selectedDiscipline, setSelectedDiscipline] = useState<Discipline[]>([]);
+   const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  // Get all users from db
+    const fetchUsers = async () => {
       try {
+        setIsLoading(true); // Set loading to true so spinner shows while fetching
+  
         const users: Fighter[] = await fetchUsersFromDB();
-        setFighters(users);
+        setAllFighters(users);
+        setFilteredFighters(users);
       } catch (error) {
-        console.error('Failed to fetch users:', error);
+        console.error('Error fetching users:', error);
+      } finally {
+        setIsLoading(false);
       }
     };
+  
+    // Fetch users when the component mounts
+    useEffect(() => {
+      fetchUsers();
+    }, []);  
 
-    loadFighters();
-  }, []);
 
-  const groupedFighters = fighters.reduce<Record<string, Fighter[]>>((acc, fighter) => {
-    if (!acc[fighter.discipline]) {
-      acc[fighter.discipline] = [];
-    }
-    acc[fighter.discipline].push(fighter);
-    return acc;
-  }, {});
+
+  const handleFilterChange = (discipline: Discipline | 'All') => {
+      if (discipline === 'All') {
+        setSelectedDiscipline([]);
+        setFilteredFighters(allFighters);
+        return;
+      }
+  
+      setSelectedDiscipline(prev => {
+        const newDisciplines = prev.includes(discipline)
+          ? prev.filter(d => d !== discipline)
+          : [...prev, discipline];
+        
+        const filtered = filterFightersByDiscipline(allFighters, newDisciplines);
+        setFilteredFighters(filtered);
+        
+        return newDisciplines;
+      });
+    };
   
   // Sort fighters by rating (descending)
-  Object.keys(groupedFighters).forEach(discipline => {
-    groupedFighters[discipline].sort((a, b) => b.rating - a.rating);
+  Object.keys(filteredFighters).forEach(discipline => {
+    filteredFighters.sort((a, b) => b.rating - a.rating);
   });
-  
-  // Convert to sections format for SectionList
-  let sections: LeaderboardSection[] = Object.keys(groupedFighters).map(discipline => ({
-    title: discipline as Discipline,
-    data: groupedFighters[discipline].slice(0, 3)
-  }));
-  
-  // Filter sections if a discipline is selected
-  if (selectedDiscipline !== 'All') {
-    sections = sections.filter(section => section.title === selectedDiscipline);
-  }
-  
-  // Sort sections alphabetically by discipline name
-  sections.sort((a, b) => a.title.localeCompare(b.title));
   
   const renderFighterItem = ({ item, index }: { item: Fighter; index: number }) => {
     const medal = index < 3 ? (
@@ -78,40 +86,33 @@ export default function LeaderboardScreen() {
         <Image source={{ uri: item.photo }} style={styles.fighterImage} />
         <View style={styles.fighterInfo}>
           <Text style={styles.fighterName}>{item.name}</Text>
-          <Text style={styles.fighterRank}>{item.rank}</Text>
+          <Text style={styles.fighterRank}>{item.discipline}</Text>
         </View>
         <View style={styles.statsContainer}>
           <Text style={styles.rating}>{item.rating}</Text>
           <Text style={styles.record}>{item.wins}W-{item.losses}L-{item.draws}D</Text>
+          <Text style={styles.fighterRank}>{item.rank}</Text>
         </View>
       </TouchableOpacity>
     );
   };
-  
-  const renderSectionHeader = ({ section }: { section: LeaderboardSection }) => (
-    <View style={styles.sectionHeader}>
-      <Text style={styles.sectionTitle}>{section.title}</Text>
-    </View>
-  );
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>Leaderboard</Text>
         <DisciplineFilter 
-          selectedDisciplines={selectedDiscipline === 'All' ? [] : [selectedDiscipline]}
-          onSelectDiscipline={setSelectedDiscipline} 
+          selectedDisciplines={selectedDiscipline}
+          onSelectDiscipline={handleFilterChange} 
         />
       </View>
       
-      <SectionList
-        sections={sections}
+      <FlatList
+      data={filteredFighters}
         keyExtractor={(item) => item.id}
         renderItem={renderFighterItem}
-        renderSectionHeader={renderSectionHeader}
-        stickySectionHeadersEnabled
-        contentContainerStyle={styles.listContent}
-      />
+        contentContainerStyle={styles.listContent}       
+        />
     </SafeAreaView>
   );
 }

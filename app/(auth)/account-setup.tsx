@@ -6,12 +6,14 @@ import { auth, db } from '@/FirebaseConfig';
 import { doc, setDoc, Timestamp } from 'firebase/firestore';
 import { Discipline } from '@/types/fighter';
 import * as ImagePicker from 'expo-image-picker';
+import { addNewUserToDB } from '@/utils/firebaseUtils';
 
 export default function AccountSetupScreen() {
   const [name, setName] = useState('');
   const [age, setAge] = useState('');
   const [location, setLocation] = useState('');
   const [discipline, setDiscipline] = useState<Discipline>('MMA');
+  const [rank, setRank] = useState<string>('Beginner');
   const [photo, setPhoto] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -55,8 +57,13 @@ export default function AccountSetupScreen() {
 
   const handleCompleteSetup = async () => {
     try {
-      if (!name || !age || !location || !discipline) {
+      if (!name || !age || !location || !discipline || !rank) {
         setError('Please fill in all required fields');
+        return;
+      }
+      const parsedAge = parseInt(age, 10);
+      if (isNaN(parsedAge) || parsedAge <= 0 || parsedAge >= 150) {
+        setError('Please enter a valid age (1-149)');
         return;
       }
 
@@ -67,35 +74,9 @@ export default function AccountSetupScreen() {
         console.error('No authenticated user found');
         throw new Error('No authenticated user found');
       }
-
-      console.log('Creating user profile with data:', {
-        id: user.uid,
-        name,
-        age: parseInt(age),
-        location,
-        discipline,
-        photo: photo || defaultPhoto,
-      });
-
-      // Create user profile in Firestore
-      const userRef = doc(db, 'users', user.uid);
-      await setDoc(userRef, {
-        id: user.uid,
-        name,
-        age: parseInt(age),
-        location,
-        discipline,
-        photo: photo || defaultPhoto, // Default photo if none selected
-        rating: 1000, // Initial rating
-        wins: 0,
-        losses: 0,
-        draws: 0,
-        likes: [],
-        dislikes: [],
-        chats: [],
-        createdAt: Timestamp.fromDate(new Date()),
-      });
-
+      
+      addNewUserToDB(user.uid, name, age, location, discipline, rank, photo);
+      
       console.log('Profile created successfully, navigating to tabs');
       // Navigate to main app
       router.replace('/(tabs)');
@@ -186,6 +167,31 @@ export default function AccountSetupScreen() {
                     ]}
                   >
                     {d}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Rank</Text>
+            <View style={styles.disciplineContainer}>
+              {['Beginner', 'Intermediate', 'Pro'].map((r) => (
+                <TouchableOpacity
+                  key={r}
+                  style={[
+                    styles.disciplineButton,
+                    rank === r && styles.disciplineButtonSelected,
+                  ]}
+                  onPress={() => setRank(r as string)}
+                >
+                  <Text
+                    style={[
+                      styles.disciplineButtonText,
+                      rank === r && styles.disciplineButtonTextSelected,
+                    ]}
+                  >
+                    {r}
                   </Text>
                 </TouchableOpacity>
               ))}

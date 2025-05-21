@@ -19,10 +19,11 @@ export default function EditProfileScreen() {
   const [age, setAge] = useState(user?.age.toString() || '');
   const [location, setLocation] = useState(user?.location || '');
   const [discipline, setDiscipline] = useState<Discipline | undefined>(user?.discipline);
+  const [rank, setRank] = useState<string | undefined>(user?.rank);
   const [photo, setPhoto] = useState(user?.photo || '');
 
   const handleSave = async () => {
-    if (!name || !age || !location || !discipline) {
+    if (!name || !age || !location || !discipline || !rank) {
       alert('Please fill in all required fields');
       return;
     } else if (!user) {
@@ -32,13 +33,20 @@ export default function EditProfileScreen() {
       console.error('No authenticated user found.');
       return;
     }
+    
+    const parsedAge = parseInt(age, 10);
+    if (isNaN(parsedAge) || parsedAge <= 0 || parsedAge >= 150) {
+      console.error('Please enter a valid age (1-149)');
+      return;
+    }
 
     const updatedUser = {
       ...user,
       name,
-      age: parseInt(age, 10),
+      age: parsedAge,
       location,
       discipline,
+      rank,
       photo,
     };
 
@@ -147,6 +155,23 @@ export default function EditProfileScreen() {
               { label: 'Wrestling', value: 'Wrestling' },
             ]}
           />
+
+          <Text style={styles.label}>Rank</Text>
+          <SelectList
+            inputStyles={styles.selectText}
+            boxStyles={styles.input}
+            dropdownStyles={styles.input}
+            dropdownItemStyles={styles.dropdownText}
+            setSelected={setRank}
+            search={false}
+            placeholder={ rank || "Select your rank" }
+            data={[
+              { label: 'Beginner', value: 'Beginner' },
+              { label: 'Intermediate', value: 'Intermediate' },
+              { label: 'Pro', value: 'Pro' },
+            ]}
+          />
+
           <View style={styles.buttonContainer}>
             <TouchableOpacity style={styles.cancelButton} onPress={() => router.back()}>
               <Text style={styles.cancelButtonText}>Cancel</Text>
