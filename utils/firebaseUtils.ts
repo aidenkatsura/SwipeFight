@@ -1,4 +1,4 @@
-import { collection, getDocs, doc, getDoc, setDoc, deleteDoc, addDoc, runTransaction, arrayUnion, Timestamp} from 'firebase/firestore';
+import { collection, getDocs, doc, getDoc, setDoc, deleteDoc, addDoc, runTransaction, arrayUnion, Timestamp, GeoPoint} from 'firebase/firestore';
 import { db } from '../FirebaseConfig';
 import { Discipline, Fighter } from '@/types/fighter';
 import { Chat, ChatMessage} from '@/types/chat';
@@ -30,12 +30,13 @@ export const fetchUsersFromDB = async (): Promise<Fighter[]> => {
  * @param {string} name - The new user's name
  * @param {string} age - The new user's age
  * @param {string} location - The new user's location
+ * @param {GeoPoint} coordinates - The new user's coordinates
  * @param {Discipline} discipline - The new user's discipline
  * @param {string} rank - The new user's rank
  * @param {string|null} photo - The new user's photo
  * @throws Throws an error if an unexpected failure occurs.
  */
-export const addNewUserToDB = async (userId: string, name: string, age: string, location: string, discipline: Discipline, rank: string, photo: string|null) => {
+export const addNewUserToDB = async (userId: string, name: string, age: string, location: string, coordinates: GeoPoint, discipline: Discipline, rank: string, photo: string|null) => {
   const defaultPhoto = 'https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png';
   console.log('Creating user profile with data:', {
     id: userId,
@@ -53,6 +54,7 @@ export const addNewUserToDB = async (userId: string, name: string, age: string, 
     name,
     age: parseInt(age),
     location,
+    coordinates,
     discipline,
     rank,
     photo: photo || defaultPhoto, // Default photo if none selected

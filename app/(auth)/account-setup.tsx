@@ -1,23 +1,97 @@
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image, SafeAreaView, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image, SafeAreaView, KeyboardAvoidingView, Platform, ScrollView, FlatList } from 'react-native';
 import { useState, useEffect } from 'react';
 import { router } from 'expo-router';
 import { theme } from '@/styles/theme';
 import { auth, db } from '@/FirebaseConfig';
-import { doc, setDoc, Timestamp } from 'firebase/firestore';
+import { GeoPoint } from 'firebase/firestore';
 import { Discipline } from '@/types/fighter';
 import * as ImagePicker from 'expo-image-picker';
 import { addNewUserToDB } from '@/utils/firebaseUtils';
+import axios from 'axios';
 
 export default function AccountSetupScreen() {
   const [name, setName] = useState('');
   const [age, setAge] = useState('');
   const [location, setLocation] = useState('');
+  const [coordinates, setCoordinates] = useState<GeoPoint>();
   const [discipline, setDiscipline] = useState<Discipline>('MMA');
   const [rank, setRank] = useState<string>('Beginner');
   const [photo, setPhoto] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const defaultPhoto = 'https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png';
+
+  type Suggestion = {
+  display_name: string;
+  lat: string;
+  lon: string;
+  };
+
+const OSMLocationAutocomplete = ({
+  onSelect,
+}: {
+  onSelect: (loc: { name: string; lat: number; lng: number }) => void;
+}) => {
+  const [query, setQuery] = useState('');
+  const [results, setResults] = useState<Suggestion[]>([]);
+
+  const search = async (text: string) => {
+    setQuery(text);
+    if (text.length < 3) return setResults([]);
+    try {
+      const res = await axios.get('https://nominatim.openstreetmap.org/search', {
+        params: {
+          q: text,
+          format: 'json',
+          addressdetails: 1,
+          limit: 5,
+        },
+        headers: {
+          'User-Agent': 'YourAppName/1.0 (you@example.com)', // Nominatim requires this
+        },
+      });
+      setResults(res.data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  return (
+    <View>
+      <TextInput
+        placeholder="Search for a location"
+        value={query}
+        onChangeText={search}
+        style={{
+          borderColor: '#ccc',
+          borderWidth: 1,
+          borderRadius: 6,
+          padding: 10,
+          marginBottom: 6,
+        }}
+      />
+      <FlatList
+        data={results}
+        keyExtractor={(item, index) => `${item.lat}-${item.lon}-${index}`}
+        renderItem={({ item }) => (
+          <TouchableOpacity
+            onPress={() => {
+              onSelect({
+                name: item.display_name,
+                lat: parseFloat(item.lat),
+                lng: parseFloat(item.lon),
+              });
+              setQuery(item.display_name);
+              setResults([]);
+            }}
+          >
+            <Text style={{ padding: 10 }}>{item.display_name}</Text>
+          </TouchableOpacity>
+        )}
+      />
+    </View>
+  );
+};
 
   // Check authentication status when component mounts
   useEffect(() => {
@@ -57,7 +131,7 @@ export default function AccountSetupScreen() {
 
   const handleCompleteSetup = async () => {
     try {
-      if (!name || !age || !location || !discipline || !rank) {
+      if (!name || !age || !location || !coordinates || !discipline || !rank) {
         setError('Please fill in all required fields');
         return;
       }
@@ -75,7 +149,7 @@ export default function AccountSetupScreen() {
         throw new Error('No authenticated user found');
       }
       
-      addNewUserToDB(user.uid, name, age, location, discipline, rank, photo);
+      addNewUserToDB(user.uid, name, age, location, coordinates, discipline, rank, photo);
       
       console.log('Profile created successfully, navigating to tabs');
       // Navigate to main app
@@ -137,13 +211,14 @@ export default function AccountSetupScreen() {
 
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Location</Text>
-            <TextInput
-              style={styles.input}
-              value={location}
-              onChangeText={setLocation}
-              placeholder="Enter your location"
-              placeholderTextColor={theme.colors.gray[400]}
-            />
+            <OSMLocationAutocomplete
+            onSelect={(loc) => {
+              console.log('Selected:', loc);
+              setLocation(loc.name);
+              setCoordinates(new GeoPoint(loc.lat, loc.lng));
+              // save to Firebase as GeoPoint(lat, lng)
+            }}
+          />
           </View>
 
           <View style={styles.inputContainer}>
