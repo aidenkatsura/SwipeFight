@@ -72,7 +72,7 @@ export default function EditProfileScreen() {
   const handlePhotoChange = async () => {
     const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (permissionResult.granted === false) {
-      alert('Permission to access camera roll is required!');
+      alert('Permission to access camera roll is required');
       return;
     }
 
