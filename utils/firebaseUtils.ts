@@ -62,6 +62,8 @@ export const addNewUserToDB = async (userId: string, name: string, age: string, 
     draws: 0,
     likes: [],
     dislikes: [],
+    achievements: [],
+    recentMatches: [],
     chats: [],
     createdAt: Timestamp.fromDate(new Date()),
   });
