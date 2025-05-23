@@ -9,19 +9,9 @@ import StatCard from '@/components/StatCard';
 import { fetchUserFromDB } from '@/utils/firebaseUtils';
 import { Ionicons } from '@expo/vector-icons';
 
-export type UserProfile = Fighter & {
-  achievements?: string[];
-  recentMatches?: {
-    opponentName: string;
-    opponentPhoto: string;
-    date: string;
-    result: 'win' | 'loss' | 'draw';
-  }[];
-};
-
 export default function ProfileScreen() {
   const { userId } = useLocalSearchParams(); // Get userId from URL params
-  const [profileUser, setProfileUser] = useState<UserProfile | null>(null);
+  const [profileUser, setProfileUser] = useState<Fighter | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
