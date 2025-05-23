@@ -7,7 +7,7 @@ import { GeoPoint } from 'firebase/firestore';
 import { Discipline } from '@/types/fighter';
 import * as ImagePicker from 'expo-image-picker';
 import { addNewUserToDB } from '@/utils/firebaseUtils';
-import axios from 'axios';
+import { OSMLocationAutocomplete } from '@/components/LocationSelector';
 
 export default function AccountSetupScreen() {
   const [name, setName] = useState('');
@@ -20,78 +20,6 @@ export default function AccountSetupScreen() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const defaultPhoto = 'https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png';
-
-  type Suggestion = {
-  display_name: string;
-  lat: string;
-  lon: string;
-  };
-
-const OSMLocationAutocomplete = ({
-  onSelect,
-}: {
-  onSelect: (loc: { name: string; lat: number; lng: number }) => void;
-}) => {
-  const [query, setQuery] = useState('');
-  const [results, setResults] = useState<Suggestion[]>([]);
-
-  const search = async (text: string) => {
-    setQuery(text);
-    if (text.length < 3) return setResults([]);
-    try {
-      const res = await axios.get('https://nominatim.openstreetmap.org/search', {
-        params: {
-          q: text,
-          format: 'json',
-          addressdetails: 1,
-          limit: 5,
-        },
-        headers: {
-          'User-Agent': 'YourAppName/1.0 (you@example.com)', // Nominatim requires this
-        },
-      });
-      setResults(res.data);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  return (
-    <View>
-      <TextInput
-        placeholder="Search for a location"
-        value={query}
-        onChangeText={search}
-        style={{
-          borderColor: '#ccc',
-          borderWidth: 1,
-          borderRadius: 6,
-          padding: 10,
-          marginBottom: 6,
-        }}
-      />
-      <FlatList
-        data={results}
-        keyExtractor={(item, index) => `${item.lat}-${item.lon}-${index}`}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            onPress={() => {
-              onSelect({
-                name: item.display_name,
-                lat: parseFloat(item.lat),
-                lng: parseFloat(item.lon),
-              });
-              setQuery(item.display_name);
-              setResults([]);
-            }}
-          >
-            <Text style={{ padding: 10 }}>{item.display_name}</Text>
-          </TouchableOpacity>
-        )}
-      />
-    </View>
-  );
-};
 
   // Check authentication status when component mounts
   useEffect(() => {
