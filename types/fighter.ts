@@ -12,6 +12,14 @@ export interface Fighter {
   draws: number;
   likes: string[];
   dislikes: string[];
+  achievements: string[];
+  recentMatches: {
+    opponentName: string;
+    opponentPhoto: string;
+    date: string;
+    result: 'win' | 'loss' | 'draw';
+  }[];
+  chats: string[];
 }
 
 // If adding anything here, make sure to update the DisciplineFilter.tsx file as well
