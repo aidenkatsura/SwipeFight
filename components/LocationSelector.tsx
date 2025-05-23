@@ -24,7 +24,7 @@ export const LocationSelector = ({ onSelect, initialLocation,}: {
   onSelect: (loc: { name: string; lat: number; lng: number }) => void;
   initialLocation: string|null;
 }) => {
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState(initialLocation || '');
   const [results, setResults] = useState<Suggestion[]>([]);
   const debounceTimeout = useRef<NodeJS.Timeout | null>(null);
 
@@ -75,7 +75,7 @@ export const LocationSelector = ({ onSelect, initialLocation,}: {
   return (
     <View>
       <TextInput
-        placeholder={initialLocation || "Search for a location"}
+        placeholder="Search for a location"
         value={query}
         onChangeText={search}
         style={styles.input}
