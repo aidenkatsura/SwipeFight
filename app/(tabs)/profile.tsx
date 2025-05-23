@@ -10,16 +10,6 @@ import { useEffect, useState } from 'react';
 import StatCard from '@/components/StatCard';
 import { useUser } from '@/context/UserContext';
 
-export type UserProfile = Fighter & {
-  achievements?: string[];
-  recentMatches?: {
-    opponentName: string;
-    opponentPhoto: string;
-    date: string;
-    result: 'win' | 'loss' | 'draw';
-  }[];
-};
-
 export default function ProfileScreen() {
   const { user, fetchUser } = useUser(); // Shared user state from UserContext
   const [loading, setLoading] = useState(true);
