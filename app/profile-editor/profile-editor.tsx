@@ -8,7 +8,7 @@ import { updateUserInDB } from '@/utils/firebaseUtils';
 import { auth } from '@/FirebaseConfig';
 import { Discipline } from '@/types/fighter';
 import { useUser } from '@/context/UserContext';
-import OSMLocationAutocomplete from '@/components/LocationSelector';
+import { LocationSelector } from '@/components/LocationSelector';
 import { GeoPoint } from 'firebase/firestore';
 
 export default function EditProfileScreen() {
@@ -128,9 +128,9 @@ export default function EditProfileScreen() {
           />
 
           <Text style={styles.label}>Location</Text>
-          <OSMLocationAutocomplete
+          <LocationSelector
+                      initialLocation={user?.location ?? null}
                       onSelect={(loc) => {
-                        console.log('Selected:', loc);
                         setLocation(loc.name);
                         setCoordinates(new GeoPoint(loc.lat, loc.lng));
                         // save to Firebase as GeoPoint(lat, lng)

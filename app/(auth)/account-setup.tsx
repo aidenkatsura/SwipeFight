@@ -7,7 +7,7 @@ import { GeoPoint } from 'firebase/firestore';
 import { Discipline } from '@/types/fighter';
 import * as ImagePicker from 'expo-image-picker';
 import { addNewUserToDB } from '@/utils/firebaseUtils';
-import { OSMLocationAutocomplete } from '@/components/LocationSelector';
+import { LocationSelector } from '@/components/LocationSelector';
 
 export default function AccountSetupScreen() {
   const [name, setName] = useState('');
@@ -139,7 +139,8 @@ export default function AccountSetupScreen() {
 
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Location</Text>
-            <OSMLocationAutocomplete
+            <LocationSelector
+            initialLocation={null}
             onSelect={(loc) => {
               console.log('Selected:', loc);
               setLocation(loc.name);

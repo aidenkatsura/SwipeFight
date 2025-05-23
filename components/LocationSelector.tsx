@@ -1,3 +1,4 @@
+import { theme } from "@/styles/theme";
 import axios from "axios";
 import { useRef, useState } from "react";
 import {
@@ -16,10 +17,12 @@ type Suggestion = {
   lon: string;
 };
 
-export const OSMLocationAutocomplete = ({
-  onSelect,
-}: {
+// A location selector
+// takes in a onSelect function and a initial location
+// returns loc, with the selected location's name, and coordinates
+export const LocationSelector = ({ onSelect, initialLocation,}: {
   onSelect: (loc: { name: string; lat: number; lng: number }) => void;
+  initialLocation: string|null;
 }) => {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<Suggestion[]>([]);
@@ -72,7 +75,7 @@ export const OSMLocationAutocomplete = ({
   return (
     <View>
       <TextInput
-        placeholder="Search for a location"
+        placeholder={initialLocation || "Search for a location"}
         value={query}
         onChangeText={search}
         style={styles.input}
@@ -102,15 +105,16 @@ export const OSMLocationAutocomplete = ({
 
 const styles = StyleSheet.create({
   input: {
-    borderColor: '#ccc',
-    borderWidth: 1,
-    borderRadius: 6,
-    padding: 10,
-    marginBottom: 6,
-  },
+      borderWidth: 1,
+      borderColor: theme.colors.gray[300],
+      borderRadius: 8,
+      padding: theme.spacing[3],
+      fontSize: 16,
+      fontFamily: 'Inter-Regular',
+      marginTop: theme.spacing[1],
+      marginHorizontal: theme.spacing[2],
+    },
   item: {
     padding: 10,
   },
 });
-
-export default OSMLocationAutocomplete;
