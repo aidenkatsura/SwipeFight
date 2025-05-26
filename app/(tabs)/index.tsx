@@ -10,6 +10,7 @@ import { Fighter, Discipline } from '@/types/fighter';
 import { addChat, addLikeToUser, addDislikeToUser, fetchUsersFromDB } from '@/utils/firebaseUtils';
 import { filterFightersByDiscipline, filterFightersByLikes } from '@/utils/filterUtils';
 import { getAuth } from 'firebase/auth';
+import { sortFightersByProximity } from '@/utils/locationUtils';
 
 
 export default function FightScreen() {
@@ -37,7 +38,9 @@ export default function FightScreen() {
       setIsLoading(true); // Set loading to true so spinner shows while fetching
 
       const users: Fighter[] = await fetchUsersFromDB();
-      const likeFilteredFighters = await filterFightersByLikes(users, userId);
+      let likeFilteredFighters = await filterFightersByLikes(users, userId);
+      // sort fighters once during fetch since fighter order shouldn't be affected later on
+      likeFilteredFighters = await sortFightersByProximity(userId, likeFilteredFighters);
       setAllFighters(likeFilteredFighters);
       setFilteredFighters(likeFilteredFighters);
     } catch (error) {
@@ -58,7 +61,7 @@ export default function FightScreen() {
     if (index >= 0 && index < filteredFighters.length) {
       console.log('Challenged fighter:', filteredFighters[index].name);
     }
-    //pretend urr user is id "user0"
+
     like(filteredFighters[index])
     // In production, would send challenge request to API
   };
