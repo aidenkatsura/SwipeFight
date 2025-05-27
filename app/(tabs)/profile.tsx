@@ -143,7 +143,9 @@ export default function ProfileScreen() {
                     <Image source={{ uri: match.opponentPhoto }} style={styles.matchOpponentImage} />
                     <View style={styles.matchDetails}>
                       <Text style={styles.matchOpponent}>{match.opponentName}</Text>
-                      <Text style={styles.matchDate}>{match.date}</Text>
+                      <Text style={styles.matchDate}>
+                        {match.date?.toDate ? match.date.toDate().toLocaleDateString() : ''}
+                      </Text>
                     </View>
                     <View style={[
                       styles.matchResultBadge,
