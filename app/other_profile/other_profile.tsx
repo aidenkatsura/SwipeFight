@@ -112,10 +112,17 @@ export default function ProfileScreen() {
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Recent Achievements</Text>
               {profileUser.achievements && profileUser.achievements.length > 0 ? (
-                profileUser.achievements.map((achievement, index) => (
+                profileUser.achievements
+                  .sort((a, b) => {
+                          const dateA = a.date?.toDate ? a.date.toDate() : new Date(0);
+                          const dateB = b.date?.toDate ? b.date.toDate() : new Date(0);
+                          return dateB - dateA;
+                  })
+                  .slice(0, 3)
+                  .map((achievement, index) => (
                   <View key={index} style={styles.achievementItem}>
                     <Medal color={theme.colors.primary[500]} size={20} />
-                    <Text style={styles.achievementText}>{achievement}</Text>
+                    <Text style={styles.achievementText}>{achievement.achievement}</Text>
                   </View>
                 ))
               ) : (
@@ -126,28 +133,35 @@ export default function ProfileScreen() {
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Recent Matches</Text>
               {profileUser.recentMatches && profileUser.recentMatches.length > 0 ? (
-                profileUser.recentMatches.map((match, index) => (
-                  <View key={index} style={styles.matchItem}>
-                    <Image source={{ uri: match.opponentPhoto }} style={styles.matchOpponentImage} />
-                    <View style={styles.matchDetails}>
-                      <Text style={styles.matchOpponent}>{match.opponentName}</Text>
-                      <Text style={styles.matchDate}>
-                        {match.date?.toDate ? match.date.toDate().toLocaleDateString() : ''}
-                      </Text>
+                profileUser.recentMatches
+                  .sort((a, b) => {
+                          const dateA = a.date?.toDate ? a.date.toDate() : new Date(0);
+                          const dateB = b.date?.toDate ? b.date.toDate() : new Date(0);
+                          return dateB - dateA;
+                  })
+                  .slice(0, 3)
+                  .map((match, index) => (
+                    <View key={index} style={styles.matchItem}>
+                      <Image source={{ uri: match.opponentPhoto }} style={styles.matchOpponentImage} />
+                      <View style={styles.matchDetails}>
+                        <Text style={styles.matchOpponent}>{match.opponentName}</Text>
+                        <Text style={styles.matchDate}>
+                          {match.date?.toDate ? match.date.toDate().toLocaleDateString() : ''}
+                        </Text>
+                      </View>
+                      <View style={[
+                        styles.matchResultBadge,
+                        match.result === 'win' ? styles.winBadge :
+                          match.result === 'loss' ? styles.lossBadge :
+                            styles.drawBadge
+                      ]}>
+                        <Text style={styles.matchResultText}>
+                          {match.result.toUpperCase()}
+                        </Text>
+                      </View>
                     </View>
-                    <View style={[
-                      styles.matchResultBadge,
-                      match.result === 'win' ? styles.winBadge :
-                        match.result === 'loss' ? styles.lossBadge :
-                          styles.drawBadge
-                    ]}>
-                      <Text style={styles.matchResultText}>
-                        {match.result.toUpperCase()}
-                      </Text>
-                    </View>
-                  </View>
-                ))
-              ) : (
+                  ))
+                ) : (
                 <Text style={styles.emptyText}>No recent matches</Text>
               )}
             </View>

@@ -217,7 +217,7 @@ export default function ChatScreen() {
 
     if (!updatedUser) return;
 
-    let newAchievements: string[] = [];
+    let newAchievements = [];
 
     const categories = ['wins', 'losses', 'draws', 'rating'] as const;
 
@@ -230,7 +230,10 @@ export default function ChatScreen() {
 
       for (const achievement of unlocked) {
         if (!alreadyUnlocked.includes(achievement)) {
-          newAchievements.unshift(achievement);
+          newAchievements.push({
+            achievement: achievement,
+            date: Timestamp.now()
+          })
         }
       }
     }
