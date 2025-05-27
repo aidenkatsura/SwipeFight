@@ -141,8 +141,6 @@ export default function ChatScreen() {
       const userId = auth.currentUser?.uid;
       if (!userId || !chat) return;
 
-      await addMatchResult(chat.chat.id, winnerId);
-
       for (const participant of chat.chat.participants) {
         let result = null;
         if (winnerId === 'draw') {
@@ -153,6 +151,7 @@ export default function ChatScreen() {
           result = 'loss';
         }
 
+        await addMatchResult(participant.id, chat.chat.id, winnerId, result);
         await updateUserStats(participant.id, result);
       }
 
@@ -171,14 +170,26 @@ export default function ChatScreen() {
     }
   };
 
-  const addMatchResult = async (chatId: string, winnerId: string) => {
+  const addMatchResult = async (userId: string, chatId: string, winnerId: string, matchResult: string) => {
+    const userRef = doc(db, 'users', userId);
     const chatRef = doc(db, 'chats', chatId);
-    const result = {
+    const resultForChat = {
       winnerId,
       submittedAt: Timestamp.now(),
     };
     await updateDoc(chatRef, {
-      results: arrayUnion(result),
+      results: arrayUnion(resultForChat),
+    });
+
+    const opponent = chat?.chat.participants.find(p => p.id !== userId);
+    const resultForUser = {
+      opponentPhoto: opponent?.photo || 'https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png',
+      opponentName: opponent?.name || '',
+      date: Timestamp.fromDate(new Date()),
+      result: matchResult
+    }
+    await updateDoc(userRef, {
+      recentMatches: arrayUnion(resultForUser),
     });
   };
 
