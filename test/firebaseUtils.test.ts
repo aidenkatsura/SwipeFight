@@ -1,4 +1,4 @@
-import { fetchUsersFromDB, addNewUserToDB } from '../utils/firebaseUtils';
+import { fetchUsersFromDB, addNewUserToDB, updateUserInDB } from '../utils/firebaseUtils';
 import { mockFighters } from '../data/mockFighters';
 import { Discipline } from '@/types/fighter';
 import { defaultPhoto } from '@/app/(auth)/account-setup';
@@ -21,7 +21,7 @@ jest.mock('../FirebaseConfig', () => ({
 }));
 
 // Import after mocking
-import { collection, getDocs, doc, setDoc } from 'firebase/firestore';
+import { collection, getDocs, doc, setDoc, getDoc } from 'firebase/firestore';
 
 afterEach(() => {
   jest.clearAllMocks();
@@ -94,7 +94,7 @@ describe('addNewUserToDB', () => {
       createdAt: 'mock-timestamp',
     }));
   });
-  
+
   it('uses defaultPhoto if no photo provided', async () => {
     (doc as jest.Mock).mockReturnValue('mock-user-ref');
     
@@ -120,5 +120,51 @@ describe('addNewUserToDB', () => {
       chats: [],
       createdAt: 'mock-timestamp',
     }));
+  });
+});
+
+describe('updateUserInDB', () => {
+  const userId = 'test-id';
+  const updatedData = { name: 'Updated User', age: 30 };
+
+  it('updates user data successfully if the user exists', async () => {
+    (doc as jest.Mock).mockReturnValue('mock-user-ref');
+    (getDoc as jest.Mock).mockResolvedValue({
+      exists: () => true, // Simulate document exists
+    });
+
+    const result = await updateUserInDB(userId, updatedData);
+
+    expect(doc).toHaveBeenCalledWith(expect.anything(), 'users', userId);
+    expect(getDoc).toHaveBeenCalledWith('mock-user-ref');
+    expect(setDoc).toHaveBeenCalledWith('mock-user-ref', updatedData, { merge: true });
+    expect(result).toBe(true);
+  });
+
+  it('returns false if the user does not exist', async () => {
+    (doc as jest.Mock).mockReturnValue('mock-user-ref');
+    (getDoc as jest.Mock).mockResolvedValue({
+      exists: () => false, // Simulate document does not exist
+    });
+
+    const result = await updateUserInDB(userId, updatedData);
+
+    expect(doc).toHaveBeenCalledWith(expect.anything(), 'users', userId);
+    expect(getDoc).toHaveBeenCalledWith('mock-user-ref');
+    expect(setDoc).not.toHaveBeenCalled();
+    expect(result).toBe(false);
+  });
+
+  it('throws an error if Firestore fails', async () => {
+    (doc as jest.Mock).mockReturnValue('mock-user-ref');
+    (getDoc as jest.Mock).mockRejectedValue(new Error('Firestore error'));
+
+    await expect(updateUserInDB(userId, updatedData)).rejects.toThrow(
+      'Unexpected error updating user in Firestore.'
+    );
+
+    expect(doc).toHaveBeenCalledWith(expect.anything(), 'users', userId);
+    expect(getDoc).toHaveBeenCalledWith('mock-user-ref');
+    expect(setDoc).not.toHaveBeenCalled();
   });
 });
