@@ -1,3 +1,5 @@
+import { Timestamp } from "firebase/firestore";
+
 export interface Fighter {
   id: string;
   name: string;
@@ -12,12 +14,15 @@ export interface Fighter {
   draws: number;
   likes: string[];
   dislikes: string[];
-  achievements: string[];
+  achievements: {
+    achievement: string,
+    date: Timestamp
+  }[];
   recentMatches: {
-    opponentName: string;
-    opponentPhoto: string;
-    date: string;
-    result: 'win' | 'loss' | 'draw';
+    opponentName: string,
+    opponentPhoto: string,
+    date: Timestamp,
+    result: 'win' | 'loss' | 'draw'
   }[];
   chats: string[];
 }
