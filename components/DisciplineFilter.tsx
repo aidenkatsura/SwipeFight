@@ -59,7 +59,7 @@ export default function DisciplineFilter({
 
 const styles = StyleSheet.create({
   container: {
-    paddingVertical: theme.spacing[2],
+    paddingVertical: theme.spacing[1],
   },
   disciplineButton: {
     paddingHorizontal: theme.spacing[3],
