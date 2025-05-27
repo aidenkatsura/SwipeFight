@@ -70,22 +70,28 @@ export function SwipeCard({ fighter, onSwipeLeft, onSwipeRight }: SwipeCardProps
           <TouchableOpacity
             style={[styles.actionButton, styles.skipButton]}
             onPress={onSwipeLeft}
+            accessibilityLabel="Skip fighter"
+            accessibilityHint="Swipe left to skip this fighter"
           >
             <Image
               source={require('@/assets/images/runningMan.png')}
               style={styles.actionIcon}
               resizeMode="contain"
+              accessibilityLabel="Skip icon"
             />
           </TouchableOpacity>
 
           <TouchableOpacity
             style={[styles.actionButton, styles.challengeButton]}
             onPress={onSwipeRight}
+            accessibilityLabel="Challenge fighter"
+            accessibilityHint="Swipe right to challenge this fighter"
           >
             <Image
               source={require('@/assets/images/greenGlove.png')}
               style={styles.actionIcon}
               resizeMode="contain"
+              accessibilityLabel="Challenge icon"
             />
           </TouchableOpacity>
         </View>

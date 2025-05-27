@@ -33,7 +33,7 @@ export default function EditProfileScreen() {
       console.error('No authenticated user found.');
       return;
     }
-    
+
     const parsedAge = parseInt(age, 10);
     if (isNaN(parsedAge) || parsedAge <= 0 || parsedAge >= 150) {
       console.error('Please enter a valid age (1-149)');
@@ -173,13 +173,21 @@ export default function EditProfileScreen() {
           />
 
           <View style={styles.buttonContainer}>
-            <TouchableOpacity style={styles.cancelButton} onPress={() => router.back()}>
+            <TouchableOpacity
+              style={styles.cancelButton}
+              onPress={() => router.back()}
+              accessibilityLabel="Cancel editing"
+              accessibilityHint="Tap to cancel changes and go back"
+            >
               <Text style={styles.cancelButtonText}>Cancel</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={[styles.saveButton, saving && styles.saveButtonDisabled]}
               onPress={handleSave}
-              disabled={saving} // Disable button while waiting on save
+              disabled={saving}
+              accessibilityLabel="Save changes"
+              accessibilityHint="Tap to save your profile changes"
+              accessibilityState={{ disabled: saving }}
             >
               <Text style={styles.saveButtonText}>
                 {saving ? 'Saving...' : 'Save'}
