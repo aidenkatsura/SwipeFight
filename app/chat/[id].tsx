@@ -9,11 +9,12 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { fetchUserFromDB, sendMessage } from '@/utils/firebaseUtils';
 import { Fighter } from '@/types/fighter';
 import { Ionicons } from '@expo/vector-icons';
-import { increment, updateDoc, doc, onSnapshot, Timestamp, arrayUnion } from 'firebase/firestore';
+import { increment, updateDoc, doc, onSnapshot, Timestamp, arrayUnion, getDoc } from 'firebase/firestore';
 import ScorecardModal from '@/components/ScorecardModal';
 import { getAuth } from 'firebase/auth';
 import { db } from '@/FirebaseConfig';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { ACHIEVEMENTS } from '@/types/achievements';
 
 export default function ChatScreen() {
   const { id } = useLocalSearchParams();
@@ -140,18 +141,18 @@ export default function ChatScreen() {
       const userId = auth.currentUser?.uid;
       if (!userId || !chat) return;
 
-      await addMatchResult(chat.chat.id, winnerId);
-
-      const draw = winnerId === 'draw';
       for (const participant of chat.chat.participants) {
-        if (draw) {
-          await updateDoc(doc(db, 'users', participant.id), {
-            draws: increment(1),
-          });
+        let result = null;
+        if (winnerId === 'draw') {
+          result = 'draw';
+        } else if (participant.id === winnerId) {
+          result = 'win';
         } else {
-          const didWin = participant.id === winnerId;
-          await updateUserStats(participant.id, didWin);
+          result = 'loss';
         }
+
+        await addMatchResult(participant.id, chat.chat.id, winnerId, result);
+        await updateUserStats(participant.id, result);
       }
 
       setIsCooldown(true);
@@ -169,24 +170,79 @@ export default function ChatScreen() {
     }
   };
 
-  const addMatchResult = async (chatId: string, winnerId: string) => {
+  const addMatchResult = async (userId: string, chatId: string, winnerId: string, matchResult: string) => {
+    const userRef = doc(db, 'users', userId);
     const chatRef = doc(db, 'chats', chatId);
-    const result = {
+    const resultForChat = {
       winnerId,
       submittedAt: Timestamp.now(),
     };
     await updateDoc(chatRef, {
-      results: arrayUnion(result),
+      results: arrayUnion(resultForChat),
+    });
+
+    const opponent = chat?.chat.participants.find(p => p.id !== userId);
+    const resultForUser = {
+      opponentPhoto: opponent?.photo || 'https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png',
+      opponentName: opponent?.name || '',
+      date: Timestamp.fromDate(new Date()),
+      result: matchResult
+    }
+    await updateDoc(userRef, {
+      recentMatches: arrayUnion(resultForUser),
     });
   };
 
-  const updateUserStats = async (userId: string, didWin: boolean) => {
+  const updateUserStats = async (userId: string, result: string) => {
     const userRef = doc(db, 'users', userId);
-    await updateDoc(userRef, {
-      wins: didWin ? increment(1) : increment(0),
-      losses: didWin ? increment(0) : increment(1),
-      rating: didWin ? increment(10) : increment(-10),
-    });
+
+    // Update stats
+    const updatedStats: any = {};
+
+    if (result === 'win') {
+      updatedStats.wins = increment(1);
+      updatedStats.rating = increment(10);
+    } else if (result === 'loss') {
+      updatedStats.losses = increment(1);
+      updatedStats.rating = increment(-10);
+    } else if (result === 'draw') {
+      updatedStats.draws = increment(1);
+    }
+
+    await updateDoc(userRef, updatedStats);
+
+    // Check for achievements
+    const updatedSnap = await getDoc(userRef);
+    const updatedUser = updatedSnap.data();
+
+    if (!updatedUser) return;
+
+    let newAchievements = [];
+
+    const categories = ['wins', 'losses', 'draws', 'rating'] as const;
+
+    for (const category of categories) {
+      const currentValue = updatedUser[category];
+      const unlocked = ACHIEVEMENTS[category].filter(a => currentValue == a.count)
+        .map(a => a.name);
+
+      const alreadyUnlocked = updatedUser.achievements || [];
+
+      for (const achievement of unlocked) {
+        if (!alreadyUnlocked.includes(achievement)) {
+          newAchievements.push({
+            achievement: achievement,
+            date: Timestamp.now()
+          })
+        }
+      }
+    }
+
+    if (newAchievements.length > 0) {
+      await updateDoc(userRef, {
+        achievements: arrayUnion(...newAchievements)
+      });
+    }
   };
 
   const renderMessage = ({ item }: { item: ChatMessage }) => {
