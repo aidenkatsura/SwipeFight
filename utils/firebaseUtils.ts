@@ -104,8 +104,8 @@ export const updateUserInDB = async (userId: string, updatedData: Partial<Fighte
  * @param {string} oldDocId - The current document ID of the user.
  * @param {string} newDocId - The new document ID to assign to the user.
  * @returns {Promise<boolean>} Resolves to true if the document ID was successfully changed, 
- *                             or false if the old ID does not exist or the new ID already exists.
- * @throws Throws an error if an unexpected failure occurs.
+ *                             or false if the old ID does not exist, the new ID already exists,
+ *                             or an error occurs during the transaction.
  */
 export const changeUserDocId = async (oldDocId: string, newDocId: string): Promise<boolean> => {
   try {

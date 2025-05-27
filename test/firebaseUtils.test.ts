@@ -1,4 +1,4 @@
-import { fetchUsersFromDB, addNewUserToDB, updateUserInDB } from '../utils/firebaseUtils';
+import { fetchUsersFromDB, addNewUserToDB, updateUserInDB, changeUserDocId } from '../utils/firebaseUtils';
 import { mockFighters } from '../data/mockFighters';
 import { Discipline } from '@/types/fighter';
 import { defaultPhoto } from '@/app/(auth)/account-setup';
@@ -21,7 +21,7 @@ jest.mock('../FirebaseConfig', () => ({
 }));
 
 // Import after mocking
-import { collection, getDocs, doc, setDoc, getDoc } from 'firebase/firestore';
+import { collection, getDocs, doc, setDoc, getDoc, runTransaction } from 'firebase/firestore';
 
 afterEach(() => {
   jest.clearAllMocks();
@@ -166,5 +166,116 @@ describe('updateUserInDB', () => {
     expect(doc).toHaveBeenCalledWith(expect.anything(), 'users', userId);
     expect(getDoc).toHaveBeenCalledWith('mock-user-ref');
     expect(setDoc).not.toHaveBeenCalled();
+  });
+});
+
+describe('changeUserDocId', () => {
+  const oldDocId = 'old-id';
+  const newDocId = 'new-id';
+
+  it('returns true if conditions are met', async () => {
+    // Mock Firestore txn behavior
+    (doc as jest.Mock).mockImplementation((db, collectionName, docId) => `mock-${docId}-ref`);
+    (runTransaction as jest.Mock).mockImplementation(async (db, transactionFn) => {
+      const transaction = {
+        get: jest.fn((docRef) => {
+          if (docRef === 'mock-old-id-ref') {
+            return { exists: (): boolean => true, data: () => ({ name: 'Test User' }) }; // Old doc exists
+          }
+          if (docRef === 'mock-new-id-ref') {
+            return { exists: (): boolean => false }; // New doc does not exist
+          }
+        }),
+        set: jest.fn(),
+        delete: jest.fn(),
+      };
+      await transactionFn(transaction);
+    });
+
+    const result = await changeUserDocId(oldDocId, newDocId);
+
+    // Assert transaction behavior
+    expect(doc).toHaveBeenCalledWith(expect.anything(), 'users', oldDocId);
+    expect(doc).toHaveBeenCalledWith(expect.anything(), 'users', newDocId);
+    expect(runTransaction).toHaveBeenCalledWith(expect.anything(), expect.any(Function));
+    expect(result).toBe(true);
+  });
+
+  it('returns false if the old document does not exist', async () => {
+    // Mock Firestore txn behavior
+    (doc as jest.Mock).mockImplementation((db, collectionName, docId) => `mock-${docId}-ref`);
+    (runTransaction as jest.Mock).mockImplementation(async (db, transactionFn) => {
+      const transaction = {
+        get: jest.fn((docRef) => {
+          if (docRef === 'mock-old-id-ref') {
+            return { exists: () => false }; // Old doc does not exist
+          }
+        }),
+        set: jest.fn(),
+        delete: jest.fn(),
+      };
+      await transactionFn(transaction);
+    });
+
+    const result = await changeUserDocId(oldDocId, newDocId);
+
+    // Assert transaction behavior
+    expect(doc).toHaveBeenCalledWith(expect.anything(), 'users', oldDocId);
+    expect(runTransaction).toHaveBeenCalledWith(expect.anything(), expect.any(Function));
+    expect(result).toBe(false);
+  });
+
+  it('returns false if the new document ID already exists', async () => {
+    // Mock Firestore txn behavior
+    (doc as jest.Mock).mockImplementation((db, collectionName, docId) => `mock-${docId}-ref`);
+    (runTransaction as jest.Mock).mockImplementation(async (db, transactionFn) => {
+      const transaction = {
+        get: jest.fn((docRef) => {
+          if (docRef === 'mock-old-id-ref') {
+            return { exists: (): boolean => true, data: () => ({ name: 'Test User' }) }; // Old doc exists
+          }
+          if (docRef === 'mock-new-id-ref') {
+            return { exists: (): boolean => true }; // New doc already exists
+          }
+        }),
+        set: jest.fn(),
+        delete: jest.fn(),
+      };
+      await transactionFn(transaction);
+    });
+
+    const result = await changeUserDocId(oldDocId, newDocId);
+
+    // Assert transaction behavior
+    expect(doc).toHaveBeenCalledWith(expect.anything(), 'users', newDocId);
+    expect(runTransaction).toHaveBeenCalledWith(expect.anything(), expect.any(Function));
+    expect(result).toBe(false);
+  });
+
+  it('returns false if the transaction fails', async () => {
+    // Mock Firestore txn behavior
+    (runTransaction as jest.Mock).mockImplementation(async (db, transactionFn) => {
+      const transaction = {
+        get: jest.fn((docRef) => {
+          if (docRef === 'mock-old-id-ref') {
+            return { exists: (): boolean => true, data: () => ({ name: 'Test User' }) }; // Old doc exists
+          }
+          if (docRef === 'mock-new-id-ref') {
+            return { exists: (): boolean => false }; // New doc does not exist
+          }
+        }),
+        set: jest.fn(),
+        delete: jest.fn(),
+      };
+      throw new Error('Transaction failed'); // Simulate transaction failure
+    });
+
+    const result = await changeUserDocId('old-id', 'new-id');
+
+    // Assert that the function returns false
+    expect(result).toBe(false);
+
+    // Assert transaction behavior
+    expect(runTransaction).toHaveBeenCalledWith(expect.anything(), expect.any(Function));
   });
 });
