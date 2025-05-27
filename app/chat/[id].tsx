@@ -29,9 +29,9 @@ export default function ChatScreen() {
     chat: Chat;
     otherParticipant: Fighter;
   };
-  
+
   const [chat, setChat] = useState<EnrichedChat | null>(null);
-  
+
   useEffect(() => {
     const auth = getAuth();
     const userId = auth.currentUser?.uid;
@@ -257,7 +257,7 @@ export default function ChatScreen() {
                   isCooldown && { color: theme.colors.gray[500] }
                 ]}
             >
-              {isCooldown ? 'Please wait...' : 'Report Result'}
+              {isCooldown ? 'Result Reported' : 'Report Result'}
             </Text>
           </TouchableOpacity>
         </View>
@@ -301,7 +301,7 @@ export default function ChatScreen() {
           onClose={() => setIsScorecardVisible(false)}
           onSubmit={handleSubmitResult}
           participants={chat.chat.participants}
-          
+
         />
       </SafeAreaView>
     </GestureHandlerRootView>

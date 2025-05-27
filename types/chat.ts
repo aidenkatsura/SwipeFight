@@ -21,4 +21,8 @@ export interface Chat {
     [userId: string]: number;
   };
   lastMessage: ChatMessage;
+  results?: {
+    winnerId: string;
+    submittedAt: Timestamp;
+  }[];
 }
