@@ -321,7 +321,7 @@ export default function ChatScreen() {
                   isCooldown && { color: theme.colors.gray[500] }
                 ]}
             >
-              {isCooldown ? 'Please wait...' : 'Report Result'}
+              {isCooldown ? 'Result Reported' : 'Report Result'}
             </Text>
           </TouchableOpacity>
         </View>
