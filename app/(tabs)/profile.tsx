@@ -108,7 +108,7 @@ export default function ProfileScreen() {
               <View style={styles.profileImageContainer}>
                 <Image source={{ uri: user.photo }} style={styles.profileImage} />
                 <TouchableOpacity style={styles.editProfileButton} onPress={handleEditProfilePress}>
-                  <EditPencil color={theme.colors.white} size={18} />
+                  <EditPencil color={theme.colors.white} size={18} accessibilityLabel="Edit profile" />
                 </TouchableOpacity>
               </View>
 
@@ -176,8 +176,13 @@ export default function ProfileScreen() {
       )}
 
       {/* Logout button shows even on error */}
-      <TouchableOpacity style={styles.logoutButton} onPress={handleSignOut}>
-        <LogOut color={theme.colors.gray[600]} size={20} />
+      <TouchableOpacity
+        style={styles.logoutButton}
+        onPress={handleSignOut}
+        accessibilityLabel="Log out"
+        accessibilityHint="Tap to sign out of your account"
+      >
+        <LogOut color={theme.colors.gray[600]} size={20} accessibilityLabel="Logout icon" />
         <Text style={styles.logoutText}>Log Out</Text>
       </TouchableOpacity>
     </SafeAreaView>

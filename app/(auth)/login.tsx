@@ -155,6 +155,8 @@ export default function LoginScreen() {
               style={[styles.loginButton, loading && styles.loginButtonDisabled]}
               onPress={signIn}
               disabled={loading}
+              accessibilityLabel="Login"
+              accessibilityState={{ disabled: loading }}
             >
               <Text style={styles.loginButtonText}>
                 {loading ? 'Logging in...' : 'Login'}
@@ -164,6 +166,8 @@ export default function LoginScreen() {
               style={[styles.loginButton, loading && styles.loginButtonDisabled]}
               onPress={signUp}
               disabled={loading}
+              accessibilityLabel="Create Account"
+              accessibilityState={{ disabled: loading }}
             >
               <Text style={styles.loginButtonText}>
                 {loading ? 'Create Account' : 'Create Account'}

@@ -29,9 +29,9 @@ export default function ChatScreen() {
     chat: Chat;
     otherParticipant: Fighter;
   };
-  
+
   const [chat, setChat] = useState<EnrichedChat | null>(null);
-  
+
   useEffect(() => {
     const auth = getAuth();
     const userId = auth.currentUser?.uid;
@@ -235,12 +235,17 @@ export default function ChatScreen() {
       <SafeAreaView style={styles.container}>
         <View style={styles.header}>
           <TouchableOpacity onPress={() => router.back()} style={{ marginRight: theme.spacing[3] }}>
-            <Ionicons name="arrow-back" size={28} color={theme.colors.gray[900]} />
+            <Ionicons name="arrow-back" size={28} color={theme.colors.gray[900]} accessibilityLabel="Go back" />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => router.push({ pathname: '../other_profile/other_profile', params: { userId: chat.otherParticipant.id } })}>
+          <TouchableOpacity
+            onPress={() => router.push({ pathname: '../other_profile/other_profile', params: { userId: chat.otherParticipant.id } })}
+            accessibilityLabel={`View ${chat.otherParticipant.name}'s profile`}
+            accessibilityHint="Tap to view fighter's profile"
+          >
             <Image
               source={{ uri: chat.otherParticipant.photo }}
               style={styles.profileImage}
+              accessibilityLabel={`${chat.otherParticipant.name}'s profile picture`}
             />
           </TouchableOpacity>
           <Text style={styles.userName}>{chat.otherParticipant.name}</Text>
@@ -250,8 +255,11 @@ export default function ChatScreen() {
                   ]}
             onPress={() => !isCooldown && setIsScorecardVisible(true)}
             disabled={isCooldown}
+            accessibilityLabel="Report match result"
+            accessibilityHint="Double tap to report the match result"
+            accessibilityState={{ disabled: isCooldown }}
           >
-            <Flag size={24} color={isCooldown ? theme.colors.gray[500] : theme.colors.primary[500]} />
+            <Flag size={24} color={isCooldown ? theme.colors.gray[500] : theme.colors.primary[500]} accessibilityLabel="Report icon" />
             <Text style={[
                   styles.reportButtonText,
                   isCooldown && { color: theme.colors.gray[500] }
@@ -290,8 +298,10 @@ export default function ChatScreen() {
             <TouchableOpacity
               style={styles.sendButton}
               onPress={handleSend}
+              accessibilityLabel="Send message"
+              accessibilityHint="Tap to send your message"
             >
-              <Send size={24} color={theme.colors.white} />
+              <Send size={24} color={theme.colors.white} accessibilityLabel="Send icon" />
             </TouchableOpacity>
           </View>
         </KeyboardAvoidingView>
@@ -301,7 +311,7 @@ export default function ChatScreen() {
           onClose={() => setIsScorecardVisible(false)}
           onSubmit={handleSubmitResult}
           participants={chat.chat.participants}
-          
+
         />
       </SafeAreaView>
     </GestureHandlerRootView>
