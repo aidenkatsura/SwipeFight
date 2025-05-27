@@ -6,11 +6,36 @@ import { auth } from '@/FirebaseConfig';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
 import { ScrollView } from 'react-native-gesture-handler';
 
+const firebaseErrorMessages: { [key: string]: string } = {
+  // Authentication errors
+  'auth/wrong-password': 'The password you entered is incorrect. Please try again.',
+  'auth/user-not-found': 'No account found with this email. Please sign up.',
+  'auth/invalid-email': 'The email address is not valid. Please check and try again.',
+  'auth/email-already-in-use': 'This email is already in use. Please use a different email.',
+  'auth/weak-password': 'Your password is too weak. Please use a stronger password.',
+  'auth/too-many-requests': 'Too many attempts. Please try again later.',
+  'auth/network-request-failed': 'Network error. Please check your internet connection and try again.',
+  'auth/invalid-credential': 'Login failed. Please check your email and password.',
+
+  // Default fallback
+  'default': 'An unexpected error occurred. Please try again.',
+};
+
+const getFriendlyErrorMessage = (errorCode: string): string => {
+  return firebaseErrorMessages[errorCode] || firebaseErrorMessages['default'];
+};
+
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const showError = (error: any) => {
+    console.log(error);
+    const errorCode = error.code || ''; // Extract the error code
+    setError(getFriendlyErrorMessage(errorCode)); // Set a user-friendly error message
+  }
 
   const signIn = async () => {
     try {
@@ -20,17 +45,17 @@ export default function LoginScreen() {
       }
 
       setLoading(true);
-      const user = await signInWithEmailAndPassword(auth, email, password)
-      if (user) console.log('sign in success');
-      if (user) router.replace('/(tabs)');
+      const user = await signInWithEmailAndPassword(auth, email, password);
+      if (user) {
+        console.log('Sign in success');
+        router.replace('/(tabs)');
+      }
     } catch (error: any) {
-      console.log(error)
-      alert('Sign in failed: ' + error.message);
-      setError('Sign in failed: ' + error.message);
+      showError(error);
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   const signUp = async () => {
     try {
@@ -40,19 +65,17 @@ export default function LoginScreen() {
       }
 
       setLoading(true);
-      const user = await createUserWithEmailAndPassword(auth, email, password)
+      const user = await createUserWithEmailAndPassword(auth, email, password);
       if (user) {
-        console.log('sign up success');
+        console.log('Sign up success');
         router.replace('/(auth)/account-setup');
       }
     } catch (error: any) {
-      console.log(error)
-      alert('Sign up failed: ' + error.message);
-      setError('Sign up failed: ' + error.message);
+      showError(error);
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   const forgotPassword = async () => {
     try {
@@ -65,13 +88,11 @@ export default function LoginScreen() {
       await sendPasswordResetEmail(auth, email);
       alert('Password reset email sent');
     } catch (error: any) {
-      console.log(error)
-      alert('Failed to send password reset email: ' + error.message);
-      setError('Failed to send password reset email: ' + error.message);
+      showError(error);
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -134,6 +155,8 @@ export default function LoginScreen() {
               style={[styles.loginButton, loading && styles.loginButtonDisabled]}
               onPress={signIn}
               disabled={loading}
+              accessibilityLabel="Login"
+              accessibilityState={{ disabled: loading }}
             >
               <Text style={styles.loginButtonText}>
                 {loading ? 'Logging in...' : 'Login'}
@@ -143,6 +166,8 @@ export default function LoginScreen() {
               style={[styles.loginButton, loading && styles.loginButtonDisabled]}
               onPress={signUp}
               disabled={loading}
+              accessibilityLabel="Create Account"
+              accessibilityState={{ disabled: loading }}
             >
               <Text style={styles.loginButtonText}>
                 {loading ? 'Create Account' : 'Create Account'}

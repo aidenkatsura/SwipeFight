@@ -1,3 +1,5 @@
+import { Timestamp } from "firebase/firestore";
+
 import { GeoPoint } from "firebase/firestore";
 
 export interface Fighter {
@@ -15,6 +17,17 @@ export interface Fighter {
   draws: number;
   likes: string[];
   dislikes: string[];
+  achievements: {
+    achievement: string,
+    date: Timestamp
+  }[];
+  recentMatches: {
+    opponentName: string,
+    opponentPhoto: string,
+    date: Timestamp,
+    result: 'win' | 'loss' | 'draw'
+  }[];
+  chats: string[];
 }
 
 // If adding anything here, make sure to update the DisciplineFilter.tsx file as well

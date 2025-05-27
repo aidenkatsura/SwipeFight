@@ -10,16 +10,6 @@ import { useEffect, useState } from 'react';
 import StatCard from '@/components/StatCard';
 import { useUser } from '@/context/UserContext';
 
-export type UserProfile = Fighter & {
-  achievements?: string[];
-  recentMatches?: {
-    opponentName: string;
-    opponentPhoto: string;
-    date: string;
-    result: 'win' | 'loss' | 'draw';
-  }[];
-};
-
 export default function ProfileScreen() {
   const { user, fetchUser } = useUser(); // Shared user state from UserContext
   const [loading, setLoading] = useState(true);
@@ -108,7 +98,7 @@ export default function ProfileScreen() {
               <View style={styles.profileImageContainer}>
                 <Image source={{ uri: user.photo }} style={styles.profileImage} />
                 <TouchableOpacity style={styles.editProfileButton} onPress={handleEditProfilePress}>
-                  <EditPencil color={theme.colors.white} size={18} />
+                  <EditPencil color={theme.colors.white} size={18} accessibilityLabel="Edit profile" />
                 </TouchableOpacity>
               </View>
 
@@ -134,10 +124,17 @@ export default function ProfileScreen() {
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Recent Achievements</Text>
               {user.achievements && user.achievements.length > 0 ? (
-                user.achievements.map((achievement, index) => (
+                user.achievements
+                  .sort((a, b) => {
+                          const dateA = a.date?.toDate ? a.date.toDate() : new Date(0);
+                          const dateB = b.date?.toDate ? b.date.toDate() : new Date(0);
+                          return dateB - dateA;
+                  })
+                  .slice(0, 3)
+                  .map((achievement, index) => (
                   <View key={index} style={styles.achievementItem}>
                     <Medal color={theme.colors.primary[500]} size={20} />
-                    <Text style={styles.achievementText}>{achievement}</Text>
+                    <Text style={styles.achievementText}>{achievement.achievement}</Text>
                   </View>
                 ))
               ) : (
@@ -148,26 +145,35 @@ export default function ProfileScreen() {
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Recent Matches</Text>
               {user.recentMatches && user.recentMatches.length > 0 ? (
-                user.recentMatches.map((match, index) => (
-                  <View key={index} style={styles.matchItem}>
-                    <Image source={{ uri: match.opponentPhoto }} style={styles.matchOpponentImage} />
-                    <View style={styles.matchDetails}>
-                      <Text style={styles.matchOpponent}>{match.opponentName}</Text>
-                      <Text style={styles.matchDate}>{match.date}</Text>
+                user.recentMatches
+                  .sort((a, b) => {
+                          const dateA = a.date?.toDate ? a.date.toDate() : new Date(0);
+                          const dateB = b.date?.toDate ? b.date.toDate() : new Date(0);
+                          return dateB - dateA;
+                  })
+                  .slice(0, 3)
+                  .map((match, index) => (
+                    <View key={index} style={styles.matchItem}>
+                      <Image source={{ uri: match.opponentPhoto }} style={styles.matchOpponentImage} />
+                      <View style={styles.matchDetails}>
+                        <Text style={styles.matchOpponent}>{match.opponentName}</Text>
+                        <Text style={styles.matchDate}>
+                          {match.date?.toDate ? match.date.toDate().toLocaleDateString() : ''}
+                        </Text>
+                      </View>
+                      <View style={[
+                        styles.matchResultBadge,
+                        match.result === 'win' ? styles.winBadge :
+                          match.result === 'loss' ? styles.lossBadge :
+                            styles.drawBadge
+                      ]}>
+                        <Text style={styles.matchResultText}>
+                          {match.result.toUpperCase()}
+                        </Text>
+                      </View>
                     </View>
-                    <View style={[
-                      styles.matchResultBadge,
-                      match.result === 'win' ? styles.winBadge :
-                        match.result === 'loss' ? styles.lossBadge :
-                          styles.drawBadge
-                    ]}>
-                      <Text style={styles.matchResultText}>
-                        {match.result.toUpperCase()}
-                      </Text>
-                    </View>
-                  </View>
-                ))
-              ) : (
+                  ))
+                ) : (
                 <Text style={styles.emptyText}>No recent matches</Text>
               )}
             </View>
@@ -176,8 +182,13 @@ export default function ProfileScreen() {
       )}
 
       {/* Logout button shows even on error */}
-      <TouchableOpacity style={styles.logoutButton} onPress={handleSignOut}>
-        <LogOut color={theme.colors.gray[600]} size={20} />
+      <TouchableOpacity
+        style={styles.logoutButton}
+        onPress={handleSignOut}
+        accessibilityLabel="Log out"
+        accessibilityHint="Tap to sign out of your account"
+      >
+        <LogOut color={theme.colors.gray[600]} size={20} accessibilityLabel="Logout icon" />
         <Text style={styles.logoutText}>Log Out</Text>
       </TouchableOpacity>
     </SafeAreaView>

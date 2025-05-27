@@ -17,6 +17,12 @@ export interface Chat {
     photo: string;
   }[];
   messages: ChatMessage[];
-  unreadCount: number;
+  unreadCounts: {
+    [userId: string]: number;
+  };
   lastMessage: ChatMessage;
+  results?: {
+    winnerId: string;
+    submittedAt: Timestamp;
+  }[];
 }

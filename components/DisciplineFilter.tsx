@@ -24,9 +24,9 @@ const disciplines: (Discipline | 'All')[] = [
   'Wrestling'
 ];
 
-export default function DisciplineFilter({ 
-  selectedDisciplines = [], 
-  onSelectDiscipline 
+export default function DisciplineFilter({
+  selectedDisciplines = [],
+  onSelectDiscipline
 }: DisciplineFilterProps) {
   return (
     <ScrollView
@@ -42,8 +42,10 @@ export default function DisciplineFilter({
             (discipline === 'All' ? selectedDisciplines.length === 0 : selectedDisciplines.includes(discipline)) && styles.selectedDiscipline
           ]}
           onPress={() => onSelectDiscipline(discipline)}
+          accessibilityLabel={`Filter by ${discipline}`}
+          accessibilityState={{ selected: discipline === 'All' ? selectedDisciplines.length === 0 : selectedDisciplines.includes(discipline) }}
         >
-          <Text 
+          <Text
             style={[
               styles.disciplineText,
               (discipline === 'All' ? selectedDisciplines.length === 0 : selectedDisciplines.includes(discipline)) && styles.selectedDisciplineText

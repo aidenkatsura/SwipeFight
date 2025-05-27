@@ -37,7 +37,7 @@ export default function ScorecardModal({ visible, onClose, onSubmit, participant
           <View style={styles.header}>
             <Text style={styles.title}>Report Match Result</Text>
             <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-              <X size={24} color={theme.colors.gray[600]} />
+              <X size={24} color={theme.colors.gray[600]} accessibilityLabel="Close" />
             </TouchableOpacity>
           </View>
 
@@ -48,6 +48,7 @@ export default function ScorecardModal({ visible, onClose, onSubmit, participant
                 selectedValue={selectedWinner}
                 onValueChange={(value) => setSelectedWinner(value)}
                 style={styles.picker}
+                testID='result-submitter'
               >
                 <Picker.Item label="Select a winner..." value="" />
                 {participants.map((participant) => (
@@ -69,6 +70,10 @@ export default function ScorecardModal({ visible, onClose, onSubmit, participant
             ]}
             onPress={handleSubmit}
             disabled={!selectedWinner}
+            testID='result-submit-button'
+            accessibilityLabel="Submit match result"
+            accessibilityHint="Tap to submit the match result"
+            accessibilityState={{ disabled: !selectedWinner }}
           >
             <Text style={styles.submitButtonText}>Submit Result</Text>
           </TouchableOpacity>

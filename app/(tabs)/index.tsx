@@ -53,7 +53,7 @@ export default function FightScreen() {
   // Fetch users when the component mounts
   useEffect(() => {
     fetchUsers();
-  }, []);  
+  }, []);
 
   const handleSwipeRight = (index: number) => {
     triggerHapticFeedback('medium');
@@ -114,11 +114,11 @@ export default function FightScreen() {
       const newDisciplines = prev.includes(discipline)
         ? prev.filter(d => d !== discipline)
         : [...prev, discipline];
-      
+
       const filtered = filterFightersByDiscipline(allFighters, newDisciplines);
       setFilteredFighters(filtered);
       swiperRef.current?.jumpToCardIndex(0);
-      
+
       return newDisciplines;
     });
   };
