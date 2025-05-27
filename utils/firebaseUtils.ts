@@ -2,6 +2,7 @@ import { collection, getDocs, doc, getDoc, setDoc, deleteDoc, addDoc, runTransac
 import { db } from '../FirebaseConfig';
 import { Discipline, Fighter } from '@/types/fighter';
 import { Chat, ChatMessage} from '@/types/chat';
+import { defaultPhoto } from '@/app/(auth)/account-setup';
 
 /**
  * Fetch all users from the Firestore database.
@@ -36,7 +37,6 @@ export const fetchUsersFromDB = async (): Promise<Fighter[]> => {
  * @throws Throws an error if an unexpected failure occurs.
  */
 export const addNewUserToDB = async (userId: string, name: string, age: string, location: string, discipline: Discipline, rank: string, photo: string|null) => {
-  const defaultPhoto = 'https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png';
   console.log('Creating user profile with data:', {
     id: userId,
     name,

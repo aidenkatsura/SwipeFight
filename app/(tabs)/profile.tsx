@@ -176,8 +176,8 @@ export default function ProfileScreen() {
       )}
 
       {/* Logout button shows even on error */}
-      <TouchableOpacity style={styles.logoutButton} onPress={handleSignOut}>
-        <LogOut color={theme.colors.gray[600]} size={20} />
+      <TouchableOpacity style={styles.logoutButton} onPress={handleSignOut} testID='logout-button'>
+        <LogOut color={theme.colors.gray[600]} size={20}/>
         <Text style={styles.logoutText}>Log Out</Text>
       </TouchableOpacity>
     </SafeAreaView>

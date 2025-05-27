@@ -1,6 +1,7 @@
 import { fetchUsersFromDB, addNewUserToDB } from '../utils/firebaseUtils';
 import { mockFighters } from '../data/mockFighters';
 import { Discipline } from '@/types/fighter';
+import { defaultPhoto } from '@/app/(auth)/account-setup';
 
 // Mock Firestore functions
 jest.mock('firebase/firestore', () => ({
@@ -20,7 +21,7 @@ jest.mock('../FirebaseConfig', () => ({
 }));
 
 // Import after mocking
-import { collection, getDocs, doc, setDoc, Timestamp } from 'firebase/firestore';
+import { collection, getDocs, doc, setDoc } from 'firebase/firestore';
 
 afterEach(() => {
   jest.clearAllMocks();
@@ -59,16 +60,17 @@ describe('fetchUsersFromDB', () => {
 });
 
 describe('addNewUserToDB', () => {
+  const userId = 'test-id';
+  const name = 'Test User';
+  const age = '25';
+  const location = 'Test City';
+  const discipline: Discipline = 'Boxing';
+  const rank = 'Beginner';
+  const photo = 'http://test/photo.png';
+
   it('adds a new user with correct data', async () => {
     (doc as jest.Mock).mockReturnValue('mock-user-ref');
-    const userId = 'test-id';
-    const name = 'Test User';
-    const age = '25';
-    const location = 'Test City';
-    const discipline: Discipline = 'Boxing';
-    const rank = 'Beginner';
-    const photo = 'http://test/photo.png';
-
+    
     // Add a new user (all valid params)
     await addNewUserToDB(userId, name, age, location, discipline, rank, photo);
 
@@ -77,11 +79,38 @@ describe('addNewUserToDB', () => {
     expect(setDoc).toHaveBeenCalledWith('mock-user-ref', expect.objectContaining({
       id: userId,
       name,
-      age: 25,
+      age: parseInt(age, 10),
       location,
       discipline,
       rank,
       photo,
+      rating: 1000,
+      wins: 0,
+      losses: 0,
+      draws: 0,
+      likes: [],
+      dislikes: [],
+      chats: [],
+      createdAt: 'mock-timestamp',
+    }));
+  });
+  
+  it('uses defaultPhoto if no photo provided', async () => {
+    (doc as jest.Mock).mockReturnValue('mock-user-ref');
+    
+    // Add a new user (all valid, null photo)
+    await addNewUserToDB(userId, name, age, location, discipline, rank, null);
+
+    // Assert correct document/userId accessed, and data set correctly (w/ defaultPhoto)
+    expect(doc).toHaveBeenCalledWith(expect.anything(), 'users', userId);
+    expect(setDoc).toHaveBeenCalledWith('mock-user-ref', expect.objectContaining({
+      id: userId,
+      name,
+      age: parseInt(age, 10),
+      location,
+      discipline,
+      rank,
+      photo: defaultPhoto,
       rating: 1000,
       wins: 0,
       losses: 0,
