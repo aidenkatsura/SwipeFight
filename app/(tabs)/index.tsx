@@ -8,13 +8,15 @@ import { theme } from '@/styles/theme';
 import DisciplineFilter from '@/components/DisciplineFilter';
 import { Fighter, Discipline } from '@/types/fighter';
 import { addChat, addLikeToUser, addDislikeToUser, fetchUsersFromDB } from '@/utils/firebaseUtils';
-import { filterFightersByDiscipline, filterFightersByLikes } from '@/utils/filterUtils';
+import { filterFightersByDiscipline, filterFightersByLikes, sortFightersByRatingDifference } from '@/utils/filterUtils';
 import { getAuth } from 'firebase/auth';
+import { useUser } from '@/context/UserContext';
 
 
 export default function FightScreen() {
   // All fighters that have not been swiped on
   const [allFighters, setAllFighters] = useState<Fighter[]>([]);
+  const { user } = useUser(); // Get current user from context
 
   // Fighters from allFighters that matched the most recent filter.
   // Only updated when a filter is applied - not modified on swipes.
@@ -38,8 +40,9 @@ export default function FightScreen() {
 
       const users: Fighter[] = await fetchUsersFromDB();
       const likeFilteredFighters = await filterFightersByLikes(users, userId);
-      setAllFighters(likeFilteredFighters);
-      setFilteredFighters(likeFilteredFighters);
+      const sortedFighters = sortFightersByRatingDifference(likeFilteredFighters, user?.rating || 1000);
+      setAllFighters(sortedFighters);
+      setFilteredFighters(sortedFighters);
     } catch (error) {
       console.error('Error fetching users:', error);
     } finally {
@@ -50,7 +53,7 @@ export default function FightScreen() {
   // Fetch users when the component mounts
   useEffect(() => {
     fetchUsers();
-  }, []);  
+  }, []);
 
   const handleSwipeRight = (index: number) => {
     triggerHapticFeedback('medium');
@@ -111,11 +114,11 @@ export default function FightScreen() {
       const newDisciplines = prev.includes(discipline)
         ? prev.filter(d => d !== discipline)
         : [...prev, discipline];
-      
+
       const filtered = filterFightersByDiscipline(allFighters, newDisciplines);
       setFilteredFighters(filtered);
       swiperRef.current?.jumpToCardIndex(0);
-      
+
       return newDisciplines;
     });
   };

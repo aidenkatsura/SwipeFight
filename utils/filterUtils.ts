@@ -25,7 +25,7 @@ export function filterFightersByDiscipline(fighters: Fighter[], disciplines: Dis
  *    - The user
  *    - Fighters already liked or disliked by user
  *    - Fighters who've disliked user
- * 
+ *
  * @param {Fighter[]} fighters - The array of fighters to filter. Each fighter is an object of type `Fighter`.
  * @param {string} userId - The ID of the user whose fighter's list is being filtered
  * @returns {Promise<Fighter[]>} A Promise that resolves to a new array of fighters filtered by user likes.
@@ -61,4 +61,24 @@ export async function filterFightersByLikes(fighters: Fighter[], userId: string)
   );
 
   return visibleFighters.filter((fighter): fighter is Fighter => fighter !== null);
+}
+
+/**
+ * Sorts fighters by the absolute difference in rating from the current user's rating.
+ * Fighters with ratings closest to the current user's rating will appear first.
+ *
+ * @param {Fighter[]} fighters - The array of fighters to sort
+ * @param {number} currentUserRating - The rating of the current user
+ * @returns {Fighter[]} A new array of fighters sorted by rating difference
+ */
+export function sortFightersByRatingDifference(fighters: Fighter[], currentUserRating: number): Fighter[] {
+  if (!fighters || !Array.isArray(fighters)) {
+    return [];
+  }
+
+  return [...fighters].sort((a, b) => {
+    const diffA = Math.abs(a.rating - currentUserRating);
+    const diffB = Math.abs(b.rating - currentUserRating);
+    return diffA - diffB;
+  });
 }
