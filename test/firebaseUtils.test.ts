@@ -20,7 +20,7 @@ jest.mock('../FirebaseConfig', () => ({
 }));
 
 // Import after mocking
-import { collection, getDocs, doc, setDoc, Timestamp } from 'firebase/firestore';
+import { collection, getDocs, doc, setDoc, Timestamp, GeoPoint } from 'firebase/firestore';
 
 afterEach(() => {
   jest.clearAllMocks();
@@ -65,12 +65,13 @@ describe('addNewUserToDB', () => {
     const name = 'Test User';
     const age = '25';
     const location = 'Test City';
+    const coordinates = new GeoPoint(0, 0);
     const discipline: Discipline = 'Boxing';
     const rank = 'Beginner';
     const photo = 'http://test/photo.png';
 
     // Add a new user (all valid params)
-    await addNewUserToDB(userId, name, age, location, discipline, rank, photo);
+    await addNewUserToDB(userId, name, age, location, coordinates , discipline, rank, photo);
 
     // Assert correct document/userId accessed, and data set correctly
     expect(doc).toHaveBeenCalledWith(expect.anything(), 'users', userId);
@@ -79,6 +80,7 @@ describe('addNewUserToDB', () => {
       name,
       age: 25,
       location,
+      coordinates,
       discipline,
       rank,
       photo,
