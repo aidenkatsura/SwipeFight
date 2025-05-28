@@ -8,6 +8,8 @@ import { updateUserInDB } from '@/utils/firebaseUtils';
 import { auth } from '@/FirebaseConfig';
 import { Discipline } from '@/types/fighter';
 import { useUser } from '@/context/UserContext';
+import { LocationSelector } from '@/components/LocationSelector';
+import { GeoPoint } from 'firebase/firestore';
 
 export default function EditProfileScreen() {
   const router = useRouter();
@@ -21,9 +23,10 @@ export default function EditProfileScreen() {
   const [discipline, setDiscipline] = useState<Discipline | undefined>(user?.discipline);
   const [rank, setRank] = useState<string | undefined>(user?.rank);
   const [photo, setPhoto] = useState(user?.photo || '');
+  const [coordinates, setCoordinates] = useState<GeoPoint>();
 
   const handleSave = async () => {
-    if (!name || !age || !location || !discipline || !rank) {
+    if (!name || !age || !location || !coordinates || !discipline || !rank) {
       alert('Please fill in all required fields');
       return;
     } else if (!user) {
@@ -45,6 +48,7 @@ export default function EditProfileScreen() {
       name,
       age: parsedAge,
       location,
+      coordinates,
       discipline,
       rank,
       photo,
@@ -124,11 +128,14 @@ export default function EditProfileScreen() {
           />
 
           <Text style={styles.label}>Location</Text>
-          <TextInput
-            style={styles.input}
-            value={location}
-            onChangeText={setLocation}
-          />
+          <LocationSelector
+                      initialLocation={user?.location ?? null}
+                      onSelect={(loc) => {
+                        setLocation(loc.name);
+                        setCoordinates(new GeoPoint(loc.lat, loc.lng));
+                        // save to Firebase as GeoPoint(lat, lng)
+                      }}
+                    />
 
           <Text style={styles.label}>Discipline</Text>
           <SelectList

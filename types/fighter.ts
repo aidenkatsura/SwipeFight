@@ -1,5 +1,7 @@
 import { Timestamp } from "firebase/firestore";
 
+import { GeoPoint } from "firebase/firestore";
+
 export interface Fighter {
   id: string;
   name: string;
@@ -8,6 +10,7 @@ export interface Fighter {
   discipline: Discipline;
   rank: string;
   location: string;
+  coordinates: GeoPoint;
   rating: number;
   wins: number;
   losses: number;
