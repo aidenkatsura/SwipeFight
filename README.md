@@ -23,8 +23,8 @@ __Link to the App:__
 
 - Prerequisites
      - Clone repo (https://github.com/aidenkatsura/SwipeFight)
-     - Install Expo Go and create an account if building on physical device
-     - Have npm/Node.js installed in terminal
+     - Install Expo Go (SDK52) and create an account if building on physical device
+     - Have npm/Node.js (npm 9+, Node 18+) installed in terminal
 - In terminal, run
    ```
    npm install
@@ -237,16 +237,22 @@ SwipeFight/
 │   ├── (auth)/                  # User Authentication
 │   ├── (tabs)/                  # App screens (Home, Chat, Leaderboard, etc.)
 │   ├── chat/                    # Live chat
+│   ├── other_profile/           # Other users' profile page
 │   ├── profile-editor/          # Edit User Profile
 ├── assets/images/               # Logos
-├── components/                  # Components
+├── components/                  # UI Components
+├── context/                     # Context/provider components
 ├── data/                        # Mock data (for testing)
 ├── hooks/                       # Hooks for React
 ├── ios/                         # To run on iOS with Xcode
 ├── node_modules/                # npm/Node.js
-├── reports/                     # Progress Reports and Living Document
+├── reports/                     # Docs, Progress Reports and Living Document
 ├── styles/                      # Theme
+├── test/                        # Jest tests (UI, Firebase, and unit)
+├── types/                       # Data types
+├── utils/                       # Helper methods (e.g., Firebase interactions, filtering)
 ├── test/                        # Frontend/Backend Tests
 ├── types/                       # Data types
 ├── utils/                       # Methods
 └── LICENSE                      # Project license
+```
