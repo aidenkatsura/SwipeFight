@@ -23,7 +23,7 @@ export default function EditProfileScreen() {
   const [discipline, setDiscipline] = useState<Discipline | undefined>(user?.discipline);
   const [rank, setRank] = useState<string | undefined>(user?.rank);
   const [photo, setPhoto] = useState(user?.photo || '');
-  const [coordinates, setCoordinates] = useState<GeoPoint>();
+  const [coordinates, setCoordinates] = useState<GeoPoint | undefined>(user?.coordinates);
 
   const handleSave = async () => {
     if (!name || !age || !location || !coordinates || !discipline || !rank) {
