@@ -242,6 +242,7 @@ const styles = StyleSheet.create({
   swiperContainer: {
     flex: 1,
     paddingTop: 0,
+    marginTop: -10,
   },
   loadingContainer: {
     flex: 1,
