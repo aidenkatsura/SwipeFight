@@ -10,9 +10,9 @@ SwipeFight is an application that helps martial artists connect with local sparr
 
 To install the app on your device you must:
  1. Clone the GitHub Repository and cd into it (https://github.com/aidenkatsura/SwipeFight)
- 2. Install the [Expo Go](https://expo.dev/go) app and make an account
+ 2. Install the [Expo Go](https://expo.dev/go) app (SDK 52, currently have issues running with SDK 53+) and make an account
  3. Install an simulator on [Windows](https://docs.expo.dev/tutorial/eas/android-development-build/) or [Mac](https://docs.expo.dev/workflow/ios-simulator/).
- 4. Install [Node.js/npm](https://nodejs.org/en/download)
+ 4. Install [Node.js/npm](https://nodejs.org/en/download) (npm version 9+, Node version 18+)
  5. In the terminal, run
 ```
 npm install
