@@ -2,7 +2,7 @@
 
 ## Abstract
 
-SwipeFight is an application that helps martial artists connect with local sparring partners in a fun and competitive way. Inspired by Tinder’s intuitive swipe interface, users swipe right if they think they can beat an opponent and left if not. If two users swipe right on each other, they match and can coordinate a sparring session. The app includes a martial arts specific matching system, a skill-based rating system, and filters by location (WIP) and discipline. By blending gamification with community, SwipeFight offers a fresh way to build connections and sharpen fighting skills.
+SwipeFight is an application that helps martial artists connect with local sparring partners in a fun and competitive way. Inspired by Tinder’s intuitive swipe interface, users swipe right if they think they can beat an opponent and left if not. If two users swipe right on each other, they match and can coordinate a sparring session. The app includes a martial arts specific matching system, a skill-based rating system, and sorts by location and filters by discipline. By blending gamification with community, SwipeFight offers a fresh way to build connections and sharpen fighting skills.
 
 ## Install
 
@@ -43,11 +43,12 @@ From here, you should enter your email and password. If you do not already have 
 
 [Maybe add back button]: #
 
-When first creating an account, you may set up your Profile Picture, Name, Age, Location, Discipline and Rank. A default Profile Picture is provided if one is not entered, however, the rest of the information must be entered. Once your profile is to your liking, press the 'Complete Setup' button to enter the app and be brought to the [Swiper Page](#swiper-page).
+When first creating an account, you may set up your Profile Picture, Name, Age, Location, Discipline and Rank. A default Profile Picture is provided if one is not entered, however, the rest of the information must be entered. To enter your location, begin typing in a city name and then click on the city from the dropdown that opens. Once your profile is to your liking, press the 'Complete Setup' button to enter the app and be brought to the [Swiper Page](#swiper-page).
 
 <div class="row">
  <img src="/documentation/Pictures/Profile_Creation_1.png" alt="Profile Creation Page 1" width="300" height="600"/>
  <img src="/documentation/Pictures/Profile_Creation_2.png" alt="Profile Creation Page 2" width="300" height="600"/>
+ <img src="/documentation/Pictures/Location_Filter" alt="Location" width="300" height="600"/>
 </div>
 
 ### Navigation
@@ -76,9 +77,9 @@ Swiping the fighter card to the left or pressing the red running man will skip t
  <img src="/documentation/Pictures/Match.png" alt="Match" width="300" height="600"/>
 </div>
 
-__Filtering__
+__Sorting and Filtering__
 
-On the top of the page, there is a scrollable list of filters that filter through the possible fighters that you can see. Multiple filters may be pressed at once and it will combine the filters together (Pressing Aikido and BJJ filters will only show fighters that practice Aikido __OR__ BJJ). Pressing the 'All' filter will reset all of the filters and show all possible fighters. The list of fighters that may appear on your list do not include any users that you have already skipped or challenged.
+The list of fighters that the user sees is automatically sorted by location so that nearby users are seen first. In addition to this, the top of the page holds a scrollable list of discipline filters that filter through the possible fighters that you can see. Multiple filters may be pressed at once and it will combine the filters together (Pressing Aikido and BJJ filters will only show fighters that practice Aikido __OR__ BJJ). Pressing the 'All' filter will reset all of the filters and show all possible fighters. The list of fighters that may appear on your list do not include any users that you have already skipped or challenged.
 
 <img src="/documentation/Pictures/Filter.png" alt="Filter Swiper" width="300" height="600"/>
 
@@ -92,7 +93,7 @@ The Chats Page is where you can communicate with the other users you have matche
  <img src="/documentation/Pictures/Chat.png" alt="Conversation" width="300" height="600"/>
 </div>
 
-This page also allows you to report the result of the match. When you press the 'Report Result' button, it will open up a pop-up where you can select which of the participants won the match or if it resulted in a draw. This will properly update each user's record and rating. After submitting a match result, there is a cooldown until another result for the two fighters can be entered. Clicking the other user's profile picture will open up their [profile](#other-users-profile-page).
+This page also allows you to report the result of the match. When you press the 'Report Result' button, it will open up a pop-up where you can select which of the participants won the match or if it resulted in a draw. This will properly update each user's record and rating. After submitting a match result, there is a cooldown until another result between the two fighters can be entered. Clicking the other user's profile picture will open up their [profile](#other-users-profile-page).
 
 <div class="row">
  <img src="/documentation/Pictures/Report_Result_Default.png" alt="Report Result Default" width="300" height="600"/>
@@ -102,7 +103,7 @@ This page also allows you to report the result of the match. When you press the 
 
 ### Leaderboard Page
 
-The Leaderboard Page is where you can view the best of the best. The 'All' option shows the at most, the top three users in each discipline ranked by their rating. Clicking on any single filter will only show the top three fighters in that discipline. 
+The Leaderboard Page is where you can view the best of the best. The 'All' option shows every user associated with SwipeFight based on sorted by their rating. Clicking on any of the filters will only show the fighters of the selected discipline(s). 
 
 <div class="row">
  <img src="/documentation/Pictures/Leaderboard_All.png" alt="Leaderboard" width="300" height="600"/>
@@ -113,7 +114,7 @@ If you want a better look at another user beyond the summary that is presented, 
 
 ### Profile Page
 
-The final tab on the main screen is the Profile Page. This page contains the authenticated user's profile information. Clicking the 'Log Out' button at the bottom of the screen will bring the user back to the [User Authentication Page](#user-authentication-page).
+The final tab on the main screen is the Profile Page. This page contains the authenticated user's profile information as well as their recent achievements and matches. Clicking the 'Log Out' button at the bottom of the screen will bring the user back to the [User Authentication Page](#user-authentication-page).
 
 <img src="/documentation/Pictures/Profile.png" alt="Profile" width="300" height="600"/>
 
