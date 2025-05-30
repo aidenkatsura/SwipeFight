@@ -1,0 +1,78 @@
+{
+  "apiRoutes": [],
+  "htmlRoutes": [
+    {
+      "file": "./(tabs)/index.tsx",
+      "page": "/(tabs)/index",
+      "namedRegex": "^(?:/\\(tabs\\))?(?:/)?$",
+      "routeKeys": {}
+    },
+    {
+      "file": "./(auth)/login.tsx",
+      "page": "/(auth)/login",
+      "namedRegex": "^(?:/\\(auth\\))?/login(?:/)?$",
+      "routeKeys": {}
+    },
+    {
+      "file": "./(auth)/account-setup.tsx",
+      "page": "/(auth)/account-setup",
+      "namedRegex": "^(?:/\\(auth\\))?/account\\-setup(?:/)?$",
+      "routeKeys": {}
+    },
+    {
+      "file": "./(tabs)/chats.tsx",
+      "page": "/(tabs)/chats",
+      "namedRegex": "^(?:/\\(tabs\\))?/chats(?:/)?$",
+      "routeKeys": {}
+    },
+    {
+      "file": "./(tabs)/profile.tsx",
+      "page": "/(tabs)/profile",
+      "namedRegex": "^(?:/\\(tabs\\))?/profile(?:/)?$",
+      "routeKeys": {}
+    },
+    {
+      "file": "expo-router/build/views/Sitemap.js",
+      "page": "/_sitemap",
+      "namedRegex": "^/_sitemap(?:/)?$",
+      "routeKeys": {},
+      "generated": true
+    },
+    {
+      "file": "./(tabs)/leaderboard.tsx",
+      "page": "/(tabs)/leaderboard",
+      "namedRegex": "^(?:/\\(tabs\\))?/leaderboard(?:/)?$",
+      "routeKeys": {}
+    },
+    {
+      "file": "./other_profile/other_profile.tsx",
+      "page": "/other_profile/other_profile",
+      "namedRegex": "^/other_profile/other_profile(?:/)?$",
+      "routeKeys": {}
+    },
+    {
+      "file": "./profile-editor/profile-editor.tsx",
+      "page": "/profile-editor/profile-editor",
+      "namedRegex": "^/profile\\-editor/profile\\-editor(?:/)?$",
+      "routeKeys": {}
+    },
+    {
+      "file": "./chat/[id].tsx",
+      "page": "/chat/[id]",
+      "namedRegex": "^/chat/(?<id>[^/]+?)(?:/)?$",
+      "routeKeys": {
+        "id": "id"
+      }
+    }
+  ],
+  "notFoundRoutes": [
+    {
+      "file": "./+not-found.tsx",
+      "page": "/+not-found",
+      "namedRegex": "^(?:/(?<notfound>.+?))?(?:/)?$",
+      "routeKeys": {
+        "notfound": "not-found"
+      }
+    }
+  ]
+}
