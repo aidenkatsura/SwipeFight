@@ -48,7 +48,7 @@ When first creating an account, you may set up your Profile Picture, Name, Age, 
 <div class="row">
  <img src="/documentation/Pictures/Profile_Creation_1.png" alt="Profile Creation Page 1" width="300" height="600"/>
  <img src="/documentation/Pictures/Profile_Creation_2.png" alt="Profile Creation Page 2" width="300" height="600"/>
- <img src="/documentation/Pictures/Location_Filter" alt="Location" width="300" height="600"/>
+ <img src="/documentation/Pictures/Location_Filter.png" alt="Location" width="300" height="600"/>
 </div>
 
 ### Navigation
