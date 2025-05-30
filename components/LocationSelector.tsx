@@ -26,10 +26,11 @@ export const LocationSelector = ({ onSelect, initialLocation,}: {
 }) => {
   const [query, setQuery] = useState(initialLocation || '');
   const [results, setResults] = useState<Suggestion[]>([]);
+  const [searchText, setSearchText] = useState(''); 
   const debounceTimeout = useRef<NodeJS.Timeout | null>(null);
 
   const search = (text: string) => {
-    setQuery(text);
+    setSearchText(text);
     if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
 
     debounceTimeout.current = setTimeout(() => {
@@ -40,6 +41,7 @@ export const LocationSelector = ({ onSelect, initialLocation,}: {
       }
     }, 500); // 500ms debounce
   };
+
 
   const fetchResults = async (text: string) => {
     try {
@@ -73,34 +75,47 @@ export const LocationSelector = ({ onSelect, initialLocation,}: {
   };
 
   return (
+  <View>
+    {/* Selected / Current Location (not tied to typing) */}
+    <TextInput
+      value={query}
+      editable={false}
+      placeholder="Selected location will appear here"
+      style={[styles.input]}
+    />
+
+    {/* Search Input */}
+    <TextInput
+      placeholder="Search for a location"
+      value={searchText}
+      onChangeText={(text) => {
+        search(text);
+      }}
+      style={styles.input}
+    />
+
+    {/* Search Results */}
     <View>
-      <TextInput
-        placeholder="Search for a location"
-        value={query}
-        onChangeText={search}
-        style={styles.input}
-      />
-      <FlatList
-        data={results}
-        keyExtractor={(item, index) => `${item.lat}-${item.lon}-${index}`}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            onPress={() => {
-              onSelect({
-                name: item.name,
-                lat: parseFloat(item.lat),
-                lng: parseFloat(item.lon),
-              });
-              setQuery(item.display_name);
-              setResults([]);
-            }}
-          >
-            <Text style={styles.item}>{item.display_name}</Text>
-          </TouchableOpacity>
-        )}
-      />
+      {results.map((item, index) => (
+        <TouchableOpacity
+          key={`${item.lat}-${item.lon}-${index}`}
+          onPress={() => {
+            onSelect({
+              name: item.name,
+              lat: parseFloat(item.lat),
+              lng: parseFloat(item.lon),
+            });
+            setQuery(item.display_name);  // Update selected location only on select
+            setSearchText('');            // Clear typing box
+            setResults([]);
+          }}
+        >
+          <Text style={styles.item}>{item.display_name}</Text>
+        </TouchableOpacity>
+      ))}
     </View>
-  );
+  </View>
+);
 };
 
 const styles = StyleSheet.create({
