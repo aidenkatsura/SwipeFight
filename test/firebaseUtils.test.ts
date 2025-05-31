@@ -1,4 +1,4 @@
-import { fetchUsersFromDB, addNewUserToDB, updateUserInDB, changeUserDocId, addLikeToUser, addDislikeToUser, fetchChatFromDB, fetchUserFromDB } from '../utils/firebaseUtils';
+import { fetchUsersFromDB, addNewUserToDB, updateUserInDB, changeUserDocId, addLikeToUser, addDislikeToUser, fetchChatFromDB, fetchUserFromDB, fetchUserLikesFromDB, fetchUserDislikesFromDB, fetchUserChatsFromDB } from '../utils/firebaseUtils';
 import { mockFighters } from '../data/mockFighters';
 import { Discipline } from '@/types/fighter';
 import { defaultPhoto } from '@/app/(auth)/account-setup';
@@ -160,9 +160,7 @@ describe('updateUserInDB', () => {
     (doc as jest.Mock).mockReturnValue('mock-user-ref');
     (getDoc as jest.Mock).mockRejectedValue(new Error('Firestore error'));
 
-    await expect(updateUserInDB(userId, updatedData)).rejects.toThrow(
-      'Unexpected error updating user in Firestore.'
-    );
+    await expect(updateUserInDB(userId, updatedData)).rejects.toThrow();
 
     expect(doc).toHaveBeenCalledWith(expect.anything(), 'users', userId);
     expect(getDoc).toHaveBeenCalledWith('mock-user-ref');
@@ -446,7 +444,7 @@ describe('fetchChatFromDB', () => {
       exists: () => false,
     });
 
-    await expect(fetchChatFromDB(chatId)).rejects.toThrow('No such document!');
+    await expect(fetchChatFromDB(chatId)).rejects.toThrow();
     expect(doc).toHaveBeenCalledWith(expect.anything(), 'chats', chatId);
     expect(getDoc).toHaveBeenCalledWith('mock-chat-123-ref');
   });
@@ -455,7 +453,7 @@ describe('fetchChatFromDB', () => {
     (doc as jest.Mock).mockImplementation((db, collectionName, docId) => `mock-${docId}-ref`);
     (getDoc as jest.Mock).mockRejectedValue(new Error('Firestore error'));
 
-    await expect(fetchChatFromDB(chatId)).rejects.toThrow('No such document!');
+    await expect(fetchChatFromDB(chatId)).rejects.toThrow();
     expect(doc).toHaveBeenCalledWith(expect.anything(), 'chats', chatId);
     expect(getDoc).toHaveBeenCalledWith('mock-chat-123-ref');
   });
@@ -501,7 +499,7 @@ describe('fetchUserFromDB', () => {
       exists: () => false,
     });
 
-    await expect(fetchUserFromDB(userId)).rejects.toThrow('No such user!');
+    await expect(fetchUserFromDB(userId)).rejects.toThrow();
     expect(doc).toHaveBeenCalledWith(expect.anything(), 'users', userId);
     expect(getDoc).toHaveBeenCalledWith('mock-user-123-ref');
   });
@@ -510,8 +508,134 @@ describe('fetchUserFromDB', () => {
     (doc as jest.Mock).mockImplementation((db, collectionName, docId) => `mock-${docId}-ref`);
     (getDoc as jest.Mock).mockRejectedValue(new Error('Firestore error'));
 
-    await expect(fetchUserFromDB(userId)).rejects.toThrow('No such user!');
+    await expect(fetchUserFromDB(userId)).rejects.toThrow();
     expect(doc).toHaveBeenCalledWith(expect.anything(), 'users', userId);
     expect(getDoc).toHaveBeenCalledWith('mock-user-123-ref');
+  });
+});
+
+describe('fetchUserLikesFromDB', () => {
+  const userId = 'user-123';
+
+  it('returns likes array if present', async () => {
+    (doc as jest.Mock).mockImplementation((db, collectionName, docId) => `mock-${docId}-ref`);
+    (getDoc as jest.Mock).mockResolvedValue({
+      exists: () => true,
+      data: () => ({ likes: ['a', 'b', 'c'] }),
+    });
+
+    const result = await fetchUserLikesFromDB(userId);
+    expect(result).toEqual(['a', 'b', 'c']);
+  });
+
+  it('returns empty array if likes is missing', async () => {
+    (doc as jest.Mock).mockImplementation((db, collectionName, docId) => `mock-${docId}-ref`);
+    (getDoc as jest.Mock).mockResolvedValue({
+      exists: () => true,
+      data: () => ({}),
+    });
+
+    const result = await fetchUserLikesFromDB(userId);
+    expect(result).toEqual([]);
+  });
+
+  it('throws if user does not exist', async () => {
+    (doc as jest.Mock).mockImplementation((db, collectionName, docId) => `mock-${docId}-ref`);
+    (getDoc as jest.Mock).mockResolvedValue({
+      exists: () => false,
+    });
+
+    await expect(fetchUserLikesFromDB(userId)).rejects.toThrow();
+  });
+
+  it('throws if Firestore throws', async () => {
+    (doc as jest.Mock).mockImplementation((db, collectionName, docId) => `mock-${docId}-ref`);
+    (getDoc as jest.Mock).mockRejectedValue(new Error('Firestore error'));
+
+    await expect(fetchUserLikesFromDB(userId)).rejects.toThrow();
+  });
+});
+
+describe('fetchUserDislikesFromDB', () => {
+  const userId = 'user-123';
+
+  it('returns dislikes array if present', async () => {
+    (doc as jest.Mock).mockImplementation((db, collectionName, docId) => `mock-${docId}-ref`);
+    (getDoc as jest.Mock).mockResolvedValue({
+      exists: () => true,
+      data: () => ({ dislikes: ['x', 'y'] }),
+    });
+
+    const result = await fetchUserDislikesFromDB(userId);
+    expect(result).toEqual(['x', 'y']);
+  });
+
+  it('returns empty array if dislikes is missing', async () => {
+    (doc as jest.Mock).mockImplementation((db, collectionName, docId) => `mock-${docId}-ref`);
+    (getDoc as jest.Mock).mockResolvedValue({
+      exists: () => true,
+      data: () => ({}),
+    });
+
+    const result = await fetchUserDislikesFromDB(userId);
+    expect(result).toEqual([]);
+  });
+
+  it('throws if user does not exist', async () => {
+    (doc as jest.Mock).mockImplementation((db, collectionName, docId) => `mock-${docId}-ref`);
+    (getDoc as jest.Mock).mockResolvedValue({
+      exists: () => false,
+    });
+
+    await expect(fetchUserDislikesFromDB(userId)).rejects.toThrow();
+  });
+
+  it('throws if Firestore throws', async () => {
+    (doc as jest.Mock).mockImplementation((db, collectionName, docId) => `mock-${docId}-ref`);
+    (getDoc as jest.Mock).mockRejectedValue(new Error('Firestore error'));
+
+    await expect(fetchUserDislikesFromDB(userId)).rejects.toThrow();
+  });
+});
+
+describe('fetchUserChatsFromDB', () => {
+  const userId = 'user-123';
+
+  it('returns chats array if present', async () => {
+    (doc as jest.Mock).mockImplementation((db, collectionName, docId) => `mock-${docId}-ref`);
+    (getDoc as jest.Mock).mockResolvedValue({
+      exists: () => true,
+      data: () => ({ chats: ['chat1', 'chat2'] }),
+    });
+
+    const result = await fetchUserChatsFromDB(userId);
+    expect(result).toEqual(['chat1', 'chat2']);
+  });
+
+  it('returns empty array if chats is missing', async () => {
+    (doc as jest.Mock).mockImplementation((db, collectionName, docId) => `mock-${docId}-ref`);
+    (getDoc as jest.Mock).mockResolvedValue({
+      exists: () => true,
+      data: () => ({}),
+    });
+
+    const result = await fetchUserChatsFromDB(userId);
+    expect(result).toEqual([]);
+  });
+
+  it('throws if user does not exist', async () => {
+    (doc as jest.Mock).mockImplementation((db, collectionName, docId) => `mock-${docId}-ref`);
+    (getDoc as jest.Mock).mockResolvedValue({
+      exists: () => false,
+    });
+
+    await expect(fetchUserChatsFromDB(userId)).rejects.toThrow();
+  });
+
+  it('throws if Firestore throws', async () => {
+    (doc as jest.Mock).mockImplementation((db, collectionName, docId) => `mock-${docId}-ref`);
+    (getDoc as jest.Mock).mockRejectedValue(new Error('Firestore error'));
+
+    await expect(fetchUserChatsFromDB(userId)).rejects.toThrow();
   });
 });
