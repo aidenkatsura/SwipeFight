@@ -1,4 +1,4 @@
-import { fetchUsersFromDB, addNewUserToDB, updateUserInDB, changeUserDocId, addLikeToUser, addDislikeToUser, fetchChatFromDB } from '../utils/firebaseUtils';
+import { fetchUsersFromDB, addNewUserToDB, updateUserInDB, changeUserDocId, addLikeToUser, addDislikeToUser, fetchChatFromDB, fetchUserFromDB } from '../utils/firebaseUtils';
 import { mockFighters } from '../data/mockFighters';
 import { Discipline } from '@/types/fighter';
 import { defaultPhoto } from '@/app/(auth)/account-setup';
@@ -458,5 +458,60 @@ describe('fetchChatFromDB', () => {
     await expect(fetchChatFromDB(chatId)).rejects.toThrow('No such document!');
     expect(doc).toHaveBeenCalledWith(expect.anything(), 'chats', chatId);
     expect(getDoc).toHaveBeenCalledWith('mock-chat-123-ref');
+  });
+});
+
+describe('fetchUserFromDB', () => {
+  const userId = 'user-123';
+  const mockUser = {
+    id: userId,
+    name: 'Test User',
+    age: 25,
+    location: 'Seattle',
+    discipline: 'MMA',
+    rank: 'Blue Belt',
+    photo: 'photo-url',
+    rating: 1010,
+    wins: 2,
+    losses: 1,
+    draws: 1,
+    likes: [],
+    dislikes: [],
+    chats: [],
+    createdAt: Timestamp.fromDate(new Date('2024-01-01T00:00:00Z')),
+  };
+
+  it('returns user data if user exists', async () => {
+    (doc as jest.Mock).mockImplementation((db, collectionName, docId) => `mock-${docId}-ref`);
+    (getDoc as jest.Mock).mockResolvedValue({
+      exists: () => true,
+      data: () => mockUser,
+    });
+
+    const result = await fetchUserFromDB(userId);
+
+    expect(doc).toHaveBeenCalledWith(expect.anything(), 'users', userId);
+    expect(getDoc).toHaveBeenCalledWith('mock-user-123-ref');
+    expect(result).toEqual(mockUser);
+  });
+
+  it('throws if user does not exist', async () => {
+    (doc as jest.Mock).mockImplementation((db, collectionName, docId) => `mock-${docId}-ref`);
+    (getDoc as jest.Mock).mockResolvedValue({
+      exists: () => false,
+    });
+
+    await expect(fetchUserFromDB(userId)).rejects.toThrow('No such user!');
+    expect(doc).toHaveBeenCalledWith(expect.anything(), 'users', userId);
+    expect(getDoc).toHaveBeenCalledWith('mock-user-123-ref');
+  });
+
+  it('throws if Firestore throws', async () => {
+    (doc as jest.Mock).mockImplementation((db, collectionName, docId) => `mock-${docId}-ref`);
+    (getDoc as jest.Mock).mockRejectedValue(new Error('Firestore error'));
+
+    await expect(fetchUserFromDB(userId)).rejects.toThrow('No such user!');
+    expect(doc).toHaveBeenCalledWith(expect.anything(), 'users', userId);
+    expect(getDoc).toHaveBeenCalledWith('mock-user-123-ref');
   });
 });
