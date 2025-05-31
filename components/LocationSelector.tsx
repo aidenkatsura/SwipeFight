@@ -53,7 +53,7 @@ export const LocationSelector = ({ onSelect, initialLocation,}: {
           limit: 10,
         },
         headers: {
-          'User-Agent': 'YourAppName/1.0 (you@example.com)',
+          'User-Agent': 'SwipeFight/1.0 (swipefight403@gmail.com)',
         },
       });
 
