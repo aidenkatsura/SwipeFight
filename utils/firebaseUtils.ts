@@ -145,7 +145,6 @@ export const changeUserDocId = async (oldDocId: string, newDocId: string): Promi
  * @param {string} userId1 - The current document ID of the user.
  * @param {string} userId1 - The user id of the user whose been Liked with.
  * @returns {Promise<boolean>} Resolves to true if successful
- * @throws Throws an error if an unexpected failure occurs.
  */
 export async function addLikeToUser(userId1: string, userId2: string) {
   return addToUserArray(userId1, userId2, "likes");
@@ -158,9 +157,8 @@ export async function addLikeToUser(userId1: string, userId2: string) {
  * @param {string} targetUserId - The current document ID of the user.
  * @param {string} dislikedUserId - The user id of the user whose been matched with.
  * @returns {Promise<boolean>} Resolves to true if successful
- * @throws Throws an error if an unexpected failure occurs.
  */
- export async function addDislikeToUser(userId1: string, userId2: string){
+ export async function addDislikeToUser(userId1: string, userId2: string) {
   return addToUserArray(userId1, userId2, "dislikes");
 };
 
@@ -169,7 +167,7 @@ export async function addLikeToUser(userId1: string, userId2: string) {
  *  
  * @param {string} targetChatId - the target id of the Chat
  * 
- * @returns {Promise<Chat>} A promise that resolves to an array of Fighter objects.
+ * @returns {Promise<Chat>} A promise that resolves to an array of Chat objects.
  * @throws Throws an error if fetching users fails.
  */
 export const fetchChatFromDB = async (targetChatId: string): Promise<Chat> => {

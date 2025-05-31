@@ -1,4 +1,4 @@
-import { fetchUsersFromDB, addNewUserToDB, updateUserInDB, changeUserDocId, addLikeToUser, addDislikeToUser } from '../utils/firebaseUtils';
+import { fetchUsersFromDB, addNewUserToDB, updateUserInDB, changeUserDocId, addLikeToUser, addDislikeToUser, fetchChatFromDB } from '../utils/firebaseUtils';
 import { mockFighters } from '../data/mockFighters';
 import { Discipline } from '@/types/fighter';
 import { defaultPhoto } from '@/app/(auth)/account-setup';
@@ -21,7 +21,8 @@ jest.mock('../FirebaseConfig', () => ({
 }));
 
 // Import after mocking
-import { collection, getDocs, doc, setDoc, getDoc, runTransaction, arrayUnion } from 'firebase/firestore';
+import { collection, getDocs, doc, setDoc, getDoc, runTransaction, arrayUnion, Timestamp } from 'firebase/firestore';
+import { Chat } from '@/types/chat';
 
 afterEach(() => {
   jest.clearAllMocks();
@@ -405,5 +406,57 @@ describe('addDislikeToUser', () => {
 
     expect(result).toBe(false);
     expect(runTransaction).toHaveBeenCalledWith(expect.anything(), expect.any(Function));
+  });
+});
+
+describe('fetchChatFromDB', () => {
+  const chatId = 'chat-123';
+  const mockChat: Chat = {
+    id: chatId,
+    participants: [],
+    messages: [],
+    unreadCounts: {},
+    lastMessage: {
+      id: '',
+      senderId: '',
+      receiverId: '',
+      message: '',
+      timestamp: Timestamp.fromDate(new Date()),
+      read: false
+    },
+  };
+
+  it('returns chat data if chat exists', async () => {
+    (doc as jest.Mock).mockImplementation((db, collectionName, docId) => `mock-${docId}-ref`);
+    (getDoc as jest.Mock).mockResolvedValue({
+      exists: () => true,
+      data: () => mockChat,
+    });
+
+    const result = await fetchChatFromDB(chatId);
+    
+    expect(doc).toHaveBeenCalledWith(expect.anything(), 'chats', chatId);
+    expect(getDoc).toHaveBeenCalledWith('mock-chat-123-ref');
+    expect(result).toEqual(mockChat);
+  });
+
+  it('throws if chat does not exist', async () => {
+    (doc as jest.Mock).mockImplementation((db, collectionName, docId) => `mock-${docId}-ref`);
+    (getDoc as jest.Mock).mockResolvedValue({
+      exists: () => false,
+    });
+
+    await expect(fetchChatFromDB(chatId)).rejects.toThrow('No such document!');
+    expect(doc).toHaveBeenCalledWith(expect.anything(), 'chats', chatId);
+    expect(getDoc).toHaveBeenCalledWith('mock-chat-123-ref');
+  });
+
+  it('throws if Firestore throws', async () => {
+    (doc as jest.Mock).mockImplementation((db, collectionName, docId) => `mock-${docId}-ref`);
+    (getDoc as jest.Mock).mockRejectedValue(new Error('Firestore error'));
+
+    await expect(fetchChatFromDB(chatId)).rejects.toThrow('No such document!');
+    expect(doc).toHaveBeenCalledWith(expect.anything(), 'chats', chatId);
+    expect(getDoc).toHaveBeenCalledWith('mock-chat-123-ref');
   });
 });
