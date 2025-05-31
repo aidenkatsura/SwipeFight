@@ -10,7 +10,8 @@ import {
   fetchUserLikesFromDB,
   fetchUserDislikesFromDB,
   fetchUserChatsFromDB,
-  sendMessage
+  sendMessage,
+  addChat,
 } from '../utils/firebaseUtils';
 import { mockFighters } from '../data/mockFighters';
 import { Discipline } from '@/types/fighter';
@@ -721,5 +722,53 @@ describe('sendMessage', () => {
     const result = await sendMessage(chatId, message);
     expect(result).toBe(false);
     expect(runTransaction).toHaveBeenCalledWith(expect.anything(), expect.any(Function));
+  });
+});
+
+describe('addChat', () => {
+  const userId1 = 'user1';
+  const userId2 = 'user2';
+  const chatId = 'mock-chat-id';
+
+  // Mock Firestore and timestamp dependencies for each addChat test
+  beforeEach(() => {
+    (collection as jest.Mock).mockImplementation((db, col) => `mock-${col}-collection`);
+    (doc as jest.Mock).mockImplementation((...args) => {
+      if (args.length === 1 && typeof args[0] === 'string' && args[0].includes('collection')) {
+        return { id: chatId }; // for new chat doc
+      }
+      return `mock-${args[2]}-ref`;
+    });
+    (runTransaction as jest.Mock).mockResolvedValue(undefined);
+    (getDoc as jest.Mock).mockResolvedValue({
+      exists: () => true,
+      data: () => ({ name: 'Test User', photo: 'photo-url' }),
+    });
+    (Timestamp.fromDate as jest.Mock).mockReturnValue('mock-timestamp');
+  });
+
+  it('creates a chat and adds chat to both users', async () => {
+    await addChat(userId1, userId2);
+
+    // Check chat doc creation
+    expect(runTransaction).toHaveBeenCalledWith(expect.anything(), expect.any(Function));
+    
+    // Check that doc was called for both users' chat arrays
+    expect(doc).toHaveBeenCalledWith(expect.anything(), 'users', userId1);
+    expect(doc).toHaveBeenCalledWith(expect.anything(), 'users', userId2);
+  });
+
+  it('throws if fetching user info fails', async () => {
+    (getDoc as jest.Mock).mockResolvedValueOnce({
+      exists: () => false,
+    });
+
+    await expect(addChat(userId1, userId2)).rejects.toThrow();
+  });
+
+  it('throws if Firestore transaction fails', async () => {
+    (runTransaction as jest.Mock).mockRejectedValue(new Error('Transaction failed'));
+
+    await expect(addChat(userId1, userId2)).rejects.toThrow();
   });
 });
