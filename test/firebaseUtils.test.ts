@@ -1,3 +1,34 @@
+// Mock Firestore functions
+jest.mock('firebase/firestore', () => ({
+  collection: jest.fn(),
+  getDocs: jest.fn(),
+  doc: jest.fn(),
+  setDoc: jest.fn(),
+  getDoc: jest.fn(),
+  runTransaction: jest.fn(),
+  arrayUnion: jest.fn(),
+  Timestamp: { fromDate: jest.fn(() => 'mock-timestamp') },
+  increment: jest.fn(),
+}));
+
+// Mock db from FirebaseConfig
+jest.mock('../FirebaseConfig', () => ({
+  db: {}, // just non-undefined object (no real getFirestore call)
+}));
+
+// Import Firestore funcs after mocking
+import {
+  collection,
+  getDocs,
+  doc,
+  setDoc,
+  getDoc,
+  runTransaction,
+  arrayUnion,
+  Timestamp,
+  increment,
+} from 'firebase/firestore';
+
 import {
   fetchUsersFromDB,
   addNewUserToDB,
@@ -13,31 +44,11 @@ import {
   sendMessage,
   addChat,
 } from '../utils/firebaseUtils';
+
 import { mockFighters } from '../data/mockFighters';
 import { Discipline } from '@/types/fighter';
-import { defaultPhoto } from '@/app/(auth)/account-setup';
-
-// Mock Firestore functions
-jest.mock('firebase/firestore', () => ({
-  collection: jest.fn(),
-  getDocs: jest.fn(),
-  doc: jest.fn(),
-  setDoc: jest.fn(),
-  Timestamp: { fromDate: jest.fn(() => 'mock-timestamp') },
-  arrayUnion: jest.fn(),
-  runTransaction: jest.fn(),
-  getDoc: jest.fn(),
-  increment: jest.fn()
-}));
-
-// Mock db from FirebaseConfig
-jest.mock('../FirebaseConfig', () => ({
-  db: {}, // just non-undefined object (no real getFirestore call)
-}));
-
-// Import after mocking
-import { collection, getDocs, doc, setDoc, getDoc, runTransaction, arrayUnion, Timestamp, increment } from 'firebase/firestore';
 import { Chat } from '@/types/chat';
+import { defaultPhoto } from '@/app/(auth)/account-setup';
 
 afterEach(() => {
   jest.clearAllMocks();
@@ -298,9 +309,12 @@ describe('addLikeToUser', () => {
   const userId1 = 'user1-id';
   const userId2 = 'user2-id';
 
-  it('returns true when like is successfully added', async () => {
+  beforeEach(() => {
     (doc as jest.Mock).mockImplementation((db, collectionName, docId) => `mock-${docId}-ref`);
-    (arrayUnion as jest.Mock).mockImplementation((val) => [`EXISTING`, val]);
+    (arrayUnion as jest.Mock).mockImplementation((val) => ['EXISTING', val]);
+  });
+
+  it('returns true when like is successfully added', async () => {
     (runTransaction as jest.Mock).mockImplementation(async (db, transactionFn) => {
       const transaction = {
         get: jest.fn(async (docRef) => ({
@@ -325,7 +339,6 @@ describe('addLikeToUser', () => {
   });
 
   it('returns false if user does not exist', async () => {
-    (doc as jest.Mock).mockImplementation((db, collectionName, docId) => `mock-${docId}-ref`);
     (runTransaction as jest.Mock).mockImplementation(async (db, transactionFn) => {
       const transaction = {
         get: jest.fn(async (docRef) => ({
@@ -346,7 +359,6 @@ describe('addLikeToUser', () => {
   });
 
   it('returns false if transaction fails', async () => {
-    (doc as jest.Mock).mockImplementation((db, collectionName, docId) => `mock-${docId}-ref`);
     (runTransaction as jest.Mock).mockImplementation(async () => {
       throw new Error('Transaction failed');
     });
@@ -362,9 +374,12 @@ describe('addDislikeToUser', () => {
   const userId1 = 'user1-id';
   const userId2 = 'user2-id';
 
-  it('returns true when dislike is successfully added', async () => {
+  beforeEach(() => {
     (doc as jest.Mock).mockImplementation((db, collectionName, docId) => `mock-${docId}-ref`);
     (arrayUnion as jest.Mock).mockImplementation((val) => ['EXISTING', val]);
+  });
+
+  it('returns true when dislike is successfully added', async () => {
     (runTransaction as jest.Mock).mockImplementation(async (db, transactionFn) => {
       const transaction = {
         get: jest.fn(async (docRef) => ({
@@ -389,7 +404,6 @@ describe('addDislikeToUser', () => {
   });
 
   it('returns false if user does not exist', async () => {
-    (doc as jest.Mock).mockImplementation((db, collectionName, docId) => `mock-${docId}-ref`);
     (runTransaction as jest.Mock).mockImplementation(async (db, transactionFn) => {
       const transaction = {
         get: jest.fn(async (docRef) => ({
@@ -410,7 +424,6 @@ describe('addDislikeToUser', () => {
   });
 
   it('returns false if transaction fails', async () => {
-    (doc as jest.Mock).mockImplementation((db, collectionName, docId) => `mock-${docId}-ref`);
     (runTransaction as jest.Mock).mockImplementation(async () => {
       throw new Error('Transaction failed');
     });
@@ -666,10 +679,13 @@ describe('sendMessage', () => {
     read: false,
   };
 
-  it('returns true when message is successfully added', async () => {
+  beforeEach(() => {
     (doc as jest.Mock).mockImplementation((db, collectionName, docId) => `mock-${docId}-ref`);
     (arrayUnion as jest.Mock).mockImplementation((msg) => [msg]);
     (increment as jest.Mock).mockImplementation((val) => val);
+  });
+
+  it('returns true when message is successfully added', async () => {
     (runTransaction as jest.Mock).mockImplementation(async (db, transactionFn) => {
       const transaction = {
         get: jest.fn(async (docRef) => ({
@@ -680,7 +696,6 @@ describe('sendMessage', () => {
       };
       await transactionFn(transaction);
 
-      // Assert update called with correct fields
       expect(transaction.update).toHaveBeenCalledWith(
         'mock-chat-123-ref',
         expect.objectContaining({
@@ -697,7 +712,6 @@ describe('sendMessage', () => {
   });
 
   it('returns false if chat does not exist', async () => {
-    (doc as jest.Mock).mockImplementation((db, collectionName, docId) => `mock-${docId}-ref`);
     (runTransaction as jest.Mock).mockImplementation(async (db, transactionFn) => {
       const transaction = {
         get: jest.fn(async (docRef) => ({
@@ -714,7 +728,6 @@ describe('sendMessage', () => {
   });
 
   it('returns false if transaction fails', async () => {
-    (doc as jest.Mock).mockImplementation((db, collectionName, docId) => `mock-${docId}-ref`);
     (runTransaction as jest.Mock).mockImplementation(async () => {
       throw new Error('Transaction failed');
     });
