@@ -1,4 +1,4 @@
-import { fetchUsersFromDB, addNewUserToDB, updateUserInDB, changeUserDocId } from '../utils/firebaseUtils';
+import { fetchUsersFromDB, addNewUserToDB, updateUserInDB, changeUserDocId, addLikeToUser, addDislikeToUser } from '../utils/firebaseUtils';
 import { mockFighters } from '../data/mockFighters';
 import { Discipline } from '@/types/fighter';
 import { defaultPhoto } from '@/app/(auth)/account-setup';
@@ -7,7 +7,7 @@ import { defaultPhoto } from '@/app/(auth)/account-setup';
 jest.mock('firebase/firestore', () => ({
   collection: jest.fn(),
   getDocs: jest.fn(),
-  doc: jest.fn(),
+  doc: jest.fn((db, collectionName, docId) => `mock-${docId}-ref`), // <-- mock implementation here!
   setDoc: jest.fn(),
   Timestamp: { fromDate: jest.fn(() => 'mock-timestamp') },
   arrayUnion: jest.fn(),
@@ -21,7 +21,7 @@ jest.mock('../FirebaseConfig', () => ({
 }));
 
 // Import after mocking
-import { collection, getDocs, doc, setDoc, getDoc, runTransaction } from 'firebase/firestore';
+import { collection, getDocs, doc, setDoc, getDoc, runTransaction, arrayUnion } from 'firebase/firestore';
 
 afterEach(() => {
   jest.clearAllMocks();
@@ -276,6 +276,134 @@ describe('changeUserDocId', () => {
     expect(result).toBe(false);
 
     // Assert transaction behavior
+    expect(runTransaction).toHaveBeenCalledWith(expect.anything(), expect.any(Function));
+  });
+});
+
+describe('addLikeToUser', () => {
+  const userId1 = 'user1-id';
+  const userId2 = 'user2-id';
+
+  it('returns true when like is successfully added', async () => {
+    (doc as jest.Mock).mockImplementation((db, collectionName, docId) => `mock-${docId}-ref`);
+    (arrayUnion as jest.Mock).mockImplementation((val) => [`EXISTING`, val]);
+    (runTransaction as jest.Mock).mockImplementation(async (db, transactionFn) => {
+      const transaction = {
+        get: jest.fn(async (docRef) => ({
+          exists: () => true,
+          data: () => ({ likes: ['EXISTING'] }),
+        })),
+        update: jest.fn(),
+      };
+      await transactionFn(transaction);
+
+      // Assert the update was called with the correct likes array
+      expect(transaction.update).toHaveBeenCalledWith(
+        'mock-user1-id-ref',
+        { likes: ['EXISTING', userId2] }
+      );
+    });
+
+    const result = await addLikeToUser(userId1, userId2);
+    
+    expect(result).toBe(true);
+    expect(runTransaction).toHaveBeenCalledWith(expect.anything(), expect.any(Function));
+  });
+
+  it('returns false if user does not exist', async () => {
+    (doc as jest.Mock).mockImplementation((db, collectionName, docId) => `mock-${docId}-ref`);
+    (runTransaction as jest.Mock).mockImplementation(async (db, transactionFn) => {
+      const transaction = {
+        get: jest.fn(async (docRef) => ({
+          exists: () => false,
+        })),
+        update: jest.fn(),
+      };
+      await transactionFn(transaction);
+
+      // Assert update was NOT called
+      expect(transaction.update).not.toHaveBeenCalled();
+    });
+
+    const result = await addLikeToUser(userId1, userId2);
+
+    expect(result).toBe(false);
+    expect(runTransaction).toHaveBeenCalledWith(expect.anything(), expect.any(Function));
+  });
+
+  it('returns false if transaction fails', async () => {
+    (doc as jest.Mock).mockImplementation((db, collectionName, docId) => `mock-${docId}-ref`);
+    (runTransaction as jest.Mock).mockImplementation(async () => {
+      throw new Error('Transaction failed');
+    });
+
+    const result = await addLikeToUser(userId1, userId2);
+
+    expect(result).toBe(false);
+    expect(runTransaction).toHaveBeenCalledWith(expect.anything(), expect.any(Function));
+  });
+});
+
+describe('addDislikeToUser', () => {
+  const userId1 = 'user1-id';
+  const userId2 = 'user2-id';
+
+  it('returns true when dislike is successfully added', async () => {
+    (doc as jest.Mock).mockImplementation((db, collectionName, docId) => `mock-${docId}-ref`);
+    (arrayUnion as jest.Mock).mockImplementation((val) => ['EXISTING', val]);
+    (runTransaction as jest.Mock).mockImplementation(async (db, transactionFn) => {
+      const transaction = {
+        get: jest.fn(async (docRef) => ({
+          exists: () => true,
+          data: () => ({ dislikes: ['EXISTING'] }),
+        })),
+        update: jest.fn(),
+      };
+      await transactionFn(transaction);
+
+      // Assert the update was called with the correct dislikes array
+      expect(transaction.update).toHaveBeenCalledWith(
+        'mock-user1-id-ref',
+        { dislikes: ['EXISTING', userId2] }
+      );
+    });
+
+    const result = await addDislikeToUser(userId1, userId2);
+
+    expect(result).toBe(true);
+    expect(runTransaction).toHaveBeenCalledWith(expect.anything(), expect.any(Function));
+  });
+
+  it('returns false if user does not exist', async () => {
+    (doc as jest.Mock).mockImplementation((db, collectionName, docId) => `mock-${docId}-ref`);
+    (runTransaction as jest.Mock).mockImplementation(async (db, transactionFn) => {
+      const transaction = {
+        get: jest.fn(async (docRef) => ({
+          exists: () => false,
+        })),
+        update: jest.fn(),
+      };
+      await transactionFn(transaction);
+
+      // Assert update was NOT called
+      expect(transaction.update).not.toHaveBeenCalled();
+    });
+
+    const result = await addDislikeToUser(userId1, userId2);
+
+    expect(result).toBe(false);
+    expect(runTransaction).toHaveBeenCalledWith(expect.anything(), expect.any(Function));
+  });
+
+  it('returns false if transaction fails', async () => {
+    (doc as jest.Mock).mockImplementation((db, collectionName, docId) => `mock-${docId}-ref`);
+    (runTransaction as jest.Mock).mockImplementation(async () => {
+      throw new Error('Transaction failed');
+    });
+
+    const result = await addDislikeToUser(userId1, userId2);
+
+    expect(result).toBe(false);
     expect(runTransaction).toHaveBeenCalledWith(expect.anything(), expect.any(Function));
   });
 });
