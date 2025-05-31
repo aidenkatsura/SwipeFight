@@ -1,4 +1,17 @@
-import { fetchUsersFromDB, addNewUserToDB, updateUserInDB, changeUserDocId, addLikeToUser, addDislikeToUser, fetchChatFromDB, fetchUserFromDB, fetchUserLikesFromDB, fetchUserDislikesFromDB, fetchUserChatsFromDB } from '../utils/firebaseUtils';
+import {
+  fetchUsersFromDB,
+  addNewUserToDB,
+  updateUserInDB,
+  changeUserDocId,
+  addLikeToUser,
+  addDislikeToUser,
+  fetchChatFromDB,
+  fetchUserFromDB,
+  fetchUserLikesFromDB,
+  fetchUserDislikesFromDB,
+  fetchUserChatsFromDB,
+  sendMessage
+} from '../utils/firebaseUtils';
 import { mockFighters } from '../data/mockFighters';
 import { Discipline } from '@/types/fighter';
 import { defaultPhoto } from '@/app/(auth)/account-setup';
@@ -7,12 +20,13 @@ import { defaultPhoto } from '@/app/(auth)/account-setup';
 jest.mock('firebase/firestore', () => ({
   collection: jest.fn(),
   getDocs: jest.fn(),
-  doc: jest.fn((db, collectionName, docId) => `mock-${docId}-ref`), // <-- mock implementation here!
+  doc: jest.fn(),
   setDoc: jest.fn(),
   Timestamp: { fromDate: jest.fn(() => 'mock-timestamp') },
   arrayUnion: jest.fn(),
   runTransaction: jest.fn(),
   getDoc: jest.fn(),
+  increment: jest.fn()
 }));
 
 // Mock db from FirebaseConfig
@@ -21,7 +35,7 @@ jest.mock('../FirebaseConfig', () => ({
 }));
 
 // Import after mocking
-import { collection, getDocs, doc, setDoc, getDoc, runTransaction, arrayUnion, Timestamp } from 'firebase/firestore';
+import { collection, getDocs, doc, setDoc, getDoc, runTransaction, arrayUnion, Timestamp, increment } from 'firebase/firestore';
 import { Chat } from '@/types/chat';
 
 afterEach(() => {
@@ -637,5 +651,75 @@ describe('fetchUserChatsFromDB', () => {
     (getDoc as jest.Mock).mockRejectedValue(new Error('Firestore error'));
 
     await expect(fetchUserChatsFromDB(userId)).rejects.toThrow();
+  });
+});
+
+describe('sendMessage', () => {
+  const chatId = 'chat-123';
+  const message = {
+    id: 'msg-1',
+    senderId: 'user1',
+    receiverId: 'user2',
+    message: 'Hello!',
+    timestamp: Timestamp.fromDate(new Date('2024-01-01T00:00:00Z')),
+    read: false,
+  };
+
+  it('returns true when message is successfully added', async () => {
+    (doc as jest.Mock).mockImplementation((db, collectionName, docId) => `mock-${docId}-ref`);
+    (arrayUnion as jest.Mock).mockImplementation((msg) => [msg]);
+    (increment as jest.Mock).mockImplementation((val) => val);
+    (runTransaction as jest.Mock).mockImplementation(async (db, transactionFn) => {
+      const transaction = {
+        get: jest.fn(async (docRef) => ({
+          exists: () => true,
+          data: () => ({ messages: [] }),
+        })),
+        update: jest.fn(),
+      };
+      await transactionFn(transaction);
+
+      // Assert update called with correct fields
+      expect(transaction.update).toHaveBeenCalledWith(
+        'mock-chat-123-ref',
+        expect.objectContaining({
+          messages: [message],
+          lastMessage: message,
+          'unreadCounts.user2': 1,
+        })
+      );
+    });
+
+    const result = await sendMessage(chatId, message);
+    expect(result).toBe(true);
+    expect(runTransaction).toHaveBeenCalledWith(expect.anything(), expect.any(Function));
+  });
+
+  it('returns false if chat does not exist', async () => {
+    (doc as jest.Mock).mockImplementation((db, collectionName, docId) => `mock-${docId}-ref`);
+    (runTransaction as jest.Mock).mockImplementation(async (db, transactionFn) => {
+      const transaction = {
+        get: jest.fn(async (docRef) => ({
+          exists: () => false,
+        })),
+        update: jest.fn(),
+      };
+      await transactionFn(transaction);
+    });
+
+    const result = await sendMessage(chatId, message);
+    expect(result).toBe(false);
+    expect(runTransaction).toHaveBeenCalledWith(expect.anything(), expect.any(Function));
+  });
+
+  it('returns false if transaction fails', async () => {
+    (doc as jest.Mock).mockImplementation((db, collectionName, docId) => `mock-${docId}-ref`);
+    (runTransaction as jest.Mock).mockImplementation(async () => {
+      throw new Error('Transaction failed');
+    });
+
+    const result = await sendMessage(chatId, message);
+    expect(result).toBe(false);
+    expect(runTransaction).toHaveBeenCalledWith(expect.anything(), expect.any(Function));
   });
 });

@@ -312,7 +312,6 @@ export async function sendMessage(chatId: string, message: ChatMessage): Promise
 
     await runTransaction(db, async (transaction) => {
       const chatSnap = await transaction.get(chatRef);
-
       if (!chatSnap.exists()) {
         throw new Error(`Chat with ID ${chatId} does not exist.`);
       }
@@ -323,7 +322,6 @@ export async function sendMessage(chatId: string, message: ChatMessage): Promise
       transaction.update(chatRef, {
         ["messages"]: arrayUnion(message), ["lastMessage"]: message, [`unreadCounts.${receiverId}`]: increment(1),
       });
-      
     });
 
     return true;
