@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, FlatList, TextInput, TouchableOpacity, Image, KeyboardAvoidingView, Platform, SafeAreaView, Keyboard } from 'react-native';
+import { StyleSheet, Text, View, FlatList, TextInput, TouchableOpacity, Image, KeyboardAvoidingView, Platform, SafeAreaView, Keyboard, ActivityIndicator } from 'react-native';
 import React, { useEffect, useState, useRef } from 'react';
 import { router, useLocalSearchParams } from 'expo-router';
 import { theme } from '@/styles/theme';
@@ -23,6 +23,7 @@ export default function ChatScreen() {
   const [newMessage, setNewMessage] = useState('');
   const [isScorecardVisible, setIsScorecardVisible] = useState(false);
   const [isCooldown, setIsCooldown] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const COOLDOWN_MINUTES = 2;
   const flatListRef = useRef<FlatList>(null);
   const keyboardHeight = useRef(0);
@@ -36,53 +37,52 @@ export default function ChatScreen() {
 
   const handleBack = useCustomBack(); // Custom back nav hook
 
+  // Redirect to chats list on loading error
+  useEffect(() => {
+    if (error) {
+      router.replace('/(tabs)/chats');
+    }
+  }, [error, router]);
+
   useEffect(() => {
     const auth = getAuth();
     const userId = auth.currentUser?.uid;
-    if (!id || typeof id !== 'string' || !userId) return;
+    if (!id || typeof id !== 'string' || !userId) {
+      setError('invalid-params');
+      return;
+    }
 
     const chatRef = doc(db, 'chats', id);
 
     const unsubscribe = onSnapshot(chatRef, async (snapshot) => {
-      if (!snapshot.exists()) return;
+      if (!snapshot.exists()) {
+        setError('not-found');
+        return;
+      }
 
-      const chatData = snapshot.data() as Chat;
+      try {
+        const chatData = snapshot.data() as Chat;
+        const otherUserId =
+          userId === chatData.participants[0].id
+            ? chatData.participants[1].id
+            : chatData.participants[0].id;
 
-      const otherUserId =
-        userId === chatData.participants[0].id
-          ? chatData.participants[1].id
-          : chatData.participants[0].id;
+        const otherParticipant = await fetchUserFromDB(otherUserId);
+        
+        const enriched: EnrichedChat = {
+          chat: chatData,
+          otherParticipant,
+        };
 
-      const otherParticipant = await fetchUserFromDB(otherUserId);
-
-      const enriched: EnrichedChat = {
-        chat: chatData,
-        otherParticipant,
-      };
-
-      setChat(enriched);
-      setMessages(chatData.messages); // live update
+        setChat(enriched);
+        setMessages(chatData.messages);
+        setError(null); // Clear any previous errors
+      } catch (err) {
+        setError('fetch-error');
+      }
     });
 
-    const keyboardWillShow = Keyboard.addListener(
-      Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
-      (e) => {
-        keyboardHeight.current = e.endCoordinates.height;
-      }
-    );
-
-    const keyboardWillHide = Keyboard.addListener(
-      Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
-      () => {
-        keyboardHeight.current = 0;
-      }
-    );
-
-    return () => {
-      unsubscribe(); // Cleanup Firestore listener
-      keyboardWillShow.remove();
-      keyboardWillHide.remove();
-    };
+    return () => unsubscribe();
   }, [id]);
 
   useEffect(() => {
@@ -282,8 +282,13 @@ export default function ChatScreen() {
     );
   };
 
-  if (!chat) {
-    return null; // Or a loading state
+  // Display loading state
+  if (!chat || error) {
+    return (
+      <GestureHandlerRootView style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color={theme.colors.primary[500]} />
+      </GestureHandlerRootView>
+    );
   }
 
   // Get the other participant (not the current user)

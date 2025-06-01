@@ -65,7 +65,7 @@ export default function EditProfileScreen() {
 
         setUser(updatedUser); // Update shared user state
 
-        handleBack(); // <-- Use custom back handler here
+        handleBack();
       } else {
         console.error('Failed to update profile.');
       }
