@@ -2,11 +2,17 @@
 
 SwipeFight is a mobile app that connects martial artists with local sparring partners through a fun, swipe-based matchmaking experience. Users can view profiles, challenge opponents, chat to coordinate fight sessions, and compete for rankings on the leaderboard.
 
-__Link to the App:__ 
+<div align="center">
+  <b>Relevant Links:</b>
+</div>
 
-(https://swipefight--jskuinw1em.expo.app)
+<br/>
 
----
+<div align="center">
+  <a href="https://swipefight--jskuinw1em.expo.app">SwipeFight</a> |
+  <a href="./documentation/UserManual.md">User Manual</a> |
+  <a href="./documentation/DeveloperDocumentation.md">Developer Documentation</a>
+</div>
 
 ## Features
 
@@ -15,7 +21,8 @@ __Link to the App:__
 - 🧑‍🤝‍🧑 Match with fighters based on discipline, location, and rating
 - 💬 Live in-app chat to coordinate sparring sessions
 - 🥇 Global leaderboard to track fighter rankings
-- 🥋 Support for multiple disciplines like Boxing, Jiu-Jitsu, Muay Thai, and more
+- 🥋 Supports multiple disciplines like Boxing, Jiu-Jitsu, Muay Thai, and more
+- 🏆 Earn achievements as you progress
 
 ---
 
@@ -76,43 +83,7 @@ To see our automated tests, navigate to the terminal and run the command
 </details>
 
 <details>
-<summary>Use Case 2 (Editing Profile Information)</summary>
-<br>
-     
-1. Actors
-   - Primary actor: User (with an existing account)
-2. Triggers
-   - User selects 'edit' on profile page
-3. Preconditions
-   - User has an existing profile
-   - User is currently authenticated/signed in to the app
-4. Postconditions (success scenario)
-   - User's updated information is reflected in their profile page
-      - For the user themselves
-      - For users that interact with the user's profile
-5. List of steps (success scenario)
-   1. User navigates to profile page
-   2. User selects 'edit'
-   3. User is presented editable profile info fields
-   4. User inputs updated profile info
-   5. User saves changes
-   6. System confirms changes (informing the user of success), navigates back to profile page
-6. Extensions/variations of the success scenario
-   - User chooses to edit profile image(s)
-      - User can select images from camera roll
-7. Exceptions: failure conditions and scenarios  
-   - User wants to edit profile image(s), but app does not have camera roll permissions
-      - If the app has not previously asked for camera roll permissions, user is presented with option to enable camera roll permissions
-      - If user has denied permissions, display a message directing them to change their settings, then return to editing page
-   - User exits app without saving profile changes
-      - Changes are lost, not updated on system
-   - Backend failure prevents saving of changes
-      - System informs user of save issue, presents option to retry or exit without saving
-      - User can keep retrying, or exit back to profile page with no changes made
-</details>
-
-<details>
-<summary>Use Case 3 (Initial Profile Setup)</summary>
+<summary>Use Case 2 (Initial Profile Setup)</summary>
 <br>
      
 1. Actors
@@ -145,6 +116,42 @@ To see our automated tests, navigate to the terminal and run the command
      - User can keep retrying or exit back to the profile page with no changes made
    - User inputs banned phrase
      - System informs user of use and prevents account creation
+</details>
+
+<details>
+<summary>Use Case 3 (Editing Profile Information)</summary>
+<br>
+     
+1. Actors
+   - Primary actor: User (with an existing account)
+2. Triggers
+   - User selects 'edit' on profile page
+3. Preconditions
+   - User has an existing profile
+   - User is currently authenticated/signed in to the app
+4. Postconditions (success scenario)
+   - User's updated information is reflected in their profile page
+      - For the user themselves
+      - For users that interact with the user's profile
+5. List of steps (success scenario)
+   1. User navigates to profile page
+   2. User selects 'edit'
+   3. User is presented editable profile info fields
+   4. User inputs updated profile info
+   5. User saves changes
+   6. System confirms changes (informing the user of success), navigates back to profile page
+6. Extensions/variations of the success scenario
+   - User chooses to edit profile image(s)
+      - User can select images from camera roll
+7. Exceptions: failure conditions and scenarios  
+   - User wants to edit profile image(s), but app does not have camera roll permissions
+      - If the app has not previously asked for camera roll permissions, user is presented with option to enable camera roll permissions
+      - If user has denied permissions, display a message directing them to change their settings, then return to editing page
+   - User exits app without saving profile changes
+      - Changes are lost, not updated on system
+   - Backend failure prevents saving of changes
+      - System informs user of save issue, presents option to retry or exit without saving
+      - User can keep retrying, or exit back to profile page with no changes made
 </details>
 
 <details>
@@ -205,6 +212,29 @@ To see our automated tests, navigate to the terminal and run the command
    - Detection of failed message sent, prompting users to retry
 </details>
 
+<details>
+<summary>Use Case 6 (Changing Location)</summary>
+<br>
+
+1. Actors
+   - Primary Actor: User
+2. Triggers
+   - When a user enters a location on the profile creation/editing screen
+3. Preconditions
+   - User is currently on the profile creation/editing screen
+4. Postconditions (success scenario)
+   - New location is displayed
+5. List of Steps (success scenario)
+   1. User navigates to the profile creation/editing page
+   2. User types in city
+   3. User selects city
+   4. User creates/saves profile
+6. Extensions/Variations of the Success Scenario
+   - If the user enters the location and cancels, the information is not changed
+7. Exceptions: Failure Conditions and Scenarios
+   - If the user types a location but does not click the location, the information will not be saved.
+</details>
+
 ## Tech Stack
 
 - **Frontend**: React Native
@@ -243,10 +273,10 @@ SwipeFight/
 ├── components/                  # UI Components
 ├── context/                     # Context/provider components
 ├── data/                        # Mock data (for testing)
+├── documentation/               # User Manual and Developer Documentation
 ├── hooks/                       # Hooks for React
 ├── ios/                         # To run on iOS with Xcode
-├── node_modules/                # npm/Node.js
-├── reports/                     # Docs, Progress Reports and Living Document
+├── reports/                     # Progress Reports and Living Document
 ├── styles/                      # Theme
 ├── test/                        # Jest tests (UI, Firebase, and unit)
 ├── types/                       # Data types

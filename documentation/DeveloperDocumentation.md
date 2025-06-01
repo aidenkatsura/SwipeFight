@@ -13,7 +13,7 @@ ___Developer Documentation___
 
     Testing: ./testing
 
-    Documentation: ./reports
+    Documentation: ./documentation
 
     Data files: ./data
 
@@ -35,10 +35,10 @@ SwipeFight/
 ├── components/                  # UI Components
 ├── context/                     # Context/provider components
 ├── data/                        # Mock data (for testing)
+├── documentation/               # User Manual and Developer Documentation
 ├── hooks/                       # Hooks for React
 ├── ios/                         # To run on iOS with Xcode
-├── node_modules/                # npm/Node.js
-├── reports/                     # Docs, Progress Reports and Living Document
+├── reports/                     # Progress Reports and Living Document
 ├── styles/                      # Theme
 ├── test/                        # Jest tests (UI, Firebase, and unit)
 ├── types/                       # Data types
@@ -82,6 +82,3 @@ SwipeFight/
       test(/*...*/);
    });
    ```
-   
-
-   
