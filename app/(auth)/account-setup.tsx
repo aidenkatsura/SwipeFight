@@ -9,6 +9,11 @@ import * as ImagePicker from 'expo-image-picker';
 import { addNewUserToDB } from '@/utils/firebaseUtils';
 import { LocationSelector } from '@/components/LocationSelector';
 
+/**
+ * Default profile photo URL used on account creation
+ */
+export const defaultPhoto = 'https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png';
+
 export default function AccountSetupScreen() {
   const [name, setName] = useState('');
   const [age, setAge] = useState('');
@@ -19,7 +24,6 @@ export default function AccountSetupScreen() {
   const [photo, setPhoto] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const defaultPhoto = 'https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png';
 
   // Check authentication status when component mounts
   useEffect(() => {

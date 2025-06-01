@@ -187,6 +187,7 @@ export default function ProfileScreen() {
         onPress={handleSignOut}
         accessibilityLabel="Log out"
         accessibilityHint="Tap to sign out of your account"
+        testID='logout-button'
       >
         <LogOut color={theme.colors.gray[600]} size={20} accessibilityLabel="Logout icon" />
         <Text style={styles.logoutText}>Log Out</Text>

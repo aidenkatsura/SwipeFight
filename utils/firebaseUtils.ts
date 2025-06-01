@@ -2,6 +2,7 @@ import { collection, getDocs, doc, getDoc, setDoc, deleteDoc, addDoc, runTransac
 import { db } from '../FirebaseConfig';
 import { Discipline, Fighter } from '@/types/fighter';
 import { Chat, ChatMessage} from '@/types/chat';
+import { defaultPhoto } from '@/app/(auth)/account-setup';
 
 /**
  * Fetch all users from the Firestore database.
@@ -33,11 +34,12 @@ export const fetchUsersFromDB = async (): Promise<Fighter[]> => {
  * @param {GeoPoint} coordinates - The new user's coordinates
  * @param {Discipline} discipline - The new user's discipline
  * @param {string} rank - The new user's rank
- * @param {string|null} photo - The new user's photo
+ * @param {string|null} photo - The new user's photo, or null if default photo desired
  * @throws Throws an error if an unexpected failure occurs.
  */
-export const addNewUserToDB = async (userId: string, name: string, age: string, location: string, coordinates: GeoPoint, discipline: Discipline, rank: string, photo: string|null) => {
-  const defaultPhoto = 'https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png';
+export const addNewUserToDB = async (userId: string, name: string, age: string, location: string,
+  coordinates: GeoPoint, discipline: Discipline, rank: string, photo: string|null) => {
+    
   console.log('Creating user profile with data:', {
     id: userId,
     name,
@@ -108,8 +110,8 @@ export const updateUserInDB = async (userId: string, updatedData: Partial<Fighte
  * @param {string} oldDocId - The current document ID of the user.
  * @param {string} newDocId - The new document ID to assign to the user.
  * @returns {Promise<boolean>} Resolves to true if the document ID was successfully changed, 
- *                             or false if the old ID does not exist or the new ID already exists.
- * @throws Throws an error if an unexpected failure occurs.
+ *                             or false if the old ID does not exist, the new ID already exists,
+ *                             or an error occurs during the transaction.
  */
 export const changeUserDocId = async (oldDocId: string, newDocId: string): Promise<boolean> => {
   try {
@@ -142,16 +144,14 @@ export const changeUserDocId = async (oldDocId: string, newDocId: string): Promi
   }
 };
 
-
 /**
  * Adds a Like to the target user's Likes array
  * 
  * @param {string} userId1 - The current document ID of the user.
  * @param {string} userId1 - The user id of the user whose been Liked with.
  * @returns {Promise<boolean>} Resolves to true if successful
- * @throws Throws an error if an unexpected failure occurs.
  */
-export async function addLikeToUser(userId1: string, userId2: string) {
+export async function addLikeToUser(userId1: string, userId2: string): Promise<boolean> {
   return addToUserArray(userId1, userId2, "likes");
 };
 
@@ -162,9 +162,8 @@ export async function addLikeToUser(userId1: string, userId2: string) {
  * @param {string} targetUserId - The current document ID of the user.
  * @param {string} dislikedUserId - The user id of the user whose been matched with.
  * @returns {Promise<boolean>} Resolves to true if successful
- * @throws Throws an error if an unexpected failure occurs.
  */
- export async function addDislikeToUser(userId1: string, userId2: string){
+ export async function addDislikeToUser(userId1: string, userId2: string): Promise<boolean> {
   return addToUserArray(userId1, userId2, "dislikes");
 };
 
@@ -173,7 +172,7 @@ export async function addLikeToUser(userId1: string, userId2: string) {
  *  
  * @param {string} targetChatId - the target id of the Chat
  * 
- * @returns {Promise<Chat>} A promise that resolves to an array of Fighter objects.
+ * @returns {Promise<Chat>} A promise that resolves to a Chat object.
  * @throws Throws an error if fetching users fails.
  */
 export const fetchChatFromDB = async (targetChatId: string): Promise<Chat> => {
@@ -191,13 +190,12 @@ export const fetchChatFromDB = async (targetChatId: string): Promise<Chat> => {
   }
 };
 
-
 /**
  * Fetch a specific user from the Firestore database.
  *  
  * @param {string} targetUserId - the target id of the user
  * 
- * @returns {Promise<Fighter>} A promise that resolves to an array of Fighter objects.
+ * @returns {Promise<Fighter>} A promise that resolves to a Fighter object.
  * @throws Throws an error if fetching users fails.
  */
 export const fetchUserFromDB = async (targetUserId: string): Promise<Fighter> => {
@@ -226,7 +224,6 @@ export const fetchUserLikesFromDB = async (targetUserId: string): Promise<string
   return fetchUserArray(targetUserId, "likes");
 };
 
-
 /**
  * Fetch the 'dislikes' array from a specific user document.
  * 
@@ -237,7 +234,6 @@ export const fetchUserLikesFromDB = async (targetUserId: string): Promise<string
 export const fetchUserDislikesFromDB = async (targetUserId: string): Promise<string[]> => {
   return fetchUserArray(targetUserId, "dislikes");
 };
-
 
 /**
  * Fetch the 'chats' array from a specific user document.
@@ -250,14 +246,13 @@ export const fetchUserChatsFromDB = async (targetUserId: string): Promise<string
   return fetchUserArray(targetUserId, "chats");
 };
 
-
 /**
  * Adds a user ID to a specific array field in another user's document.
  *
  * @param {string} targetUserId - The user document to update.
  * @param {string} userIdToAdd - The user ID to add to the array.
  * @param {string} arrayField - The name of the array field to update (e.g., 'matches', 'likes').
- * @returns {Promise<boolean>} Resolves to true if successful, false otherwise.
+ * @returns {Promise<boolean>} Resolves to true if add is successful, false otherwise.
  */
 async function addToUserArray(targetUserId: string, userIdToAdd: string, arrayField: string): 
                                                                           Promise<boolean> {
@@ -310,23 +305,19 @@ const fetchUserArray = async (targetUserId: string, targetArray: string): Promis
   }
 };
 
-
-
 /**
  * Adds a chat message to a chat in the database
  *
  * @param {string} chatId - The target chat.
  * @param {ChatMessage} message - The chat message that will be added to the chat.
- * @returns {Promise<boolean>} Resolves to true if successful, false otherwise.
+ * @returns {Promise<boolean>} Resolves to true if adding message is successful, false otherwise.
  */
-export async function sendMessage(chatId: string, message: ChatMessage): 
-                                                                          Promise<boolean> {
+export async function sendMessage(chatId: string, message: ChatMessage): Promise<boolean> {
   try {
     const chatRef = doc(db, 'chats', chatId);
 
     await runTransaction(db, async (transaction) => {
       const chatSnap = await transaction.get(chatRef);
-
       if (!chatSnap.exists()) {
         throw new Error(`Chat with ID ${chatId} does not exist.`);
       }
@@ -337,7 +328,6 @@ export async function sendMessage(chatId: string, message: ChatMessage):
       transaction.update(chatRef, {
         ["messages"]: arrayUnion(message), ["lastMessage"]: message, [`unreadCounts.${receiverId}`]: increment(1),
       });
-      
     });
 
     return true;
@@ -378,21 +368,16 @@ const fetchUserString = async (targetUserId: string, targetField: string): Promi
   }
 };
 
-
-
-  /**
- * creates a chat between two users
- * adds it a chat into the chat collection
- * adds the chat id to both user's chat array
+/**
+ * Creates a chat between two users
+ * Adds a chat into the chat collection
+ * Adds the chat id to both user's chat array
  * 
- * 
- * @param {string} userId1 - user 1's id
- * @param {string} userId2 - user 2's id
- * @returns {Promise<boolean>} Resolves to true if the document ID was successfully changed, 
- *                             or false if the old ID does not exist or the new ID already exists.
+ * @param {string} userId1 - User 1's id
+ * @param {string} userId2 - User 2's id
  * @throws Throws an error if an unexpected failure occurs.
  */
-export async function addChat(userId1: string, userId2: string) {
+export async function addChat(userId1: string, userId2: string): Promise<void> {
   // Create a reference to a new document in the 'chats' collection
   const chatDocRef = doc(collection(db, 'chats'));
   const chatId = chatDocRef.id;
