@@ -1,12 +1,13 @@
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image, SafeAreaView, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image, SafeAreaView, KeyboardAvoidingView, Platform, ScrollView, FlatList } from 'react-native';
 import { useState, useEffect } from 'react';
 import { router } from 'expo-router';
 import { theme } from '@/styles/theme';
 import { auth, db } from '@/FirebaseConfig';
-import { doc, setDoc, Timestamp } from 'firebase/firestore';
+import { GeoPoint } from 'firebase/firestore';
 import { Discipline } from '@/types/fighter';
 import * as ImagePicker from 'expo-image-picker';
 import { addNewUserToDB } from '@/utils/firebaseUtils';
+import { LocationSelector } from '@/components/LocationSelector';
 
 /**
  * Default profile photo URL used on account creation
@@ -17,6 +18,7 @@ export default function AccountSetupScreen() {
   const [name, setName] = useState('');
   const [age, setAge] = useState('');
   const [location, setLocation] = useState('');
+  const [coordinates, setCoordinates] = useState<GeoPoint>();
   const [discipline, setDiscipline] = useState<Discipline>('MMA');
   const [rank, setRank] = useState<string>('Beginner');
   const [photo, setPhoto] = useState<string | null>(null);
@@ -61,7 +63,7 @@ export default function AccountSetupScreen() {
 
   const handleCompleteSetup = async () => {
     try {
-      if (!name || !age || !location || !discipline || !rank) {
+      if (!name || !age || !location || !coordinates || !discipline || !rank) {
         setError('Please fill in all required fields');
         return;
       }
@@ -79,7 +81,7 @@ export default function AccountSetupScreen() {
         throw new Error('No authenticated user found');
       }
       
-      addNewUserToDB(user.uid, name, age, location, discipline, rank, photo);
+      addNewUserToDB(user.uid, name, age, location, coordinates, discipline, rank, photo);
       
       console.log('Profile created successfully, navigating to tabs');
       // Navigate to main app
@@ -141,13 +143,15 @@ export default function AccountSetupScreen() {
 
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Location</Text>
-            <TextInput
-              style={styles.input}
-              value={location}
-              onChangeText={setLocation}
-              placeholder="Enter your location"
-              placeholderTextColor={theme.colors.gray[400]}
-            />
+            <LocationSelector
+            initialLocation={null}
+            onSelect={(loc) => {
+              console.log('Selected:', loc);
+              setLocation(loc.name);
+              setCoordinates(new GeoPoint(loc.lat, loc.lng));
+              // save to Firebase as GeoPoint(lat, lng)
+            }}
+          />
           </View>
 
           <View style={styles.inputContainer}>

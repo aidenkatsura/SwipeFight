@@ -9,6 +9,7 @@ jest.mock('firebase/firestore', () => ({
   arrayUnion: jest.fn(),
   Timestamp: { fromDate: jest.fn(() => 'mock-timestamp') },
   increment: jest.fn(),
+  GeoPoint: jest.fn().mockImplementation((lat, lng) => ({ latitude: lat, longitude: lng })),
 }));
 
 // Mock db from FirebaseConfig
@@ -27,6 +28,7 @@ import {
   arrayUnion,
   Timestamp,
   increment,
+  GeoPoint
 } from 'firebase/firestore';
 
 import {
@@ -91,6 +93,7 @@ describe('addNewUserToDB', () => {
   const name = 'Test User';
   const age = '25';
   const location = 'Test City';
+  const coordinates = new GeoPoint(0, 30);
   const discipline: Discipline = 'Boxing';
   const rank = 'Beginner';
   const photo = 'http://test/photo.png';
@@ -99,7 +102,7 @@ describe('addNewUserToDB', () => {
     (doc as jest.Mock).mockReturnValue('mock-user-ref');
     
     // Add a new user (all valid params)
-    await addNewUserToDB(userId, name, age, location, discipline, rank, photo);
+    await addNewUserToDB(userId, name, age, location, coordinates, discipline, rank, photo);
 
     // Assert correct document/userId accessed, and data set correctly
     expect(doc).toHaveBeenCalledWith(expect.anything(), 'users', userId);
@@ -108,6 +111,7 @@ describe('addNewUserToDB', () => {
       name,
       age: parseInt(age, 10),
       location,
+      coordinates,
       discipline,
       rank,
       photo,
@@ -117,7 +121,10 @@ describe('addNewUserToDB', () => {
       draws: 0,
       likes: [],
       dislikes: [],
+      recentMatches: [],
       chats: [],
+      achievements: [],
+
       createdAt: 'mock-timestamp',
     }));
   });
@@ -126,7 +133,7 @@ describe('addNewUserToDB', () => {
     (doc as jest.Mock).mockReturnValue('mock-user-ref');
     
     // Add a new user (all valid, null photo)
-    await addNewUserToDB(userId, name, age, location, discipline, rank, null);
+    await addNewUserToDB(userId, name, age, location, coordinates, discipline, rank, null);
 
     // Assert correct document/userId accessed, and data set correctly (w/ defaultPhoto)
     expect(doc).toHaveBeenCalledWith(expect.anything(), 'users', userId);

@@ -1,3 +1,7 @@
+import { Timestamp } from "firebase/firestore";
+
+import { GeoPoint } from "firebase/firestore";
+
 export interface Fighter {
   id: string;
   name: string;
@@ -6,12 +10,24 @@ export interface Fighter {
   discipline: Discipline;
   rank: string;
   location: string;
+  coordinates: GeoPoint;
   rating: number;
   wins: number;
   losses: number;
   draws: number;
   likes: string[];
   dislikes: string[];
+  achievements: {
+    achievement: string,
+    date: Timestamp
+  }[];
+  recentMatches: {
+    opponentName: string,
+    opponentPhoto: string,
+    date: Timestamp,
+    result: 'win' | 'loss' | 'draw'
+  }[];
+  chats: string[];
 }
 
 // If adding anything here, make sure to update the DisciplineFilter.tsx file as well

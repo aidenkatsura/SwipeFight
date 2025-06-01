@@ -8,6 +8,8 @@ import { updateUserInDB } from '@/utils/firebaseUtils';
 import { auth } from '@/FirebaseConfig';
 import { Discipline } from '@/types/fighter';
 import { useUser } from '@/context/UserContext';
+import { LocationSelector } from '@/components/LocationSelector';
+import { GeoPoint } from 'firebase/firestore';
 
 export default function EditProfileScreen() {
   const router = useRouter();
@@ -21,9 +23,10 @@ export default function EditProfileScreen() {
   const [discipline, setDiscipline] = useState<Discipline | undefined>(user?.discipline);
   const [rank, setRank] = useState<string | undefined>(user?.rank);
   const [photo, setPhoto] = useState(user?.photo || '');
+  const [coordinates, setCoordinates] = useState<GeoPoint | undefined>(user?.coordinates);
 
   const handleSave = async () => {
-    if (!name || !age || !location || !discipline || !rank) {
+    if (!name || !age || !location || !coordinates || !discipline || !rank) {
       alert('Please fill in all required fields');
       return;
     } else if (!user) {
@@ -33,7 +36,7 @@ export default function EditProfileScreen() {
       console.error('No authenticated user found.');
       return;
     }
-    
+
     const parsedAge = parseInt(age, 10);
     if (isNaN(parsedAge) || parsedAge <= 0 || parsedAge >= 150) {
       console.error('Please enter a valid age (1-149)');
@@ -45,6 +48,7 @@ export default function EditProfileScreen() {
       name,
       age: parsedAge,
       location,
+      coordinates,
       discipline,
       rank,
       photo,
@@ -124,11 +128,14 @@ export default function EditProfileScreen() {
           />
 
           <Text style={styles.label}>Location</Text>
-          <TextInput
-            style={styles.input}
-            value={location}
-            onChangeText={setLocation}
-          />
+          <LocationSelector
+                      initialLocation={user?.location ?? null}
+                      onSelect={(loc) => {
+                        setLocation(loc.name);
+                        setCoordinates(new GeoPoint(loc.lat, loc.lng));
+                        // save to Firebase as GeoPoint(lat, lng)
+                      }}
+                    />
 
           <Text style={styles.label}>Discipline</Text>
           <SelectList
@@ -173,13 +180,21 @@ export default function EditProfileScreen() {
           />
 
           <View style={styles.buttonContainer}>
-            <TouchableOpacity style={styles.cancelButton} onPress={() => router.back()}>
+            <TouchableOpacity
+              style={styles.cancelButton}
+              onPress={() => router.back()}
+              accessibilityLabel="Cancel editing"
+              accessibilityHint="Tap to cancel changes and go back"
+            >
               <Text style={styles.cancelButtonText}>Cancel</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={[styles.saveButton, saving && styles.saveButtonDisabled]}
               onPress={handleSave}
-              disabled={saving} // Disable button while waiting on save
+              disabled={saving}
+              accessibilityLabel="Save changes"
+              accessibilityHint="Tap to save your profile changes"
+              accessibilityState={{ disabled: saving }}
             >
               <Text style={styles.saveButtonText}>
                 {saving ? 'Saving...' : 'Save'}

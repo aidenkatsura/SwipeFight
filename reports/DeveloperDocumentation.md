@@ -17,7 +17,35 @@ ___Developer Documentation___
 
     Data files: ./data
 
-4. __Build the software__
+    #### Current Repository Layout:
+
+```bash
+SwipeFight/
+├── README.md                    # Overview, setup, and documentation
+├── .gitignore                   # Files and folders to ignore in Git
+├── .expo/                       # Expo app and router
+├── .github/workflows/           # Continous Integration
+├── app/                         # React Native mobile application
+│   ├── (auth)/                  # User Authentication
+│   ├── (tabs)/                  # App screens (Home, Chat, Leaderboard, etc.)
+│   ├── chat/                    # Live chat
+│   ├── other_profile/           # Other users' profile page
+│   ├── profile-editor/          # Edit User Profile
+├── assets/images/               # Logos
+├── components/                  # UI Components
+├── context/                     # Context/provider components
+├── data/                        # Mock data (for testing)
+├── hooks/                       # Hooks for React
+├── ios/                         # To run on iOS with Xcode
+├── node_modules/                # npm/Node.js
+├── reports/                     # Docs, Progress Reports and Living Document
+├── styles/                      # Theme
+├── test/                        # Jest tests (UI, Firebase, and unit)
+├── types/                       # Data types
+├── utils/                       # Helper methods (e.g., Firebase interactions, filtering)
+```
+
+3. __Build the software__
    
    eas build --profile development --platform ios
 
@@ -26,7 +54,7 @@ ___Developer Documentation___
    npm install
    npx expo start
    ```
-5. __Test the software__
+4. __Test the software__
    
    To test, run the command:
    ```
@@ -34,7 +62,7 @@ ___Developer Documentation___
    ```
    And the test suite will show all tests along with pass/fails
 
-6. __Add new tests__
+5. __Add new tests__
 
    We are using the [Jest](https://jestjs.io/docs/getting-started) test framework and TypeScript as the test language. Navigate to ./test/ to view the test files. When adding a test for an existing feature, add a specific test within the associated feature. 
    ```ts
@@ -51,7 +79,7 @@ ___Developer Documentation___
    If adding a test for a brand new feature, add a new suite function using:
    ```ts
    describe('<Feature name>', () => {
-      test('...') {/* ... */}
+      test(/*...*/);
    });
    ```
    
