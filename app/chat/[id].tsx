@@ -15,6 +15,7 @@ import { getAuth } from 'firebase/auth';
 import { db } from '@/FirebaseConfig';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ACHIEVEMENTS } from '@/types/achievements';
+import { useCustomBack } from '@/hooks/useCustomBack';
 
 export default function ChatScreen() {
   const { id } = useLocalSearchParams();
@@ -32,6 +33,8 @@ export default function ChatScreen() {
   };
 
   const [chat, setChat] = useState<EnrichedChat | null>(null);
+
+  const handleBack = useCustomBack(); // Custom back nav hook
 
   useEffect(() => {
     const auth = getAuth();
@@ -290,7 +293,7 @@ export default function ChatScreen() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaView style={styles.container}>
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => router.back()} style={{ marginRight: theme.spacing[3] }}>
+          <TouchableOpacity onPress={handleBack} style={{ marginRight: theme.spacing[3] }}>
             <Ionicons name="arrow-back" size={28} color={theme.colors.gray[900]} accessibilityLabel="Go back" />
           </TouchableOpacity>
           <TouchableOpacity

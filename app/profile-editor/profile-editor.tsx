@@ -10,6 +10,7 @@ import { Discipline } from '@/types/fighter';
 import { useUser } from '@/context/UserContext';
 import { LocationSelector } from '@/components/LocationSelector';
 import { GeoPoint } from 'firebase/firestore';
+import { useCustomBack } from '@/hooks/useCustomBack';
 
 export default function EditProfileScreen() {
   const router = useRouter();
@@ -24,6 +25,8 @@ export default function EditProfileScreen() {
   const [rank, setRank] = useState<string | undefined>(user?.rank);
   const [photo, setPhoto] = useState(user?.photo || '');
   const [coordinates, setCoordinates] = useState<GeoPoint | undefined>(user?.coordinates);
+
+  const handleBack = useCustomBack(); // Custom back hook for routing
 
   const handleSave = async () => {
     if (!name || !age || !location || !coordinates || !discipline || !rank) {
@@ -62,7 +65,7 @@ export default function EditProfileScreen() {
 
         setUser(updatedUser); // Update shared user state
 
-        router.back();
+        handleBack(); // <-- Use custom back handler here
       } else {
         console.error('Failed to update profile.');
       }
@@ -182,7 +185,7 @@ export default function EditProfileScreen() {
           <View style={styles.buttonContainer}>
             <TouchableOpacity
               style={styles.cancelButton}
-              onPress={() => router.back()}
+              onPress={handleBack}
               accessibilityLabel="Cancel editing"
               accessibilityHint="Tap to cancel changes and go back"
             >
