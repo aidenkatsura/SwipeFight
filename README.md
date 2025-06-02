@@ -1,5 +1,7 @@
 # SwipeFight 🥊
 
+[![Node.js CI](https://github.com/aidenkatsura/SwipeFight/actions/workflows/node.js.yml/badge.svg)](https://github.com/aidenkatsura/SwipeFight/actions/workflows/node.js.yml)
+
 SwipeFight is a mobile app that connects martial artists with local sparring partners through a fun, swipe-based matchmaking experience. Users can view profiles, challenge opponents, chat to coordinate fight sessions, and compete for rankings on the leaderboard.
 
 <div align="center">
