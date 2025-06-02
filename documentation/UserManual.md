@@ -21,7 +21,7 @@ npx expo start
 
 ## Run
 
-The latest release of the app can be accessed on any web-enabled device through this link: (https://swipefight--jskuinw1em.expo.app)
+The latest release of the app can be accessed on any web-enabled device through this link: (https://swipefight--g6lclxs58i.expo.app)
 
 After running 'npx expo start' the app can be opened by:
  - Scanning the generated QR code with the camera app which will open SwipeFight in Expo Go.
