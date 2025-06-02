@@ -10,14 +10,19 @@ type UserContextType = {
   fetchUser: () => Promise<void>;
 };
 
-const UserContext = createContext<UserContextType>({
+export const UserContext = createContext<UserContextType>({
   user: null,
   setUser: () => {},
   fetchUser: async () => {},
 });
 
-// Tracks a user profile, allowing for shared user profile state between components
-// (useful for updating user state in profile page after editing)
+/**
+ * Provides shared user profile state across components.
+ * Useful for updating the user profile after editing on the profile page.
+ *
+ * @param children - The child components that will have access to the user context.
+ * @returns A context provider for user-related state and actions.
+ */
 export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<UserProfile | null>(null);
 
