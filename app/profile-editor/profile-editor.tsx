@@ -1,7 +1,7 @@
-import { Image, KeyboardAvoidingView, Text, TextInput, Platform, TouchableOpacity, ScrollView, StyleSheet, SafeAreaView, View } from 'react-native';
+import { Image, KeyboardAvoidingView, Text, TextInput, Platform, TouchableOpacity, ScrollView, StyleSheet, SafeAreaView, View, ActivityIndicator } from 'react-native';
 import { SelectList } from 'react-native-dropdown-select-list';
 import * as ImagePicker from 'expo-image-picker';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'expo-router';
 import { theme } from '@/styles/theme';
 import { updateUserInDB } from '@/utils/firebaseUtils';
@@ -10,13 +10,16 @@ import { Discipline } from '@/types/fighter';
 import { useUser } from '@/context/UserContext';
 import { LocationSelector } from '@/components/LocationSelector';
 import { GeoPoint } from 'firebase/firestore';
+import { useCustomBack } from '@/hooks/useCustomBack';
 
 export default function EditProfileScreen() {
   const router = useRouter();
-  const { user, setUser } = useUser(); // Shared user state from UserContext
-  const [saving, setSaving] = useState(false);
+  const { user, setUser } = useUser();
+  const handleBack = useCustomBack();
 
-  // Initialize form fields with user data from context
+  // Add a loading state for user context
+  const [checking, setChecking] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [name, setName] = useState(user?.name || '');
   const [age, setAge] = useState(user?.age.toString() || '');
   const [location, setLocation] = useState(user?.location || '');
@@ -24,6 +27,19 @@ export default function EditProfileScreen() {
   const [rank, setRank] = useState<string | undefined>(user?.rank);
   const [photo, setPhoto] = useState(user?.photo || '');
   const [coordinates, setCoordinates] = useState<GeoPoint | undefined>(user?.coordinates);
+
+  useEffect(() => {
+    // Only check for user and auth
+    if (user && auth.currentUser) {
+      setChecking(false);
+    } else {
+      // Defer navigation to after the first render tick
+      const timeout = setTimeout(() => {
+        router.replace('/(tabs)/profile');
+      }, 0);
+      return () => clearTimeout(timeout);
+    }
+  }, [user, router]);
 
   const handleSave = async () => {
     if (!name || !age || !location || !coordinates || !discipline || !rank) {
@@ -62,7 +78,7 @@ export default function EditProfileScreen() {
 
         setUser(updatedUser); // Update shared user state
 
-        router.back();
+        handleBack();
       } else {
         console.error('Failed to update profile.');
       }
@@ -91,6 +107,16 @@ export default function EditProfileScreen() {
       setPhoto(pickerResult.assets[0].uri);
     }
   };
+
+  if (checking) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <ActivityIndicator size="large" color={theme.colors.primary[500]} />
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -182,7 +208,7 @@ export default function EditProfileScreen() {
           <View style={styles.buttonContainer}>
             <TouchableOpacity
               style={styles.cancelButton}
-              onPress={() => router.back()}
+              onPress={handleBack}
               accessibilityLabel="Cancel editing"
               accessibilityHint="Tap to cancel changes and go back"
             >
