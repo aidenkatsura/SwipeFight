@@ -223,22 +223,18 @@ export default function ChatScreen() {
     let newAchievements = [];
 
     const categories = ['wins', 'losses', 'draws', 'rating'] as const;
+    const existingAchievementNames = (updatedUser.achievements || []).map((a: { achievement: string }) => a.achievement);
 
     for (const category of categories) {
       const currentValue = updatedUser[category];
-      const unlocked = ACHIEVEMENTS[category].filter(a => currentValue == a.count)
-        .map(a => a.name);
-
-      const alreadyUnlocked = updatedUser.achievements || [];
-
-      for (const achievement of unlocked) {
-        if (!alreadyUnlocked.includes(achievement)) {
-          newAchievements.push({
-            achievement: achievement,
-            date: Timestamp.now()
-          })
-        }
-      }
+      const unlocked = ACHIEVEMENTS[category]
+        .filter(a => currentValue == a.count && !existingAchievementNames.includes(a.name))
+        .map(a => ({
+          achievement: a.name,
+          date: Timestamp.now()
+        }));
+      
+      newAchievements.push(...unlocked);
     }
 
     if (newAchievements.length > 0) {

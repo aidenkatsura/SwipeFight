@@ -11,7 +11,7 @@ SwipeFight is a mobile app that connects martial artists with local sparring par
 <br/>
 
 <div align="center">
-  <a href="https://swipefight--g6lclxs58i.expo.app">SwipeFight</a> |
+  <a href="https://swipefight--t77u5pi7in.expo.app">SwipeFight</a> |
   <a href="./documentation/UserManual.md">User Manual</a> |
   <a href="./documentation/DeveloperDocumentation.md">Developer Documentation</a>
 </div>
