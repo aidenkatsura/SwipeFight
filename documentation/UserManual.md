@@ -21,7 +21,7 @@ npx expo start
 
 ## Run
 
-The latest release of the app can be accessed on any web-enabled device through this link: (https://swipefight--jskuinw1em.expo.app)
+The latest release of the app can be accessed on any web-enabled device through this link: (https://swipefight--g6lclxs58i.expo.app)
 
 After running 'npx expo start' the app can be opened by:
  - Scanning the generated QR code with the camera app which will open SwipeFight in Expo Go.
@@ -138,7 +138,7 @@ This page allows you to visit the profiles of other users. It shares the same in
 If you encounter any bugs while using SwipeFight, let us know using our GitHub Issues following these steps:
  1. Navigate to SwipeFight's [GitHub Issues](https://github.com/aidenkatsura/SwipeFight/issues)
  2. Click the "New Issue" button
- 3. Fill in the Bug Report
+ 3. Fill in the [Bug Report template](https://github.com/aidenkatsura/SwipeFight/issues/new?template=issue_template.md)
 
     - Use a title that is clear, concise and descriptive
     - Describe the expected and actual behavior

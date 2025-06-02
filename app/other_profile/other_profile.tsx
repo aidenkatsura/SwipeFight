@@ -2,18 +2,20 @@ import { StyleSheet, Text, View, Image, ScrollView, TouchableOpacity, SafeAreaVi
 import { StatusBar } from 'expo-status-bar';
 import { Medal } from 'lucide-react-native';
 import { theme } from '@/styles/theme';
-import { router, useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams } from 'expo-router';
 import { Fighter } from '@/types/fighter';
 import { useEffect, useState } from 'react';
 import StatCard from '@/components/StatCard';
 import { fetchUserFromDB } from '@/utils/firebaseUtils';
 import { Ionicons } from '@expo/vector-icons';
+import { useCustomBack } from '@/hooks/useCustomBack';
 
 export default function ProfileScreen() {
   const { userId } = useLocalSearchParams(); // Get userId from URL params
   const [profileUser, setProfileUser] = useState<Fighter | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const handleBack = useCustomBack(); // Custom back hook
 
   // Fetches user data once on first mount
   useEffect(() => { 
@@ -80,7 +82,7 @@ export default function ProfileScreen() {
         // Main profile content
         <>
           <View style={styles.backContainer}>
-            <TouchableOpacity onPress={() => router.back()} style={{ marginLeft: theme.spacing[3] }}>
+            <TouchableOpacity onPress={handleBack} style={{ marginLeft: theme.spacing[3] }}>
               <Ionicons name="arrow-back" size={28} color={theme.colors.gray[900]} />
             </TouchableOpacity>
           </View>
