@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image, SafeAreaView, KeyboardAvoidingView, Platform, ScrollView, FlatList } from 'react-native';
 import { useState, useEffect } from 'react';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { theme } from '@/styles/theme';
 import { auth, db } from '@/FirebaseConfig';
 import { GeoPoint } from 'firebase/firestore';
@@ -8,6 +8,10 @@ import { Discipline } from '@/types/fighter';
 import * as ImagePicker from 'expo-image-picker';
 import { addNewUserToDB } from '@/utils/firebaseUtils';
 import { LocationSelector } from '@/components/LocationSelector';
+import { createUserWithEmailAndPassword } from '@firebase/auth';
+// inside your component
+const { email, password } = useLocalSearchParams<{ email?: string; password?: string }>();
+
 
 /**
  * Default profile photo URL used on account creation
@@ -24,18 +28,7 @@ export default function AccountSetupScreen() {
   const [photo, setPhoto] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  // Check authentication status when component mounts
-  useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      if (!user) {
-        console.log('No authenticated user found, redirecting to login');
-        router.replace('/(auth)/login');
-      }
-    });
-
-    return () => unsubscribe();
-  }, []);
+  const { email, password } = useLocalSearchParams<{ email: string; password: string }>();
 
   const handlePhotoChange = async () => {
     try {
@@ -74,13 +67,17 @@ export default function AccountSetupScreen() {
       }
 
       setLoading(true);
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      if (userCredential) {
+        console.log('Sign up success');
+      }
+      setLoading(false);
       const user = auth.currentUser;
 
       if (!user) {
         console.error('No authenticated user found');
         throw new Error('No authenticated user found');
       }
-      
       addNewUserToDB(user.uid, name, age, location, coordinates, discipline, rank, photo);
       
       console.log('Profile created successfully, navigating to tabs');

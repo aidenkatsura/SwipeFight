@@ -58,23 +58,26 @@ export default function LoginScreen() {
   };
 
   const signUp = async () => {
-    try {
+    //try {
       if (!email || !password) {
         setError('Please enter both email and password');
         return;
       }
-
-      setLoading(true);
-      const user = await createUserWithEmailAndPassword(auth, email, password);
-      if (user) {
-        console.log('Sign up success');
-        router.replace('/(auth)/account-setup');
-      }
-    } catch (error: any) {
-      showError(error);
-    } finally {
-      setLoading(false);
-    }
+      router.push({
+        pathname: '/(auth)/account-setup',
+        params: { email, password },
+      });
+      // router.replace('/(auth)/account-setup');
+      // setLoading(true);
+      // const user = await createUserWithEmailAndPassword(auth, email, password);
+      // if (user) {
+      //   console.log('Sign up success');
+      // }
+    // } catch (error: any) {
+    //   showError(error);
+    // } finally {
+    //   setLoading(false);
+    // }
   };
 
   const forgotPassword = async () => {
