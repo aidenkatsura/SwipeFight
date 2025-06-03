@@ -97,7 +97,7 @@ export default function ProfileScreen() {
             <View style={styles.profileHeader}>
               <View style={styles.profileImageContainer}>
                 <Image source={{ uri: user.photo }} style={styles.profileImage} />
-                <TouchableOpacity style={styles.editProfileButton} onPress={handleEditProfilePress}>
+                <TouchableOpacity style={styles.editProfileButton} onPress={handleEditProfilePress} testID='edit-profile-button'>
                   <EditPencil color={theme.colors.white} size={18} accessibilityLabel="Edit profile" />
                 </TouchableOpacity>
               </View>

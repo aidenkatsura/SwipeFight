@@ -129,6 +129,24 @@ describe('ProfileScreen', () => {
     expect(router.replace).toHaveBeenCalledWith('/(auth)/login');
     expect(router.replace).toHaveBeenCalledTimes(1);
   });
+
+  test('navigates to edit profile screen when edit button pressed', async () => {
+    const { getByTestId } = render(
+      <UserContext.Provider value={{ user: mockUser, setUser, fetchUser }}>
+        <ProfileScreen />
+      </UserContext.Provider>
+    );
+
+    // Wait for the edit button to appear
+    await waitFor(() => expect(getByTestId('edit-profile-button')).toBeTruthy(), { timeout: 10000 });
+
+    // Simulate pressing the edit button
+    fireEvent.press(getByTestId('edit-profile-button'));
+
+    // Check that router.push was called with the edit profile route
+    expect(router.push).toHaveBeenCalledWith('/profile-editor/profile-editor');
+    expect(router.push).toHaveBeenCalledTimes(1);
+  });
 });
 
 describe('SwipeCard', () => {
