@@ -17,6 +17,7 @@ jest.mock('expo-router', () => ({
     back: jest.fn(),
     prefetch: jest.fn(),
   },
+  useLocalSearchParams: () => ({})
 }));
 
 // Mock expo-image-picker to prevent errors when accessing the device's media library or camera
