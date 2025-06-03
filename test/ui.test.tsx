@@ -4,6 +4,8 @@ import ProfileScreen from '../app/(tabs)/profile';
 import { UserContext } from '../context/UserContext';
 import { signOut } from 'firebase/auth';
 import { router } from 'expo-router';
+import { SwipeCard } from '../components/SwipeCard';
+import { Fighter } from '@/types/fighter';
 
 jest.mock('firebase/auth', () => ({
   signOut: jest.fn(() => Promise.resolve()), // Mock signOut to resolve successfully
@@ -126,5 +128,63 @@ describe('ProfileScreen', () => {
     // Check that router.replace was called with the login route
     expect(router.replace).toHaveBeenCalledWith('/(auth)/login');
     expect(router.replace).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('SwipeCard', () => {
+  const fighter: Fighter = {
+    id: '1',
+    name: 'Jane Doe',
+    age: 28,
+    photo: 'https://example.com/jane.jpg',
+    discipline: 'Muay Thai',
+    rank: 'Amateur',
+    location: 'Seattle',
+    rating: 1450,
+    wins: 5,
+    losses: 2,
+    draws: 1,
+    coordinates: { // Mock GeoPoint
+      latitude: 0,
+      longitude: 0,
+      isEqual: () => true,
+      toJSON: () => ({ latitude: 0, longitude: 0 }),
+    },
+    likes: [],
+    dislikes: [],
+    achievements: [],
+    recentMatches: [],
+    chats: [],
+  };
+
+  it('renders fighter info', () => {
+    const { getByText } = render(<SwipeCard fighter={fighter} />);
+    expect(getByText('Jane Doe')).toBeTruthy();
+    expect(getByText('28')).toBeTruthy();
+    expect(getByText('Muay Thai')).toBeTruthy();
+    expect(getByText('Amateur')).toBeTruthy();
+    expect(getByText('Seattle')).toBeTruthy();
+    expect(getByText('1450 rating')).toBeTruthy();
+    expect(getByText('5-2-1')).toBeTruthy();
+  });
+
+  it('calls onSwipeLeft when skip button pressed', () => {
+    const onSwipeLeft = jest.fn();
+    const { getAllByLabelText } = render(
+      <SwipeCard fighter={fighter} onSwipeLeft={onSwipeLeft} />
+    );
+    // The skip button has accessibilityLabel="Skip fighter"
+    fireEvent.press(getAllByLabelText('Skip fighter')[0]);
+    expect(onSwipeLeft).toHaveBeenCalled();
+  });
+
+  it('calls onSwipeRight when challenge button pressed', () => {
+    const onSwipeRight = jest.fn();
+    const { getAllByLabelText } = render(
+      <SwipeCard fighter={fighter} onSwipeRight={onSwipeRight} />
+    );
+    // The challenge button has accessibilityLabel="Challenge fighter"
+    fireEvent.press(getAllByLabelText('Challenge fighter')[0]);
+    expect(onSwipeRight).toHaveBeenCalled();
   });
 });

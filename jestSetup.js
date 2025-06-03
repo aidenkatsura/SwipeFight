@@ -38,3 +38,8 @@ jest.mock('firebase/auth', () => ({
   ...jest.requireActual('firebase/auth'),
   getReactNativePersistence: jest.fn(), // Mock getReactNativePersistence to prevent native module errors
 }));
+
+// Mock expo-linear-gradient to prevent import errors in tests
+jest.mock('expo-linear-gradient', () => ({
+  LinearGradient: ({ children }) => children,
+}));
