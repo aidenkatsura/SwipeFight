@@ -43,3 +43,9 @@ jest.mock('firebase/auth', () => ({
 jest.mock('expo-linear-gradient', () => ({
   LinearGradient: ({ children }) => children,
 }));
+
+// Mock react-native-gesture-handler to prevent errors related to gesture handling
+jest.mock('react-native-gesture-handler', () => ({
+  FlatList: jest.requireActual('react-native').FlatList,
+  GestureHandlerRootView: jest.requireActual('react-native').View,
+}));

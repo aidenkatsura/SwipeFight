@@ -1,6 +1,7 @@
-import { render, fireEvent, act, waitFor } from '@testing-library/react-native';
+import { render, fireEvent, act, waitFor, within } from '@testing-library/react-native';
 import ScorecardModal from '../components/ScorecardModal';
 import ProfileScreen from '../app/(tabs)/profile';
+import LeaderboardScreen from '../app/(tabs)/leaderboard';
 import { UserContext } from '../context/UserContext';
 import { signOut } from 'firebase/auth';
 import { router } from 'expo-router';
@@ -15,6 +16,37 @@ jest.mock('../FirebaseConfig', () => ({
   auth: {
     signOut: jest.fn(() => Promise.resolve()), // Mock auth.signOut to resolve successfully
   },
+}));
+
+// Mock firebaseUtils used by screens and components (so we don't make real Firebase calls)
+jest.mock('@/utils/firebaseUtils', () => ({
+  // Used by LeaderboardScreen
+  fetchUsersFromDB: jest.fn(() =>
+    Promise.resolve([
+      {
+        id: '1',
+        name: 'Alice',
+        photo: 'alice.jpg',
+        discipline: 'Boxing',
+        rank: 'Pro',
+        rating: 1800,
+        wins: 12,
+        losses: 1,
+        draws: 0,
+      },
+      {
+        id: '2',
+        name: 'Bob',
+        photo: 'bob.jpg',
+        discipline: 'Muay Thai',
+        rank: 'Amateur',
+        rating: 1500,
+        wins: 8,
+        losses: 3,
+        draws: 2,
+      },
+    ])
+  ),
 }));
 
 describe('ScorecardModal', () => {
@@ -204,5 +236,57 @@ describe('SwipeCard', () => {
     // The challenge button has accessibilityLabel="Challenge fighter"
     fireEvent.press(getAllByLabelText('Challenge fighter')[0]);
     expect(onSwipeRight).toHaveBeenCalled();
+  });
+});
+
+describe('LeaderboardScreen', () => {
+  it('renders each fighter\'s details', async () => {
+    const { getByTestId } = render(<LeaderboardScreen />);
+
+    // Wait for fighters to be rendered
+    await waitFor(() => {
+      const aliceCard = getByTestId('fighter-card-1');
+      const bobCard = getByTestId('fighter-card-2');
+
+      // Check Alice's details
+      expect(within(aliceCard).getByText('Alice')).toBeTruthy();
+      expect(within(aliceCard).getByText('Boxing')).toBeTruthy();
+      expect(within(aliceCard).getByText('1800')).toBeTruthy();
+      expect(within(aliceCard).getByText('12W-1L-0D')).toBeTruthy();
+      expect(within(aliceCard).getByText('Pro')).toBeTruthy();
+
+      // Check Bob's details
+      expect(within(bobCard).getByText('Bob')).toBeTruthy();
+      expect(within(bobCard).getByText('Muay Thai')).toBeTruthy();
+      expect(within(bobCard).getByText('1500')).toBeTruthy();
+      expect(within(bobCard).getByText('8W-3L-2D')).toBeTruthy();
+      expect(within(bobCard).getByText('Amateur')).toBeTruthy();
+    });
+  });
+
+  it('navigates to other profile when fighter is pressed', async () => {
+    const { getByText } = render(<LeaderboardScreen />);
+
+    // Wait for fighters to be rendered
+    await waitFor(() => {
+      fireEvent.press(getByText('Alice'));
+      expect(router.push).toHaveBeenCalledWith({ pathname: '../other_profile/other_profile', params: { userId: '1' } });
+    });
+  });
+
+  it('renders fighters in the correct order', async () => {
+    const { getByTestId } = render(<LeaderboardScreen />);
+
+    // Wait for fighters to be rendered
+    await waitFor(() => {
+      const fightersList = getByTestId('leaderboard-list');
+
+      // Get all fighter cards in the list
+      const fighterCards = within(fightersList).getAllByTestId(/fighter-card-/);
+
+      // Assert order by checking the text within each card
+      expect(within(fighterCards[0]).getByText('Alice')).toBeTruthy();
+      expect(within(fighterCards[1]).getByText('Bob')).toBeTruthy();
+    });
   });
 });
