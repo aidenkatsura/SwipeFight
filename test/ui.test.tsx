@@ -7,6 +7,8 @@ import { signOut } from 'firebase/auth';
 import { router } from 'expo-router';
 import { SwipeCard } from '../components/SwipeCard';
 import { Fighter } from '@/types/fighter';
+import EditProfileScreen from '../app/profile-editor/profile-editor';
+import { updateUserInDB } from '@/utils/firebaseUtils';
 
 jest.mock('firebase/auth', () => ({
   signOut: jest.fn(() => Promise.resolve()), // Mock signOut to resolve successfully
@@ -47,7 +49,94 @@ jest.mock('@/utils/firebaseUtils', () => ({
       },
     ])
   ),
+  // Used by ProfileEditorScreen
+  updateUserInDB: jest.fn(() => Promise.resolve(true)),
 }));
+
+// Mock FirebaseConfig (auth)
+jest.mock('@/FirebaseConfig', () => ({
+  auth: {
+    currentUser: { uid: '1' },
+  },
+}));
+
+// Mock useCustomBack to just be a jest.fn()
+jest.mock('@/hooks/useCustomBack', () => ({
+  useCustomBack: () => jest.fn(),
+}));
+
+// Mock LocationSelector to be a simple input for testing
+jest.mock('@/components/LocationSelector', () => {
+  const React = require('react');
+  const { TextInput } = require('react-native');
+  return {
+    LocationSelector: ({ onSelect, initialLocation }: any) => {
+      // Ensure initialLocation is properly handled
+      const initialValue = initialLocation?.name || '';
+      
+      return (
+        <TextInput
+          testID="location-selector-input"
+          value={initialValue}
+          onChangeText={(text: string) => 
+            onSelect({ 
+              name: text, 
+              lat: initialLocation?.lat || 0, 
+              lng: initialLocation?.lng || 0 
+            })
+          }
+        />
+      );
+    },
+  };
+});
+
+// Mock expo-router's router and hook
+jest.mock('expo-router', () => ({
+  useRouter: () => ({
+    push: jest.fn(),
+    replace: jest.fn(),
+    back: jest.fn(),
+  }),
+  router: {
+    push: jest.fn(),
+    replace: jest.fn(),
+    back: jest.fn(),
+  },
+}));
+
+// Mock the SelectList component so it can be used in tests
+jest.mock('react-native-dropdown-select-list', () => {
+  const React = require('react');
+  const { View, Text, TouchableOpacity } = require('react-native');
+  return {
+    SelectList: ({
+      setSelected,
+      data,
+      defaultOption,
+    }: {
+      setSelected: (value: any) => void;
+      data: Array<{ value: any; label: string }>;
+      defaultOption?: { value: any; label: string };
+    }) => {
+      const handleSelect = (value: any) => setSelected(value);
+      return (
+        <View>
+          <Text>{defaultOption?.value || ''}</Text>
+          {data.map((item) => (
+            <TouchableOpacity 
+              key={item.value} 
+              onPress={() => handleSelect(item.value)}
+              testID={`select-option-${item.value}`}
+            >
+              <Text>{item.label}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      );
+    }
+  };
+});
 
 describe('ScorecardModal', () => {
   const participants = [
@@ -372,5 +461,130 @@ describe('LeaderboardScreen', () => {
       expect(queryByTestId('fighter-card-1')).toBeNull();
       expect(queryByTestId('fighter-card-2')).toBeNull();
     });
+  });
+});
+
+describe('EditProfileScreen', () => {
+  const mockUser = {
+    id: '1',
+    name: 'John Doe',
+    age:30,
+    photo: 'https://example.com/johndoe.jpg',
+    discipline: 'Boxing',
+    rank: 'Pro',
+    location: 'New York',
+    rating: 1500,
+    wins: 10,
+    losses: 2,
+    draws: 1,
+    coordinates: { latitude: 0, longitude: 0, isEqual: () => true, toJSON: () => ({ latitude: 0, longitude: 0 }) },
+  };
+
+  let setUser: jest.Mock;
+  let fetchUser: jest.Mock;
+
+  beforeEach(() => {
+    setUser = jest.fn();
+    fetchUser = jest.fn(() => Promise.resolve());
+    global.alert = jest.fn();
+    jest.clearAllMocks();
+  });
+
+  it('renders the profile editor with user info', async () => {
+    const { getByDisplayValue, getByText, getByTestId } = render(
+      <UserContext.Provider value={{ 
+        user: {
+          ...mockUser,
+          location: {
+            name: 'New York',
+            lat: 0,
+            lng: 0
+          }
+        }, 
+        setUser, 
+        fetchUser 
+      }}>
+        <EditProfileScreen />
+      </UserContext.Provider>
+    );
+
+    await act(async () => {
+      await waitFor(() => {
+        // Check text inputs
+        expect(getByDisplayValue('John Doe')).toBeTruthy();
+        expect(getByDisplayValue('30')).toBeTruthy();
+        
+        // Check location through testID and props
+        const locationInput = getByTestId('location-selector-input');
+        expect(locationInput.props.value).toBe('New York');
+        
+        // Check if discipline and rank are displayed
+        expect(getByText('Boxing')).toBeTruthy();
+        expect(getByText('Pro')).toBeTruthy();
+      });
+    });
+  });
+
+  it('allows editing and submitting profile changes', async () => {
+    const { getByDisplayValue, getByText, getByTestId } = render(
+      <UserContext.Provider value={{ user: mockUser, setUser, fetchUser }}>
+        <EditProfileScreen />
+      </UserContext.Provider>
+    );
+
+    await act(async () => {
+      fireEvent.changeText(getByDisplayValue('John Doe'), 'Jane Smith');
+      fireEvent.changeText(getByDisplayValue('30'), '25');
+      fireEvent.press(getByTestId('select-option-MMA'));
+      fireEvent.press(getByTestId('select-option-Beginner'));
+      fireEvent.changeText(getByTestId('location-selector-input'), 'Los Angeles');
+    });
+
+    // Save changes
+    await act(async () => {
+      fireEvent.press(getByText('Save'));
+    });
+
+    await waitFor(() => {
+      expect(setUser).toHaveBeenCalledWith(
+        expect.objectContaining({
+          name: 'Jane Smith',
+          age: 25,
+          discipline: 'MMA',
+          rank: 'Beginner',
+          location: 'Los Angeles'
+        })
+      );
+      expect(updateUserInDB).toHaveBeenCalledWith('1', expect.objectContaining({
+        name: 'Jane Smith',
+        age: 25,
+        discipline: 'MMA',
+        rank: 'Beginner',
+        location: 'Los Angeles'
+      }));
+    });
+  });
+
+  it('shows alert if required fields are empty and does not update DB', async () => {
+    const { getByDisplayValue, getByText } = render(
+      <UserContext.Provider value={{ user: mockUser, setUser, fetchUser }}>
+        <EditProfileScreen />
+      </UserContext.Provider>
+    );
+
+    // Clear name
+    await act(async () => {
+      fireEvent.changeText(getByDisplayValue('John Doe'), '');
+    });
+
+    // Try to save
+    await act(async () => {
+      fireEvent.press(getByText('Save'));
+    });
+
+    // Check results
+    expect(global.alert).toHaveBeenCalled(); // Give some alert to user about missing fields
+    expect(updateUserInDB).not.toHaveBeenCalled();
+    expect(setUser).not.toHaveBeenCalled();
   });
 });

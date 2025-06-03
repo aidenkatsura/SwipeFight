@@ -16,6 +16,7 @@ import { db } from '@/FirebaseConfig';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ACHIEVEMENTS } from '@/types/achievements';
 import { useCustomBack } from '@/hooks/useCustomBack';
+import { defaultPhoto } from '../(auth)/account-setup';
 
 export default function ChatScreen() {
   const { id } = useLocalSearchParams();
@@ -186,7 +187,7 @@ export default function ChatScreen() {
 
     const opponent = chat?.chat.participants.find(p => p.id !== userId);
     const resultForUser = {
-      opponentPhoto: opponent?.photo || 'https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png',
+      opponentPhoto: opponent?.photo || defaultPhoto,
       opponentName: opponent?.name || '',
       date: Timestamp.fromDate(new Date()),
       result: matchResult
