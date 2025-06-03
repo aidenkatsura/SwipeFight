@@ -289,4 +289,88 @@ describe('LeaderboardScreen', () => {
       expect(within(fighterCards[1]).getByText('Bob')).toBeTruthy();
     });
   });
+
+  it('renders the correct fighters when a filter is applied', async () => {
+    const { getByTestId, queryByText, queryByTestId } = render(<LeaderboardScreen />);
+
+    // Wait for fighters to be rendered
+    await waitFor(() => {
+      const fightersList = getByTestId('leaderboard-list');
+      expect(fightersList).toBeTruthy();
+    });
+
+    // Simulate applying the "Boxing" filter
+    const leaderboardScreen = getByTestId('leaderboard-screen');
+    const boxingFilterButton = within(leaderboardScreen).getByTestId('filter-Boxing');
+    fireEvent.press(boxingFilterButton);
+
+    // Wait for the filtered results
+    await waitFor(() => {
+      // Check that only fighters matching the filter are displayed
+      expect(getByTestId('fighter-card-1')).toBeTruthy(); 
+      expect(queryByText('Alice')).toBeTruthy(); // Alice should be displayed
+
+      expect(queryByTestId('fighter-card-2')).toBeNull();
+      expect(queryByText('Bob')).toBeNull(); // Bob should not be displayed
+    });
+  });
+
+  it('renders correct fighters after filtering and unfiltering', async () => {
+    const { getByTestId, queryByText, queryByTestId } = render(<LeaderboardScreen />);
+
+    // Wait for fighters to be rendered
+    await waitFor(() => {
+      const fightersList = getByTestId('leaderboard-list');
+      expect(fightersList).toBeTruthy();
+    });
+
+    // Simulate applying the "Boxing" filter
+    const boxingFilterButton = getByTestId('filter-Boxing');
+    fireEvent.press(boxingFilterButton);
+
+    // Wait for the filtered results
+    await waitFor(() => {
+      // Check that only fighters matching the filter are displayed
+      expect(getByTestId('fighter-card-1')).toBeTruthy(); // Alice should be displayed
+      expect(queryByText('Alice')).toBeTruthy();
+
+      expect(queryByTestId('fighter-card-2')).toBeNull(); // Bob should not be displayed
+      expect(queryByText('Bob')).toBeNull();
+    });
+
+    // Simulate unfiltering by selecting the "All" filter
+    const allFilterButton = getByTestId('filter-All');
+    fireEvent.press(allFilterButton);
+
+    // Wait for the unfiltered results
+    await waitFor(() => {
+      // Check that all fighters are displayed again
+      expect(getByTestId('fighter-card-1')).toBeTruthy(); // Alice should be displayed
+      expect(queryByText('Alice')).toBeTruthy();
+
+      expect(getByTestId('fighter-card-2')).toBeTruthy(); // Bob should be displayed
+      expect(queryByText('Bob')).toBeTruthy();
+    });
+  });
+
+  it('renders no fighters when no matches exist for the filter', async () => {
+    const { getByTestId, queryByTestId } = render(<LeaderboardScreen />);
+
+    // Wait for fighters to be rendered
+    await waitFor(() => {
+      const fightersList = getByTestId('leaderboard-list');
+      expect(fightersList).toBeTruthy();
+    });
+
+    // Simulate applying a filter with no matches
+    const mmaFilterButton = getByTestId('filter-MMA');
+    fireEvent.press(mmaFilterButton);
+
+    // Wait for the filtered results
+    await waitFor(() => {
+      // Check that no fighters are displayed
+      expect(queryByTestId('fighter-card-1')).toBeNull();
+      expect(queryByTestId('fighter-card-2')).toBeNull();
+    });
+  });
 });

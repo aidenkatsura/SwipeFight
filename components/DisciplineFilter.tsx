@@ -44,6 +44,7 @@ export default function DisciplineFilter({
           onPress={() => onSelectDiscipline(discipline)}
           accessibilityLabel={`Filter by ${discipline}`}
           accessibilityState={{ selected: discipline === 'All' ? selectedDisciplines.length === 0 : selectedDisciplines.includes(discipline) }}
+          testID={`filter-${discipline}`}
         >
           <Text
             style={[

@@ -101,12 +101,12 @@ export default function LeaderboardScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} testID='leaderboard-screen'>
       <View style={styles.header}>
         <Text style={styles.title}>Leaderboard</Text>
         <DisciplineFilter 
           selectedDisciplines={selectedDiscipline}
-          onSelectDiscipline={handleFilterChange} 
+          onSelectDiscipline={handleFilterChange}
         />
       </View>
       
