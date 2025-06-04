@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "bolt-expo-nativewind",
-    "slug": "bolt-expo-nativewind",
+    "name": "SwipeFight",
+    "slug": "swipefight",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -10,7 +10,7 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.anonymous.bolt-expo-nativewind"
+      "bundleIdentifier": "com.aidenkatsura.swipefight"
     },
     "web": {
       "bundler": "metro",
