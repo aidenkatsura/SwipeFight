@@ -11,7 +11,7 @@ SwipeFight is a mobile app that connects martial artists with local sparring par
 <br/>
 
 <div align="center">
-  <a href="https://swipefight--t77u5pi7in.expo.app">SwipeFight</a> |
+  <a href="https://swipefight--2k325zsceh.expo.app">SwipeFight</a> |
   <a href="./documentation/UserManual.md">User Manual</a> |
   <a href="./documentation/DeveloperDocumentation.md">Developer Documentation</a>
 </div>
@@ -291,8 +291,8 @@ SwipeFight/
 
 ## Contributors
  - [Aiden Katsuragawa](https://github.com/aidenkatsura) - Project Coordinator
- - [Brian Dinh](https://github.com/brian-dinh-tung)
- - [Calvin Tsai](https://github.com/calvin-tsai)
- - [Josh Chou](https://github.com/jcthewizard)
+ - [Brian Dinh](https://github.com/brian-dinh-tung) - Lead Tester
+ - [Calvin Tsai](https://github.com/calvin-tsai) - Lead Designer
+ - [Josh Chou](https://github.com/jcthewizard) - Project Manager
  - [Sam Zappa](https://github.com/zzzappy) - Lead Developer
  - [Yashveer Paul](https://github.com/YashveerP) - Backend Developer
