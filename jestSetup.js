@@ -38,3 +38,15 @@ jest.mock('firebase/auth', () => ({
   ...jest.requireActual('firebase/auth'),
   getReactNativePersistence: jest.fn(), // Mock getReactNativePersistence to prevent native module errors
 }));
+
+// Mock expo-linear-gradient to prevent import errors in tests
+jest.mock('expo-linear-gradient', () => ({
+  LinearGradient: ({ children }) => children,
+}));
+
+// Mock react-native-gesture-handler to prevent errors related to gesture handling
+jest.mock('react-native-gesture-handler', () => ({
+  FlatList: jest.requireActual('react-native').FlatList,
+  GestureHandlerRootView: jest.requireActual('react-native').View,
+  ScrollView: jest.requireActual('react-native').ScrollView,
+}));

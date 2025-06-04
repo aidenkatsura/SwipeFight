@@ -79,8 +79,11 @@ export default function LeaderboardScreen() {
     ) : null;
     
     return (
-      <TouchableOpacity style={styles.fighterItem}
-                onPress={() => router.push({ pathname: '../other_profile/other_profile', params: { userId: item.id } })}>
+      <TouchableOpacity
+        style={styles.fighterItem}
+        testID={`fighter-card-${item.id}`}
+        onPress={() => router.push({ pathname: '../other_profile/other_profile', params: { userId: item.id } })}
+      >
         <Text style={styles.rank}>{index + 1}</Text>
         {medal && <View style={styles.medalContainer}>{medal}</View>}
         <Image source={{ uri: item.photo }} style={styles.fighterImage} />
@@ -98,21 +101,22 @@ export default function LeaderboardScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} testID='leaderboard-screen'>
       <View style={styles.header}>
         <Text style={styles.title}>Leaderboard</Text>
         <DisciplineFilter 
           selectedDisciplines={selectedDiscipline}
-          onSelectDiscipline={handleFilterChange} 
+          onSelectDiscipline={handleFilterChange}
         />
       </View>
       
       <FlatList
-      data={filteredFighters}
+        data={filteredFighters}
         keyExtractor={(item) => item.id}
         renderItem={renderFighterItem}
-        contentContainerStyle={styles.listContent}       
-        />
+        contentContainerStyle={styles.listContent}
+        testID='leaderboard-list'
+      />
     </SafeAreaView>
   );
 }
