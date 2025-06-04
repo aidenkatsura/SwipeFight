@@ -77,12 +77,10 @@ export const LocationSelector = ({ onSelect, initialLocation,}: {
   return (
   <View>
     {/* Selected / Current Location (not tied to typing) */}
-    <TextInput
-      value={query}
-      editable={false}
-      placeholder="Selected location will appear here"
-      style={[styles.input]}
-    />
+      <Text style={styles.input}>
+        {query || 'Selected location will appear here'}
+      </Text>
+
 
     {/* Search Input */}
     <TextInput
