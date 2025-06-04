@@ -48,4 +48,5 @@ jest.mock('expo-linear-gradient', () => ({
 jest.mock('react-native-gesture-handler', () => ({
   FlatList: jest.requireActual('react-native').FlatList,
   GestureHandlerRootView: jest.requireActual('react-native').View,
+  ScrollView: jest.requireActual('react-native').ScrollView,
 }));

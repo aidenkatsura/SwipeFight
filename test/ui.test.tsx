@@ -10,12 +10,17 @@ import { Fighter } from '@/types/fighter';
 import EditProfileScreen from '../app/profile-editor/profile-editor';
 import { updateUserInDB } from '@/utils/firebaseUtils';
 import ChatScreen from '../app/chat/[id]';
+import LoginScreen from '@/app/(auth)/login';
+import { sendPasswordResetEmail, signInWithEmailAndPassword } from 'firebase/auth';
 
 jest.mock('firebase/auth', () => ({
   signOut: jest.fn(() => Promise.resolve()), // Mock signOut to resolve successfully
   getAuth: jest.fn(() => ({
     currentUser: { uid: '1' }
   })),
+  signInWithEmailAndPassword: jest.fn(),
+  createUserWithEmailAndPassword: jest.fn(),
+  sendPasswordResetEmail: jest.fn()
 }));
 
 jest.mock('../FirebaseConfig', () => ({
@@ -809,6 +814,172 @@ describe('ChatScreen', () => {
     // Now the modal should be open
     await waitFor(() => {
       expect(queryByTestId('report-result-modal')).toBeTruthy();
+    });
+  });
+});
+
+describe('LoginScreen', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    global.alert = jest.fn();
+  });
+
+  it('renders login form fields', () => {
+    const { getByPlaceholderText, getByText } = render(<LoginScreen />);
+
+    expect(getByPlaceholderText('Enter your email')).toBeTruthy();
+    expect(getByPlaceholderText('Enter your password')).toBeTruthy();
+    expect(getByText('Login')).toBeTruthy();
+    expect(getByText('Create Account')).toBeTruthy();
+    expect(getByText('Forgot Password?')).toBeTruthy();
+  });
+
+  it('shows error if login is attempted with empty fields', async () => {
+    const { getByText } = render(<LoginScreen />);
+    
+    await act(async () => {
+      fireEvent.press(getByText('Login'));
+    });
+
+    await waitFor(() => {
+      expect(getByText('Please enter both email and password')).toBeTruthy();
+    });
+  });
+
+  it('calls signInWithEmailAndPassword and navigates on success', async () => {
+    const { getByPlaceholderText, getByText } = render(<LoginScreen />);
+    const mockSignIn = jest.fn().mockResolvedValue({ user: { uid: 'test-uid' } });
+    (signInWithEmailAndPassword as jest.Mock).mockImplementation(mockSignIn);
+
+    // Set email
+    await act(async () => {
+      fireEvent.changeText(getByPlaceholderText('Enter your email'), 'test@example.com');
+    });
+
+    // Set password
+    await act(async () => {
+      fireEvent.changeText(getByPlaceholderText('Enter your password'), 'password123');
+    });
+
+    // Check state
+    await waitFor(() => {
+      expect(getByPlaceholderText('Enter your email').props.value).toBe('test@example.com');
+      expect(getByPlaceholderText('Enter your password').props.value).toBe('password123');
+    });
+
+    // Press Login
+    await act(async () => {
+      fireEvent.press(getByText('Login'));
+    });
+
+    await waitFor(() => {
+      expect(signInWithEmailAndPassword).toHaveBeenCalledWith(
+        expect.anything(),
+        'test@example.com',
+        'password123'
+      );
+      expect(router.replace).toHaveBeenCalledWith('/(tabs)');
+    });
+  });
+
+  it('shows error if login fails', async () => {
+    const { getByPlaceholderText, getByText, queryByText } = render(<LoginScreen />);
+    const mockSignIn = jest.fn().mockRejectedValue({ code: 'auth/wrong-password' });
+    (signInWithEmailAndPassword as jest.Mock).mockImplementation(mockSignIn);
+
+    // Set email
+    await act(async () => {
+      fireEvent.changeText(getByPlaceholderText('Enter your email'), 'test@example.com');
+    });
+
+    // Set password
+    await act(async () => {
+      fireEvent.changeText(getByPlaceholderText('Enter your password'), 'wrongpass');
+    });
+
+    // Attempt to login
+    await act(async () => {
+      fireEvent.press(getByText('Login'));
+    });
+
+    await waitFor(() => {
+      expect(getByText('The password you entered is incorrect. Please try again.')).toBeTruthy();
+    });
+  });
+
+  it('navigates to account setup on account creation', async () => {
+    const { getByText, getByPlaceholderText } = render(<LoginScreen />);
+
+    // Set email
+    await act(async () => {
+      fireEvent.changeText(getByPlaceholderText('Enter your email'), 'test@example.com');
+    });
+
+    // Set password
+    await act(async () => {
+      fireEvent.changeText(getByPlaceholderText('Enter your password'), 'password123');
+    });
+
+    // Wait for state to update
+    await waitFor(() => {
+      expect(getByPlaceholderText('Enter your email').props.value).toBe('test@example.com');
+      expect(getByPlaceholderText('Enter your password').props.value).toBe('password123');
+    });
+
+    // Press Create Account
+    await act(async () => {
+      fireEvent.press(getByText('Create Account'));
+    });
+
+    await waitFor(() => {
+      expect(router.push).toHaveBeenCalledWith({
+        pathname: '/(auth)/account-setup',
+        params: { 
+          email: 'test@example.com',
+          password: 'password123'
+        }
+      });
+    });
+  });
+
+  it('shows error if forgot password is pressed with empty email', async () => {
+    const { getByText } = render(<LoginScreen />);
+    
+    await act(async () => {
+      fireEvent.press(getByText('Forgot Password?'));
+    });
+
+    await waitFor(() => {
+      expect(getByText('Please enter your email')).toBeTruthy();
+    });
+  });
+
+  it('sends password reset email if forgot password is pressed with email', async () => {
+    const { getByPlaceholderText, getByText } = render(<LoginScreen />);
+    const mockSendReset = jest.fn().mockResolvedValue(undefined);
+    (sendPasswordResetEmail as jest.Mock).mockImplementation(mockSendReset);
+
+    // Change email input
+    await act(async () => {
+      fireEvent.changeText(getByPlaceholderText('Enter your email'), 'test@example.com');
+    });
+
+    // Wait for state to update
+    await waitFor(() => {
+      expect(getByPlaceholderText('Enter your email').props.value).toBe('test@example.com');
+    });
+
+    // Press forgot password
+    await act(async () => {
+      fireEvent.press(getByText('Forgot Password?'));
+    });
+
+    await waitFor(() => {
+      expect(sendPasswordResetEmail).toHaveBeenCalledWith(
+        expect.anything(),
+        'test@example.com'
+      );
+      expect(global.alert).toHaveBeenCalledWith('Password reset email sent');
     });
   });
 });
