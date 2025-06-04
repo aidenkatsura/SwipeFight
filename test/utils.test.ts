@@ -5,7 +5,7 @@ import { ChatMessage } from '../types/chat';
 import { Discipline, Fighter } from '@/types/fighter';
 import { Timestamp } from 'firebase/firestore';
 
-describe('Swiping Screen', () => {
+describe('Filtering', () => {
   describe('Filter by Discipline', () => {
     test('should only show users with the selected discipline', () => {
       const selectedDiscipline = "Boxing";
