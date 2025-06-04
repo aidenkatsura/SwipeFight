@@ -5,14 +5,6 @@ import { ChatMessage } from '../types/chat';
 import { Discipline, Fighter } from '@/types/fighter';
 import { Timestamp } from 'firebase/firestore';
 
-describe('Dummy Test: Array', () => {
-  describe('#indexOf()', () => {
-    test('should return -1 when the value is not present', () => {
-      expect([1, 2, 3].indexOf(4)).toBe(-1);
-    });
-  });
-});
-
 describe('Swiping Screen', () => {
   describe('Filter by Discipline', () => {
     test('should only show users with the selected discipline', () => {
