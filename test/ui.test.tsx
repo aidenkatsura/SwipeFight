@@ -9,9 +9,13 @@ import { SwipeCard } from '../components/SwipeCard';
 import { Fighter } from '@/types/fighter';
 import EditProfileScreen from '../app/profile-editor/profile-editor';
 import { updateUserInDB } from '@/utils/firebaseUtils';
+import ChatScreen from '../app/chat/[id]';
 
 jest.mock('firebase/auth', () => ({
   signOut: jest.fn(() => Promise.resolve()), // Mock signOut to resolve successfully
+  getAuth: jest.fn(() => ({
+    currentUser: { uid: '1' }
+  })),
 }));
 
 jest.mock('../FirebaseConfig', () => ({
@@ -51,6 +55,48 @@ jest.mock('@/utils/firebaseUtils', () => ({
   ),
   // Used by ProfileEditorScreen
   updateUserInDB: jest.fn(() => Promise.resolve(true)),
+  // Used by ChatScreen
+  fetchUserFromDB: jest.fn(() => Promise.resolve({
+    id: '2',
+    name: 'Other User',
+    photo: 'https://example.com/otheruser.jpg',
+    discipline: 'MMA',
+    rank: 'Pro',
+    location: 'Chicago',
+    rating: 1600,
+    wins: 8,
+    losses: 3,
+    draws: 0,
+    coordinates: {
+      latitude: 0, 
+      longitude: 0,
+      isEqual: () => true,
+      toJSON: () => ({ latitude: 0, longitude: 0 })
+    },
+    likes: [],
+    dislikes: [],
+    achievements: [],
+    recentMatches: [],
+    chats: []
+  })),
+  sendMessage: jest.fn(() => Promise.resolve(true)),
+  fetchChatFromDB: jest.fn(() => Promise.resolve({
+    id: 'chat1',
+    participants: [
+      { id: '1', name: 'Current User' },
+      { id: '2', name: 'Other User' }
+    ],
+    messages: [
+      { id: 'msg1', message: 'Hello there!', senderId: '2', timestamp: { toDate: () => new Date(2025, 5, 1, 10, 0) } },
+      { id: 'msg2', message: 'Hi! How are you?', senderId: '1', timestamp: { toDate: () => new Date(2025, 5, 1, 10, 1) } }
+    ],
+    lastMessage: {
+      message: 'Hi! How are you?',
+      senderId: '1',
+      timestamp: { toDate: () => new Date(2025, 5, 1, 10, 1) }
+    },
+    unreadCounts: { '1': 0, '2': 1 }
+  }))
 }));
 
 // Mock FirebaseConfig (auth)
@@ -103,6 +149,8 @@ jest.mock('expo-router', () => ({
     replace: jest.fn(),
     back: jest.fn(),
   },
+  useLocalSearchParams: jest.fn().mockImplementation(() => ({ id: 'chat1' })),
+  Link: ({ children }: { children: React.ReactNode }) => children,
 }));
 
 // Mock the SelectList component so it can be used in tests
@@ -135,6 +183,85 @@ jest.mock('react-native-dropdown-select-list', () => {
         </View>
       );
     }
+  };
+});
+
+// Mock @expo/vector-icons
+jest.mock('@expo/vector-icons', () => ({
+  Ionicons: 'Ionicons-Mock',
+  AntDesign: 'AntDesign-Mock',
+  MaterialCommunityIcons: 'MaterialCommunityIcons-Mock',
+  FontAwesome: 'FontAwesome-Mock',
+}));
+
+// Mock firebase/firestore completely
+jest.mock('firebase/firestore', () => {
+  return {
+    doc: jest.fn(() => ({})),
+    getDoc: jest.fn(() => Promise.resolve({
+      exists: () => true,
+      data: () => ({
+        id: 'chat1',
+        participants: [
+          { id: '1', name: 'Current User' },
+          { id: '2', name: 'Other User' }
+        ],
+        messages: [
+          { id: 'msg1', message: 'Hello there!', senderId: '2', timestamp: { toDate: () => new Date(2025, 5, 1, 10, 0) } },
+          { id: 'msg2', message: 'Hi! How are you?', senderId: '1', timestamp: { toDate: () => new Date(2025, 5, 1, 10, 1) } }
+        ],
+        lastMessage: {
+          message: 'Hi! How are you?',
+          senderId: '1',
+          timestamp: { toDate: () => new Date(2025, 5, 1, 10, 1) }
+        },
+        unreadCounts: { '1': 0, '2': 1 }
+      })
+    })),
+    collection: jest.fn(() => ({})),
+    addDoc: jest.fn(() => Promise.resolve({ id: 'newMsg1' })),
+    updateDoc: jest.fn(() => Promise.resolve()),
+    onSnapshot: jest.fn((_, callback) => {
+      callback({
+        exists: () => true,
+        data: () => ({
+          id: 'chat1',
+          participants: [
+            { id: '1', name: 'Current User' },
+            { id: '2', name: 'Other User' }
+          ],
+          messages: [
+            { id: 'msg1', message: 'Hello there!', senderId: '2', timestamp: { toDate: () => new Date(2025, 5, 1, 10, 0) } },
+            { id: 'msg2', message: 'Hi! How are you?', senderId: '1', timestamp: { toDate: () => new Date(2025, 5, 1, 10, 1) } }
+          ],
+          lastMessage: {
+            message: 'Hi! How are you?',
+            senderId: '1',
+            timestamp: { toDate: () => new Date(2025, 5, 1, 10, 1) }
+          },
+          unreadCounts: { '1': 0, '2': 1 }
+        })
+      });
+      return jest.fn(); // Return a cleanup function
+    }),
+    arrayUnion: jest.fn((value) => value),
+    increment: jest.fn((value) => value),
+    Timestamp: {
+      now: jest.fn(() => ({
+        toDate: () => new Date()
+      })),
+      fromDate: jest.fn((date) => ({
+        toDate: () => date,
+        seconds: Math.floor(date.getTime() / 1000),
+        nanoseconds: (date.getTime() % 1000) * 1000000
+      }))
+    },
+    GeoPoint: jest.fn((lat, lng) => ({
+      latitude: lat,
+      longitude: lng,
+      isEqual: () => true,
+      toJSON: () => ({ latitude: lat, longitude: lng })
+    }))
   };
 });
 
@@ -586,5 +713,102 @@ describe('EditProfileScreen', () => {
     expect(global.alert).toHaveBeenCalled(); // Give some alert to user about missing fields
     expect(updateUserInDB).not.toHaveBeenCalled();
     expect(setUser).not.toHaveBeenCalled();
+  });
+});
+
+describe('ChatScreen', () => {
+  beforeEach(() => {
+    // Reset mocks between tests
+    jest.clearAllMocks();
+    
+    // Mock expo-router's useLocalSearchParams to return chat ID
+    require('expo-router').useLocalSearchParams.mockReturnValue({ id: 'chat1' });
+    
+    // Reset the getAuth mock to ensure it returns the expected value
+    require('firebase/auth').getAuth.mockReturnValue({
+      currentUser: { uid: '1' }
+    });
+  });
+
+  it('renders the chat screen with other user info', async () => {
+    const { queryByText, queryByPlaceholderText } = render(<ChatScreen />);
+    
+    // Check for messaging UI elements first with longer timeout
+    await waitFor(() => {
+      expect(queryByPlaceholderText('Type a message...')).toBeTruthy();
+    }, { timeout: 5000 });
+    
+    // Then look for the other user's name
+    await waitFor(() => {
+      expect(queryByText('Other User')).toBeTruthy();
+    }, { timeout: 5000 });
+  });
+
+  it('displays messages from the chat', async () => {
+    const { queryByText } = render(<ChatScreen />);
+    
+    await waitFor(() => {
+      // Check that messages are rendered
+      expect(queryByText('Hello there!')).toBeTruthy();
+      expect(queryByText('Hi! How are you?')).toBeTruthy();
+    });
+  });
+
+  it('allows sending a new message', async () => {
+    const { getByPlaceholderText, getByLabelText } = render(<ChatScreen />);
+    
+    // Wait for the component to fully render
+    await waitFor(() => {
+      expect(getByPlaceholderText('Type a message...')).toBeTruthy();
+    });
+    
+    // Type a new message in the input
+    const messageInput = getByPlaceholderText('Type a message...');
+    fireEvent.changeText(messageInput, 'Test message');
+    
+    // Press the send button
+    const sendButton = getByLabelText('Send message');
+    fireEvent.press(sendButton);
+    
+    // Check that sendMessage was called with the chat ID as first parameter
+    await waitFor(() => {
+      expect(require('@/utils/firebaseUtils').sendMessage).toHaveBeenCalledWith(
+        'chat1',
+        expect.objectContaining({
+          message: 'Test message',
+          senderId: '1',
+          receiverId: '2'
+        })
+      );
+    });
+  });
+  
+  it('shows the report result button', async () => {
+    const { getByText } = render(<ChatScreen />);
+    
+    await waitFor(() => {
+      // Check that Record Fight button is visible
+      expect(getByText('Report Result')).toBeTruthy();
+    });
+  });
+  
+  it('opens scorecard modal when Record Fight button is pressed', async () => {
+    const { queryByTestId, findByText } = render(<ChatScreen />);
+    
+    // Wait for the component to finish loading and for the button to appear
+    const reportButton = await findByText('Report Result', {}, { timeout: 5000 });
+    
+    // Initially the modal should be closed
+    expect(queryByTestId('report-result-modal')).toBeNull();
+    
+    // Press the button once it's available
+    await act(async () => {
+      fireEvent.press(reportButton);
+    });
+    
+    // Now the modal should be open
+    await waitFor(() => {
+      expect(queryByTestId('report-result-modal')).toBeTruthy();
+    });
   });
 });

@@ -13,9 +13,10 @@ interface ScorecardModalProps {
     name: string;
     photo: string;
   }[];
+  testID?: string;
 }
 
-export default function ScorecardModal({ visible, onClose, onSubmit, participants }: ScorecardModalProps) {
+export default function ScorecardModal({ visible, onClose, onSubmit, participants, testID }: ScorecardModalProps) {
   const [selectedWinner, setSelectedWinner] = useState<string>('');
 
   const handleSubmit = () => {
@@ -31,6 +32,7 @@ export default function ScorecardModal({ visible, onClose, onSubmit, participant
       animationType="slide"
       transparent={true}
       onRequestClose={onClose}
+      testID={testID}
     >
       <View style={styles.modalOverlay}>
         <View style={styles.modalContent}>

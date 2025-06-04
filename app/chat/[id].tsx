@@ -372,7 +372,7 @@ export default function ChatScreen() {
           onClose={() => setIsScorecardVisible(false)}
           onSubmit={handleSubmitResult}
           participants={chat.chat.participants}
-
+          testID='report-result-modal'
         />
       </SafeAreaView>
     </GestureHandlerRootView>
