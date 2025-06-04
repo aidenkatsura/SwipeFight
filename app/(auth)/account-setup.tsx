@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image, SafeAreaView, KeyboardAvoidingView, Platform, ScrollView, FlatList } from 'react-native';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { router, useLocalSearchParams } from 'expo-router';
 import { theme } from '@/styles/theme';
 import { auth, db } from '@/FirebaseConfig';
@@ -9,8 +9,6 @@ import * as ImagePicker from 'expo-image-picker';
 import { addNewUserToDB } from '@/utils/firebaseUtils';
 import { LocationSelector } from '@/components/LocationSelector';
 import { createUserWithEmailAndPassword } from '@firebase/auth';
-// inside your component
-const { email, password } = useLocalSearchParams<{ email?: string; password?: string }>();
 
 
 /**
