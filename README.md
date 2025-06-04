@@ -288,3 +288,11 @@ SwipeFight/
 ├── utils/                       # Methods
 └── LICENSE                      # Project license
 ```
+
+## Contributors
+ - [Aiden Katsuragawa](https://github.com/aidenkatsura) - Project Coordinator
+ - [Brian Dinh](https://github.com/brian-dinh-tung)
+ - [Calvin Tsai](https://github.com/calvin-tsai)
+ - [Josh Chou](https://github.com/jcthewizard)
+ - [Sam Zappa](https://github.com/zzzappy) - Lead Developer
+ - [Yashveer Paul](https://github.com/YashveerP) - Backend Developer
