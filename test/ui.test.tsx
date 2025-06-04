@@ -883,7 +883,7 @@ describe('LoginScreen', () => {
   });
 
   it('shows error if login fails', async () => {
-    const { getByPlaceholderText, getByText, queryByText } = render(<LoginScreen />);
+    const { getByPlaceholderText, getByText } = render(<LoginScreen />);
     const mockSignIn = jest.fn().mockRejectedValue({ code: 'auth/wrong-password' });
     (signInWithEmailAndPassword as jest.Mock).mockImplementation(mockSignIn);
 
